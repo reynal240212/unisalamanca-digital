@@ -75,71 +75,87 @@ if (loginForm) {
         setLoading(true);
 
         try {
-            // Consulta directa a Supabase (Backend-less)
-            const { data: user, error } = await supabaseClient
+            // 1. Intentar Autenticación Nativa de Supabase
+            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (!authError && authData.user) {
+                // Obtener perfil vinculado en public.user
+                const { data: user, error: profileError } = await supabaseClient
+                    .from('user')
+                    .select('*')
+                    .eq('id', authData.user.id)
+                    .single();
+                
+                if (!profileError && user) {
+                    processLogin(user, email, rememberMe);
+                    return;
+                }
+            }
+
+            // 2. Fallback: Autenticación Manual (Legacy para usuarios no migrados)
+            const { data: legacyUser, error: legacyError } = await supabaseClient
                 .from('user')
                 .select('*')
                 .eq('email', email)
                 .single();
 
-            if (error || !user) {
-                showError("Usuario no encontrado o error de red");
-                setLoading(false);
-                generateCaptcha();
-                return;
+            if (!legacyError && legacyUser && legacyUser.password_hash) {
+                const passwordMatch = dcodeIO.bcrypt.compareSync(password, legacyUser.password_hash);
+                if (passwordMatch) {
+                    processLogin(legacyUser, email, rememberMe);
+                    return;
+                }
             }
 
-            // Verificar contraseña usando bcryptjs (localmente en el navegador)
-            const passwordMatch = dcodeIO.bcrypt.compareSync(password, user.password_hash);
+            // Si ambos fallan
+            showError("Credenciales incorrectas o usuario no encontrado");
+            setLoading(false);
+            generateCaptcha();
 
-            if (passwordMatch) {
-                // Lógica de Recordarme
-                if (rememberMe) {
-                    localStorage.setItem('remembered_email', email);
-                } else {
-                    localStorage.removeItem('remembered_email');
-                }
-
-                // Determinar si es un login para validador o estudiante
-                const urlParams = new URLSearchParams(window.location.search);
-                const requestedRole = urlParams.get('role');
-
-                // En el modo backend-less, usamos una sesión local simple
-                localStorage.setItem('auth_token', 'supabase_session_active');
-
-                if (requestedRole === 'validador') {
-                    if (user.role !== 'VALIDADOR' && user.role !== 'ADMIN') {
-                        showError("Error: Esta cuenta no tiene permisos de validador.");
-                        setLoading(false);
-                        return;
-                    }
-                    localStorage.setItem('user_role', user.role);
-                    window.location.href = '../validator/index.html';
-                } else if (user.role === 'ADMIN') {
-                    // Admin login
-                    localStorage.setItem('user_role', 'ADMIN');
-                    window.location.href = '../admin/index.html';
-                } else {
-                    // Estudiante
-                    localStorage.setItem('student_user', JSON.stringify(user));
-                    
-                    if (user.must_change_password) {
-                        window.location.href = 'change-password.html';
-                    } else {
-                        window.location.href = 'index.html';
-                    }
-                }
-            } else {
-                showError("Credenciales incorrectas");
-                setLoading(false);
-                generateCaptcha();
-            }
         } catch (error) {
             console.error(error);
             showError("Error de comunicación con Supabase");
             setLoading(false);
         }
     });
+}
+
+function processLogin(user, email, rememberMe) {
+    // Lógica de Recordarme
+    if (rememberMe) {
+        localStorage.setItem('remembered_email', email);
+    } else {
+        localStorage.removeItem('remembered_email');
+    }
+
+    // Guardar sesión local
+    localStorage.setItem('auth_token', 'supabase_session_active');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedRole = urlParams.get('role');
+
+    if (requestedRole === 'validador') {
+        if (user.role !== 'VALIDADOR' && user.role !== 'ADMIN') {
+            showError("Error: Esta cuenta no tiene permisos de validador.");
+            setLoading(false);
+            return;
+        }
+        localStorage.setItem('user_role', user.role);
+        window.location.href = '../validator/index.html';
+    } else if (user.role === 'ADMIN') {
+        localStorage.setItem('user_role', 'ADMIN');
+        window.location.href = '../admin/index.html';
+    } else {
+        localStorage.setItem('student_user', JSON.stringify(user));
+        if (user.must_change_password) {
+            window.location.href = 'change-password.html';
+        } else {
+            window.location.href = 'index.html';
+        }
+    }
 }
 
 function showError(message) {
