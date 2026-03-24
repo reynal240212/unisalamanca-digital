@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.env
+
+# Database
+*.db
+*.sqlite3
+
+# Node/Vercel
+node_modules/
+.vercel/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+frontend/uploads/*
+!frontend/uploads/.gitkeep
+api/.env
+backend/.env

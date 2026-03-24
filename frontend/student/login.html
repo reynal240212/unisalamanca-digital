@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | UniSalamanca Digital Identity</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4c1d95; /* Morado UniSalamanca */
+            --secondary: #06b6d4; /* Cian UniSalamanca */
+            --bg: #f8fafc;
+            --text-dark: #1e1b4b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 100%);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-dark);
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(76, 29, 149, 0.15);
+            overflow: hidden;
+            margin: 20px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-side {
+            flex: 1;
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 40px;
+            color: white;
+            position: relative;
+            background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+
+        .mascot-container {
+            width: 100%;
+            max-width: 280px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .mascot-container img {
+            width: 100%;
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.3));
+        }
+
+        .info-side h2 {
+            font-size: 1.8rem;
+            text-align: center;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .info-side p {
+            font-size: 1rem;
+            opacity: 0.9;
+            text-align: center;
+            margin-top: 15px;
+            line-height: 1.5;
+            max-width: 300px;
+        }
+
+        .form-side {
+            flex: 1.2;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo-box {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .logo-box img {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            margin-bottom: 5px;
+            margin-left: -10px;
+            mix-blend-mode: multiply; /* Elimina el fondo blanco de la imagen original */
+        }
+
+        .logo-box p {
+            color: var(--text-light);
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            background: #fcfcfd;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(76, 29, 149, 0.05);
+        }
+
+        .toggle-btn {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .captcha-box {
+            background: #f5f3ff;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(76, 29, 149, 0.1);
+        }
+
+        .captcha-header {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .captcha-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .puzzle-text {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.3rem;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            min-width: 100px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        #captchaInput {
+            width: 80px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px -5px rgba(6, 182, 212, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .login-btn:hover {
+            background: #0891b2;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -5px rgba(6, 182, 212, 0.5);
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.9rem;
+            background: #fee2e2;
+            padding: 14px;
+            border-radius: 16px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 850px) {
+            .container {
+                flex-direction: column;
+                max-width: 450px;
+            }
+            .info-side {
+                padding: 40px 30px;
+            }
+            .mascot-container {
+                max-width: 180px;
+            }
+            .form-side {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="info-side">
+            <div class="mascot-container">
+                <img src="img/squirrel.png" alt="Mascota Ardilla UniSalamanca">
+            </div>
+            <h2>NUESTRA COMUNIDAD</h2>
+            <p>El talento se está moviendo y merece ser visto. Muy pronto lo verás...</p>
+        </div>
+        
+        <div class="form-side">
+            <div class="logo-box">
+                <img src="img/logo.png" alt="UniSalamanca Logo Oficial">
+                <p>Identidad Digital Estudiantil</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Correo Universitario</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" placeholder="usuario@unisalamanca.edu.co" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" placeholder="Tu contraseña" required>
+                        <button type="button" id="togglePassword" class="toggle-btn">
+                            <span id="toggleIcon">👁️</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="captcha-box">
+                    <label class="captcha-header">Verificación de Seguridad</label>
+                    <div class="captcha-content">
+                        <div id="puzzleText" class="puzzle-text">Cargando...</div>
+                        <input type="number" id="captchaInput" placeholder="?" required>
+                    </div>
+                </div>
+                
+                <button type="submit" id="loginBtn" class="login-btn">
+                    <span class="btn-text">INGRESAR AHORA</span>
+                    <span class="loader hidden"></span>
+                </button>
+                
+                <div id="errorMsg" class="error-msg"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

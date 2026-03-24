@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración | UniSalamanca</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo">UniSalamanca</div>
+            <nav>
+                <ul id="menu">
+                    <li id="menu-students" class="active"><span class="icon">👥</span> Estudiantes</li>
+                    <li id="menu-reports"><span class="icon">📊</span> Reportes de Acceso</li>
+                    <li id="menu-settings"><span class="icon">⚙️</span> Configuración</li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="btn-logout" class="btn-logout">
+                    <span class="icon">🚪</span> Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <main class="content">
+            <!-- Sección: Estudiantes -->
+            <section id="students-view">
+                <header class="content-header">
+                    <div class="header-title">
+                        <h1>Gestión de Identidades</h1>
+                        <p class="subtitle">Administra los usuarios y sus credenciales digitales</p>
+                    </div>
+                    <button id="btn-open-modal" class="btn-primary">+ Nuevo Estudiante</button>
+                </header>
+
+                <div class="toolbar">
+                    <div class="search-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="student-search" placeholder="Buscar estudiante por nombre o programa...">
+                    </div>
+                </div>
+
+                <section class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Total Estudiantes</span>
+                        <span id="total-students" class="stat-value">...</span>
+                    </div>
+                    <div class="stat-card success">
+                        <span class="stat-label">Identidades Activas</span>
+                        <span id="active-students" class="stat-value">...</span>
+                    </div>
+                    <div class="stat-card danger">
+                        <span class="stat-label">Suspendidos</span>
+                        <span id="suspended-students" class="stat-value">...</span>
+                    </div>
+                </section>
+
+                <section class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Estudiante</th>
+                                <th>Programa</th>
+                                <th>ID (UUID)</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px;">Cargando estudiantes...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+
+            <!-- Sección: Reportes -->
+            <section id="reports-view" class="hidden">
+                <header class="content-header">
+                    <h1>Reportes de Acceso</h1>
+                </header>
+                <section class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Estudiante ID</th>
+                                <th>Fecha/Hora</th>
+                                <th>Ubicación</th>
+                                <th>Resultado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-table-body">
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+
+            <!-- Sección: Configuración -->
+            <section id="settings-view" class="hidden">
+                <header class="content-header">
+                    <h1>Configuración del Sistema</h1>
+                </header>
+                <div class="card">
+                    <p>Módulo en desarrollo. Aquí podrás configurar los tiempos de expiración y claves de seguridad.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal: Nuevo Estudiante -->
+    <div id="student-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Registrar Nuevo Estudiante</h2>
+                <button id="btn-close-modal" class="close-btn">&times;</button>
+            </div>
+            <form id="student-form">
+                <div class="form-group">
+                    <label for="name">Nombre Completo</label>
+                    <input type="text" id="name" name="name" placeholder="Ej: Juan Perez" required>
+                </div>
+                <div class="form-group">
+                    <label for="program">Programa Académico</label>
+                    <select id="program" name="program" required>
+                        <option value="" disabled selected>Seleccione un programa</option>
+                        <optgroup label="Pregrados">
+                            <option value="Ingeniería de Sistemas de Información">Ingeniería de Sistemas de Información</option>
+                            <option value="Finanzas y Comercio Internacional">Finanzas y Comercio Internacional</option>
+                            <option value="Administración de Empresas">Administración de Empresas</option>
+                            <option value="Contaduría Pública">Contaduría Pública</option>
+                        </optgroup>
+                        <optgroup label="Tecnólogos">
+                            <option value="Gestión de Comercio Exterior">Gestión de Comercio Exterior</option>
+                            <option value="Gestión Bancaria y Financiera">Gestión Bancaria y Financiera</option>
+                            <option value="Desarrollo de Software">Desarrollo de Software</option>
+                        </optgroup>
+                        <optgroup label="Técnicos">
+                            <option value="Técnico Laboral en Auxiliar de Primera Infancia">Técnico Laboral en Auxiliar de Primera Infancia</option>
+                            <option value="Técnico en Sistemas de Telecomunicaciones">Técnico en Sistemas de Telecomunicaciones</option>
+                            <option value="Técnico en Recreación y Deportes">Técnico en Recreación y Deportes</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="expiry">Fecha de Vencimiento de Credencial</label>
+                    <input type="date" id="expiry" name="expiry" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="btn-cancel">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar Estudiante</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Contenedor de Toasts -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

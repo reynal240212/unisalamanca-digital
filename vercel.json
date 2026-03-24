@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/main.py" },
+    { "source": "/student/(.*)", "destination": "/frontend/student/$1" },
+    { "source": "/admin/(.*)", "destination": "/frontend/admin/$1" },
+    { "source": "/validator/(.*)", "destination": "/frontend/validator/$1" },
+    { "source": "/uploads/(.*)", "destination": "/frontend/uploads/$1" },
+    { "source": "/(.*)", "destination": "/frontend/student/index.html" }
+  ]
+}

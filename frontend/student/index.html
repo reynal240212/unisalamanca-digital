@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credencial Digital | UniSalamanca</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div id="onboarding" class="onboarding-overlay">
+        <div class="onboarding-content">
+            <h2>¡Bienvenido a tu Credencial Digital!</h2>
+            <p>Para activar tu identidad, necesitamos una foto clara de tu rostro. Sigue los ejemplos a continuación:</p>
+            
+            <div class="examples-grid">
+                <div class="example-item">
+                    <img src="examples/example_h_v2.png" alt="Ejemplo Hombre">
+                    <span>Ejemplo Hombre</span>
+                </div>
+                <div class="example-item">
+                    <img src="examples/example_m_v2.png" alt="Ejemplo Mujer">
+                    <span>Ejemplo Mujer</span>
+                </div>
+            </div>
+
+            <div class="capture-area">
+                <video id="camera-stream" autoplay playsinline></video>
+                <canvas id="photo-canvas" width="400" height="400"></canvas>
+            </div>
+
+            <div id="capture-controls" class="capture-btns">
+                <button id="take-photo-btn" class="btn btn-primary">Tomar Foto</button>
+                <button id="upload-btn" class="btn btn-secondary">Subir Foto</button>
+                <input type="file" id="photo-upload" accept="image/*" class="hidden">
+            </div>
+
+            <div id="confirm-controls" class="capture-btns hidden">
+                <button id="retake-btn" class="btn btn-secondary">Repetir</button>
+                <button id="save-photo-btn" class="btn btn-primary">Guardar y Activar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <div class="logo">UniSalamanca</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="status-badge active">Activo</div>
+                <button id="logoutBtn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: 0.3s; font-family: 'Outfit', sans-serif;">Log out</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="card-container">
+                <div class="glow"></div>
+                <div class="id-card">
+                    <div class="photo-section">
+                        <div class="photo-placeholder">
+                            <img id="student-photo" src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=256&h=256&auto=format&fit=crop" alt="Foto Estudiante">
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h1 id="student-name">Cargando...</h1>
+                        <p id="student-program" class="program">Cargando...</p>
+                        <div class="divider"></div>
+                        <div class="meta-info">
+                            <div class="meta-item">
+                                <span class="label">ID Estudiante</span>
+                                <span id="student-uuid" class="value">...</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="label">Vence</span>
+                                <span id="student-expiry" class="value">...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="qr-section">
+                        <div id="qrcode"></div>
+                        <div class="qr-overlay">
+                            <div class="qr-scanner-line"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="refresh-section">
+                        <div class="progress-bar">
+                            <div id="refresh-progress" class="progress"></div>
+                        </div>
+                        <p id="timer-text">El código se actualiza pronto</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Identidad Digital Verificada</p>
+            <div class="dots">
+                <span></span><span></span><span></span>
+            </div>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
