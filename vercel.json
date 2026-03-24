@@ -2,10 +2,19 @@
   "version": 2,
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/main.py" },
+    { "source": "/student/style.css", "destination": "/frontend/student/style.css" },
+    { "source": "/student/app.js", "destination": "/frontend/student/app.js" },
     { "source": "/student/(.*)", "destination": "/frontend/student/$1" },
     { "source": "/admin/(.*)", "destination": "/frontend/admin/$1" },
     { "source": "/validator/(.*)", "destination": "/frontend/validator/$1" },
     { "source": "/uploads/(.*)", "destination": "/frontend/uploads/$1" },
+    { "source": "/style.css", "destination": "/frontend/student/style.css" },
+    { "source": "/app.js", "destination": "/frontend/student/app.js" },
+    { "source": "/login.html", "destination": "/frontend/student/login.html" },
+    { "source": "/auth.js", "destination": "/frontend/student/auth.js" },
+    { "source": "/examples/(.*)", "destination": "/frontend/student/examples/$1" },
+    { "source": "/img/(.*)", "destination": "/frontend/student/img/$1" },
+    { "source": "/", "destination": "/frontend/student/index.html" },
     { "source": "/(.*)", "destination": "/frontend/student/index.html" }
   ]
 }
