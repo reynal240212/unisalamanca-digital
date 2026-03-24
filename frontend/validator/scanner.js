@@ -2,113 +2,123 @@
 const token = localStorage.getItem('auth_token');
 const userRole = localStorage.getItem('user_role');
 
+// Protección de Ruta
 if (!token || (userRole !== 'VALIDADOR' && userRole !== 'ADMIN')) {
-    alert("Acceso Restringido: Solo para personal de seguridad (Validador)");
+    localStorage.clear();
     window.location.href = '../student/login.html?role=validador'; 
 }
 
+// Configuración de UI
 const html5QrCode = new Html5Qrcode("reader");
-const overlay = document.getElementById('resultOverlay');
+const resultPanel = document.getElementById('resultPanel');
+const statusBadge = document.getElementById('statusBadge');
+const avatarContainer = document.getElementById('avatarContainer');
+const studentPhoto = document.getElementById('studentPhoto');
+const resultTitle = document.getElementById('resultTitle');
+const resultDetails = document.getElementById('resultDetails');
 
-function onScanSuccess(decodedText, decodedResult) {
-    // Detener escaneo mientras se muestra el resultado
+const config = { fps: 15, qrbox: { width: 300, height: 300 } };
+
+function onScanSuccess(decodedText) {
+    // Feedback táctil si es posible
+    if (window.navigator.vibrate) window.navigator.vibrate(50);
+    
     html5QrCode.pause();
-    verifyQR(decodedText);
+    verifyAccess(decodedText);
 }
 
-async function verifyQR(qrToken) {
+async function verifyAccess(qrToken) {
     try {
-        console.log("Verificando token:", qrToken);
+        console.log("Verificando:", qrToken);
         
-        // Consulta directa a Supabase
+        // 1. Consulta atómica a Supabase (con Join para perfil)
         const { data: credential, error } = await supabaseClient
             .from('credential')
-            .select('*, user:user_id(name, program, photo_url)')
+            .select('*, student:user!user_id(name, program, photo_url, status)')
             .eq('token', qrToken)
             .single();
 
         if (error || !credential) {
-            console.error("Token no encontrado:", error);
-            showResult({ status: 'Denied', reason: 'Código QR no reconocido o falso' });
+            showDenied("Código Inválido", "El código QR no existe o es fraudulento.");
             return;
         }
 
-        // Verificar expiración
+        // 2. Verificar expiración temporal
         const now = new Date();
-        const expiresAt = new Date(credential.expires_at);
-        
-        if (now > expiresAt) {
-            showResult({ status: 'Denied', reason: 'El código QR ha expirado' });
+        if (now > new Date(credential.expires_at)) {
+            showDenied("Código Expirado", "El tiempo de validez del código ha terminado. El estudiante debe generar uno nuevo.");
             return;
         }
 
-        // Registrar el acceso en el log
-        await supabaseClient
-            .from('accesslog')
-            .insert({
-                user_id: credential.user_id,
-                location: "Entrada Principal",
-                status: "Granted"
-            });
+        // 3. Verificar estado del estudiante
+        if (credential.student.status !== 'Active') {
+            showDenied("Acceso Restringido", `El estudiante ${credential.student.name} tiene un estado: ${credential.student.status}`);
+            return;
+        }
 
-        // Mostrar éxito
-        showResult({
-            status: 'Granted',
-            student_name: credential.user.name,
-            program: credential.user.program,
-            photo_url: credential.user.photo_url
-        });
+        // 4. Registrar éxito en AccessLog (Async)
+        supabaseClient.from('accesslog').insert({
+            user_id: credential.user_id,
+            location: "Acceso Digital",
+            status: "Granted"
+        }).then();
 
-    } catch (error) {
-        console.error("Error verify:", error);
-        showResult({ status: 'Denied', reason: 'Error de comunicación con Supabase' });
+        // 5. Mostrar Éxito
+        showGranted(credential.student);
+
+    } catch (err) {
+        console.error(err);
+        showDenied("Error de Red", "No se pudo conectar con el servidor de validación.");
     }
 }
 
-function showResult(data) {
-    const icon = document.getElementById('statusIcon');
-    const title = document.getElementById('resultTitle');
-    const subtitle = document.getElementById('resultSubtitle');
-    const photo = document.getElementById('resultPhoto');
-
-    if (data.status === 'Granted') {
-        icon.innerText = "✅";
-        icon.className = "status-icon success";
-        title.innerText = "Acceso Permitido";
-        subtitle.innerText = `${data.student_name}\n${data.program || ''}`;
-        if (data.photo_url) {
-            photo.src = data.photo_url;
-            photo.style.display = 'block';
-        }
-        // Sonido de exito? (Opcional)
+function showGranted(student) {
+    statusBadge.innerText = "✅";
+    statusBadge.className = "status-badge granted";
+    resultTitle.innerText = "Acceso Permitido";
+    resultTitle.style.color = "#10b981";
+    resultDetails.innerText = `${student.name.toUpperCase()}\n${student.program || 'Programa N/A'}`;
+    
+    if (student.photo_url) {
+        studentPhoto.src = student.photo_url;
+        avatarContainer.style.display = 'block';
     } else {
-        icon.innerText = "❌";
-        icon.className = "status-icon error";
-        title.innerText = "Acceso Denegado";
-        subtitle.innerText = data.reason || "Token inválido";
-        photo.style.display = 'none';
+        avatarContainer.style.display = 'none';
     }
 
-    overlay.classList.add('active');
+    resultPanel.classList.add('active');
+}
+
+function showDenied(title, reason) {
+    statusBadge.innerText = "❌";
+    statusBadge.className = "status-badge denied";
+    resultTitle.innerText = title;
+    resultTitle.style.color = "#ef4444";
+    resultDetails.innerText = reason;
+    avatarContainer.style.display = 'none';
+    
+    resultPanel.classList.add('active');
 }
 
 function closeOverlay() {
-    overlay.classList.remove('active');
-    html5QrCode.resume();
+    resultPanel.classList.remove('active');
+    setTimeout(() => {
+        html5QrCode.resume();
+    }, 400);
 }
 
-// Configuración de la cámara
-const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
+// Iniciar Cámara
 html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
     .catch(err => {
-        console.error("Error al iniciar cámara:", err);
-        // Si no hay cámara trasera, intentar con cualquier cámara
+        console.error("No se pudo iniciar cámara trasera:", err);
+        // Fallback a cualquier cámara
         html5QrCode.start({ facingMode: "user" }, config, onScanSuccess);
     });
 
 // Logout
 document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.clear();
-    window.location.href = '../student/login.html';
+    html5QrCode.stop().then(() => {
+        localStorage.clear();
+        window.location.href = '../student/login.html';
+    });
 });

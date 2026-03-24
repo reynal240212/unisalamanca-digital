@@ -227,7 +227,13 @@ async function refreshQR() {
         // Generar un token único localmente
         const qrContent = `UNISALAMANCA|${STUDENT_ID}|${Date.now()}`;
         
-        // Registrar el token en la tabla credential (Backend-less)
+        // 0. Limpiar tokens antiguos de este usuario (Mantenimiento)
+        await supabaseClient
+            .from('credential')
+            .delete()
+            .eq('user_id', STUDENT_ID);
+
+        // 1. Registrar el token en la tabla credential (Backend-less)
         const { error } = await supabaseClient
             .from('credential')
             .insert({ 
@@ -238,6 +244,7 @@ async function refreshQR() {
 
         if (error) {
             console.error("Error al registrar credential:", error);
+            // Intentar de nuevo en el siguiente ciclo o mostrar error visual
             return;
         }
         
