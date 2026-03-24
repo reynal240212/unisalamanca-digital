@@ -1,4 +1,4 @@
-const API_BASE_URL = window.location.origin + "/api";
+// Admin Settings
 
 // Verificar Sesión Admin
 const token = localStorage.getItem('auth_token');
@@ -50,15 +50,21 @@ menuItems.settings.addEventListener('click', () => switchView('settings'));
 // --- Gestión de Estudiantes ---
 async function fetchStudents() {
     try {
-        const response = await fetch(`${API_BASE_URL}/students/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        allStudents = await response.json();
+        // Consulta directa a Supabase
+        const { data: students, error } = await supabaseClient
+            .from('user')
+            .select('*')
+            .eq('role', 'estudiante')
+            .order('name');
+
+        if (error) throw error;
+
+        allStudents = students;
         renderTable(allStudents);
         updateStats(allStudents);
     } catch (error) {
         console.error('Error al obtener estudiantes:', error);
-        showToast('Error al conectar con el servidor', 'error');
+        showToast('Error al conectar con Supabase', 'error');
     }
 }
 
@@ -128,17 +134,16 @@ async function handleStatusChange(studentId, newStatus, studentName) {
 
 async function updateStatus(studentId, newStatus) {
     try {
-        const response = await fetch(`${API_BASE_URL}/users/${studentId}/status?new_status=${newStatus}`, {
-            method: 'PATCH',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const { error } = await supabaseClient
+            .from('user')
+            .update({ status: newStatus })
+            .eq('id', studentId);
         
-        if (response.ok) {
+        if (!error) {
             showToast('Estado actualizado correctamente', 'success');
             fetchStudents();
         } else {
-            const error = await response.json();
-            showToast(`Error: ${error.detail}`, 'error');
+            showToast(`Error: ${error.message}`, 'error');
         }
     } catch (error) {
         console.error('Error al actualizar estado:', error);
@@ -155,10 +160,13 @@ function updateStats(students) {
 // --- Reportes ---
 async function fetchLogs() {
     try {
-        const response = await fetch(`${API_BASE_URL}/logs/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const logs = await response.json();
+        const { data: logs, error } = await supabaseClient
+            .from('accesslog')
+            .select('*')
+            .order('timestamp', { ascending: false })
+            .limit(100);
+
+        if (error) throw error;
         renderLogsTable(logs);
     } catch (error) {
         console.error('Error al obtener logs:', error);
@@ -169,7 +177,7 @@ function renderLogsTable(logs) {
     const tbody = document.getElementById('logs-table-body');
     tbody.innerHTML = '';
 
-    if (logs.length === 0) {
+    if (!logs || logs.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No hay registros de acceso aún.</td></tr>';
         return;
     }
@@ -204,33 +212,33 @@ studentForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = new FormData(studentForm);
+    const password = "Salamanca2024"; // Contraseña inicial
+    const salt = dcodeIO.bcrypt.genSaltSync(10);
+    const password_hash = dcodeIO.bcrypt.hashSync(password, salt);
+
     const studentData = {
         name: formData.get('name'),
         email: `${formData.get('name').toLowerCase().replace(/\s+/g, '.')}@unisalamanca.edu.co`,
         program: formData.get('program'),
         expiration_date: new Date(formData.get('expiry')).toISOString(),
         status: 'Active',
-        role: 'estudiante'
+        role: 'estudiante',
+        password_hash: password_hash,
+        must_change_password: true
     };
 
     try {
-        const response = await fetch(`${API_BASE_URL}/students/`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(studentData)
-        });
+        const { error } = await supabaseClient
+            .from('user')
+            .insert(studentData);
 
-        if (response.ok) {
+        if (!error) {
             showToast('Estudiante registrado con éxito', 'success');
             modal.classList.add('hidden');
             studentForm.reset();
             fetchStudents();
         } else {
-            const error = await response.json();
-            showToast(`Error: ${error.detail}`, 'error');
+            showToast(`Error: ${error.message}`, 'error');
         }
     } catch (error) {
         console.error('Error al guardar:', error);

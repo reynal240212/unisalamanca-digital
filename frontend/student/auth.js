@@ -1,4 +1,4 @@
-const API_BASE_URL = window.location.origin + "/api";
+// Auth logic
 
 let captchaAnswer = 0;
 
@@ -75,15 +75,24 @@ if (loginForm) {
         setLoading(true);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
+            // Consulta directa a Supabase (Backend-less)
+            const { data: user, error } = await supabaseClient
+                .from('user')
+                .select('*')
+                .eq('email', email)
+                .single();
 
-            const data = await response.json();
+            if (error || !user) {
+                showError("Usuario no encontrado o error de red");
+                setLoading(false);
+                generateCaptcha();
+                return;
+            }
 
-            if (response.ok) {
+            // Verificar contraseña usando bcryptjs (localmente en el navegador)
+            const passwordMatch = dcodeIO.bcrypt.compareSync(password, user.password_hash);
+
+            if (passwordMatch) {
                 // Lógica de Recordarme
                 if (rememberMe) {
                     localStorage.setItem('remembered_email', email);
@@ -95,38 +104,39 @@ if (loginForm) {
                 const urlParams = new URLSearchParams(window.location.search);
                 const requestedRole = urlParams.get('role');
 
+                // En el modo backend-less, usamos una sesión local simple
+                localStorage.setItem('auth_token', 'supabase_session_active');
+
                 if (requestedRole === 'validador') {
-                    if (data.user.role !== 'VALIDADOR' && data.user.role !== 'ADMIN') {
+                    if (user.role !== 'VALIDADOR' && user.role !== 'ADMIN') {
                         showError("Error: Esta cuenta no tiene permisos de validador.");
                         setLoading(false);
                         return;
                     }
-                    localStorage.setItem('auth_token', data.access_token);
-                    localStorage.setItem('user_role', data.user.role);
+                    localStorage.setItem('user_role', user.role);
                     window.location.href = '../validator/index.html';
-                } else if (data.user.role === 'ADMIN') {
+                } else if (user.role === 'ADMIN') {
                     // Admin login
-                    localStorage.setItem('auth_token', data.access_token);
                     localStorage.setItem('user_role', 'ADMIN');
                     window.location.href = '../admin/index.html';
                 } else {
                     // Estudiante
-                    localStorage.setItem('auth_token', data.access_token);
-                    localStorage.setItem('student_user', JSON.stringify(data.user));
+                    localStorage.setItem('student_user', JSON.stringify(user));
                     
-                    if (data.user.must_change_password) {
+                    if (user.must_change_password) {
                         window.location.href = 'change-password.html';
                     } else {
                         window.location.href = 'index.html';
                     }
                 }
             } else {
-                showError(data.detail || "Error al iniciar sesión");
+                showError("Credenciales incorrectas");
                 setLoading(false);
                 generateCaptcha();
             }
         } catch (error) {
-            showError("Error de conexión con el servidor");
+            console.error(error);
+            showError("Error de comunicación con Supabase");
             setLoading(false);
         }
     });

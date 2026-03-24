@@ -1,5 +1,4 @@
 // Configuración
-const API_BASE_URL = window.location.origin + "/api";
 
 // Verificar Sesión
 const token = localStorage.getItem('auth_token');
@@ -48,16 +47,25 @@ async function init() {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/students/${STUDENT_ID}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) {
-            const studentData = await response.json();
+        // Consulta directa a Supabase
+        const { data: studentData, error } = await supabaseClient
+            .from('user')
+            .select('*')
+            .eq('id', STUDENT_ID)
+            .single();
+
+        if (studentData && !error) {
             updateStudentInfo(studentData);
+            // Actualizar el cache local
+            localStorage.setItem('student_user', JSON.stringify(studentData));
             refreshQR();
         } else {
-            localStorage.clear();
-            window.location.href = 'login.html';
+            console.error("Error al obtener datos:", error);
+            // Si el usuario no existe o hay error crítico, re-loguear
+            if (error && error.code === 'PGRST116') { // Not found
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }
         }
     } catch (error) {
         console.error('Error al inicializar:', error);
@@ -150,27 +158,37 @@ document.getElementById('save-photo-btn').onclick = async () => {
         btn.innerText = "Guardando...";
         btn.disabled = true;
 
-        const response = await fetch(`${API_BASE_URL}/students/${STUDENT_ID}/upload-photo`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(imageData)
-        });
+        // Convertir base64 a Blob para subir a Supabase Storage
+        const blob = await fetch(imageData).then(res => res.blob());
+        const fileName = `${STUDENT_ID}/${Date.now()}.jpg`;
 
-        if (response.status === 401) {
-            alert("Tu sesión expiró. Vuelve a iniciar sesión.");
-            localStorage.clear();
-            window.location.href = 'login.html';
+        // Subir a Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabaseClient.storage
+            .from('student-photos')
+            .upload(fileName, blob, { contentType: 'image/jpeg' });
+
+        if (uploadError) {
+            console.error("Error upload:", uploadError);
+            alert("Error al subir la foto.");
+            btn.innerText = "Guardar y Activar";
+            btn.disabled = false;
             return;
         }
 
-        if (response.ok) {
-            const data = await response.json();
-            
+        // Obtener URL pública
+        const { data: { publicUrl } } = supabaseClient.storage
+            .from('student-photos')
+            .getPublicUrl(fileName);
+
+        // Actualizar perfil del usuario en la base de datos
+        const { error: updateError } = await supabaseClient
+            .from('user')
+            .update({ photo_url: publicUrl })
+            .eq('id', STUDENT_ID);
+
+        if (!updateError) {
             // Actualizar usuario local
-            user.photo_url = data.photo_url;
+            user.photo_url = publicUrl;
             localStorage.setItem('student_user', JSON.stringify(user));
             
             // Cerrar stream y modal
@@ -180,7 +198,8 @@ document.getElementById('save-photo-btn').onclick = async () => {
             // Reiniciar app
             init();
         } else {
-            alert("Error al subir la foto. Inténtalo de nuevo.");
+            console.error("Error update DB:", updateError);
+            alert("Error al actualizar perfil.");
             btn.innerText = "Guardar y Activar";
             btn.disabled = false;
         }
@@ -204,21 +223,27 @@ async function refreshQR() {
 
     try {
         console.log('Actualizando QR...');
-        const response = await fetch(`${API_BASE_URL}/students/${STUDENT_ID}/qrcode`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
         
-        if (!response.ok) {
-            const error = await response.json();
-            console.error(`Error: ${error.detail}`);
+        // Generar un token único localmente
+        const qrContent = `UNISALAMANCA|${STUDENT_ID}|${Date.now()}`;
+        
+        // Registrar el token en la tabla credential (Backend-less)
+        const { error } = await supabaseClient
+            .from('credential')
+            .insert({ 
+                user_id: STUDENT_ID, 
+                token: qrContent,
+                expires_at: new Date(Date.now() + 120000).toISOString() // 2 minutos
+            });
+
+        if (error) {
+            console.error("Error al registrar credential:", error);
             return;
         }
-
-        const data = await response.json();
         
-        // Actualizar el QR con el nuevo token dinámico
+        // Actualizar el QR
         qrcode.clear();
-        qrcode.makeCode(data.qr_token);
+        qrcode.makeCode(qrContent);
 
         startProgressBar(120); // 2 minutos
     } catch (error) {
