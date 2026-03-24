@@ -1,4 +1,4 @@
-const API_BASE_URL = window.location.origin;
+const API_BASE_URL = window.location.origin + "/api";
 
 // Verificar Sesión de Validador
 const token = localStorage.getItem('auth_token');

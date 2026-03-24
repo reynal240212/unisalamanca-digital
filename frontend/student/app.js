@@ -1,5 +1,5 @@
 // Configuración
-const API_BASE_URL = window.location.origin;
+const API_BASE_URL = window.location.origin + "/api";
 
 // Verificar Sesión
 const token = localStorage.getItem('auth_token');
