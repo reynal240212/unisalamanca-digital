@@ -59,7 +59,7 @@ async function fetchStudents() {
         const { data: students, error } = await supabaseClient
             .from('user')
             .select('*')
-            .eq('role', 'estudiante')
+            .eq('role', 'ESTUDIANTE')
             .order('name');
 
         if (error) throw error;
@@ -227,7 +227,7 @@ studentForm.addEventListener('submit', async (e) => {
         program: formData.get('program'),
         expiration_date: new Date(formData.get('expiry')).toISOString(),
         status: 'Active',
-        role: 'estudiante',
+        role: 'ESTUDIANTE',
         password_hash: password_hash,
         must_change_password: true
     };

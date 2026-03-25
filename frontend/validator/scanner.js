@@ -51,13 +51,13 @@ async function verifyAccess(qrToken) {
         // 2. Verificar expiración temporal
         const now = new Date();
         if (now > new Date(credential.expires_at)) {
-            showDenied("Código Expirado", "El tiempo de validez del código ha terminado. El estudiante debe generar uno nuevo.");
+            showDenied("Código Expirado", "El tiempo de validez del código ha terminado. El ESTUDIANTE debe generar uno nuevo.");
             return;
         }
 
-        // 3. Verificar estado del estudiante
+        // 3. Verificar estado del ESTUDIANTE
         if (credential.student.status !== 'Active') {
-            showDenied("Acceso Restringido", `El estudiante ${credential.student.name} tiene un estado: ${credential.student.status}`);
+            showDenied("Acceso Restringido", `El ESTUDIANTE ${credential.student.name} tiene un estado: ${credential.student.status}`);
             return;
         }
 
