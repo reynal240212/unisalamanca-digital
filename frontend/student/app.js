@@ -251,6 +251,9 @@ async function refreshQR() {
 
         if (error) {
             console.error("❌ Error al registrar credential:", error);
+            // Mostrar más detalle si está disponible
+            if (error.message) console.error("Mensaje:", error.message);
+            if (error.details) console.error("Detalles:", error.details);
             // Intentamos mostrar el QR de todos modos para depuración visual
         }
         
