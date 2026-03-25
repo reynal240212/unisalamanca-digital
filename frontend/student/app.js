@@ -10,7 +10,7 @@ const token = localStorage.getItem('auth_token');
 const user = JSON.parse(localStorage.getItem('student_user'));
 
 if (!token || !user) {
-    window.location.replace('login.html');
+    window.location.replace('../login.html');
 }
 
 if (user && user.must_change_password) {
@@ -69,7 +69,7 @@ async function init() {
             // Si el usuario no existe o hay error crítico, re-loguear
             if (error && error.code === 'PGRST116') { // Not found
                 localStorage.clear();
-                window.location.replace('login.html');
+                window.location.replace('../login.html');
             }
         }
     } catch (error) {
@@ -294,7 +294,7 @@ if (logoutBtn) {
             console.error("Error signing out:", e);
         }
         localStorage.clear();
-        window.location.replace('login.html');
+        window.location.replace('../login.html');
     });
 }
 

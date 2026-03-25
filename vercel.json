@@ -3,15 +3,15 @@
   "rewrites": [
     { "source": "/student/style.css", "destination": "/frontend/student/style.css" },
     { "source": "/student/app.js", "destination": "/frontend/student/app.js" },
-    { "source": "/student/auth.js", "destination": "/frontend/student/auth.js" },
+    { "source": "/auth.js", "destination": "/frontend/auth.js" },
     { "source": "/supabase-client.js", "destination": "/frontend/supabase-client.js" },
     { "source": "/student/(.*).html", "destination": "/frontend/student/$1.html" },
     { "source": "/student/(.*)", "destination": "/frontend/student/$1" },
     { "source": "/admin/(.*)", "destination": "/frontend/admin/$1" },
     { "source": "/validator/(.*)", "destination": "/frontend/validator/$1" },
-    { "source": "/img/(.*)", "destination": "/frontend/student/img/$1" },
-    { "source": "/login.html", "destination": "/frontend/student/login.html" },
-    { "source": "/", "destination": "/frontend/student/login.html" },
+    { "source": "/img/(.*)", "destination": "/frontend/img/$1" },
+    { "source": "/login.html", "destination": "/frontend/login.html" },
+    { "source": "/", "destination": "/frontend/login.html" },
     { "source": "/(.*)", "destination": "/frontend/student/$1" }
   ]
 }

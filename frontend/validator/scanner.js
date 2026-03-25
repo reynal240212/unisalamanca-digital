@@ -10,7 +10,7 @@ const userRole = localStorage.getItem('user_role');
 // Protección de Ruta
 if (!token || (userRole !== 'VALIDADOR' && userRole !== 'ADMIN')) {
     localStorage.clear();
-    window.location.href = '../student/login.html?role=validador'; 
+    window.location.replace('../login.html?role=validador'); 
 }
 
 // Configuración de UI
@@ -129,6 +129,6 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
     }
     html5QrCode.stop().then(() => {
         localStorage.clear();
-        window.location.replace('../student/login.html');
+        window.location.replace('../login.html');
     });
 });

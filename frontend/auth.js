@@ -145,16 +145,16 @@ function processLogin(user, email, rememberMe) {
             return;
         }
         localStorage.setItem('user_role', user.role);
-        window.location.replace('../validator/index.html');
+        window.location.replace('validator/index.html');
     } else if (user.role === 'ADMIN') {
         localStorage.setItem('user_role', 'ADMIN');
-        window.location.replace('../admin/index.html');
+        window.location.replace('admin/index.html');
     } else {
         localStorage.setItem('student_user', JSON.stringify(user));
         if (user.must_change_password) {
-            window.location.replace('change-password.html');
+            window.location.replace('student/change-password.html');
         } else {
-            window.location.replace('index.html');
+            window.location.replace('student/index.html');
         }
     }
 }

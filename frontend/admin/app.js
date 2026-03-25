@@ -10,7 +10,7 @@ const token = localStorage.getItem('auth_token');
 const userRole = localStorage.getItem('user_role');
 
 if (!token || userRole !== 'ADMIN') {
-    window.location.replace('../student/login.html');
+    window.location.replace('../login.html');
 }
 
 // Estado global simple
@@ -290,7 +290,7 @@ if (btnLogout) {
         localStorage.clear();
         showToast('Sesión cerrada correctamente', 'warning');
         setTimeout(() => {
-            window.location.replace('../student/login.html');
+            window.location.replace('../login.html');
         }, 1000);
     });
 }
