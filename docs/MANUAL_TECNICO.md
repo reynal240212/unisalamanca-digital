@@ -41,6 +41,12 @@ El sistema implementa una rotación basada en **Time-Blocks**:
 3.  **Validación:** El escáner recalcula el `timeBlock` y permite una diferencia de ±1 (ventana de 60s) para mitigar latencias de red o desincronización de reloj.
 
 ## 4. Despliegue y Mantenimiento
-1.  **Credenciales:** Las API Keys de Supabase se encuentran en `frontend/supabase-client.js`.
+1.  **Seguridad de Credenciales (Vercel):**
+    *   Las llaves ya **no están hardcodeadas** en el repositorio.
+    *   Se utiliza un script de construcción (`scripts/build-env.js`) que se ejecuta en Vercel.
+    *   **Variables Requeridas:** En el panel de Vercel, debes configurar:
+        *   `SUPABASE_URL`
+        *   `SUPABASE_ANON_KEY`
+    *   El proceso de build genera automáticamente `frontend/env.js`, el cual es cargado por los archivos HTML.
 2.  **Almacenamiento:** Las fotos de perfil se guardan en el bucket `student-photos` con políticas de lectura pública.
-3.  **Hosting:** El proyecto es completamente estático y puede ser servido desde cualquier CDN o servidor web (Apache/Nginx).
+3.  **Hosting:** El proyecto está optimizado para Vercel, utilizando el comando de build `npm run build`.
