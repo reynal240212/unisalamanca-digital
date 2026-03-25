@@ -234,7 +234,7 @@ async function refreshQR() {
     if (!STUDENT_ID) return;
 
     try {
-        console.log('🔄 Actualizando QR Dinámico (Local)...');
+        console.log('🔄 Actualizando QR Dinámico (Bypass SVG)...');
         
         // Generar un token único con bloque de tiempo (cada 30s)
         const timeBlock = Math.floor(Date.now() / 30000);
@@ -254,22 +254,29 @@ async function refreshQR() {
             if (error.message) console.error("Mensaje:", error.message);
         }
         
-        // Generar el QR localmente usando QRious
-        if (typeof QRious === 'undefined') {
-            console.error("❌ Error: La librería QRious no está cargada.");
+        // Generar el QR usando SVG para evitar bloqueos de Canvas (Brave/Privacy)
+        if (typeof QRCode === 'undefined') {
+            console.error("❌ Error: La librería QRCode no está cargada.");
             return;
         }
 
-        const qr = new QRious({
-            element: document.getElementById('qr-canvas'),
-            value: qrContent,
-            size: 130, // Tamaño interno cómodo
-            background: 'white',
-            foreground: '#0f172a',
-            level: 'H'
+        // QRCode.toString genera un string SVG que inyectamos directamente
+        QRCode.toString(qrContent, { 
+            type: 'svg', 
+            margin: 2,
+            width: 130,
+            color: {
+                dark: '#0f172a',
+                light: '#ffffff'
+            }
+        }, function (err, svgString) {
+            if (err) {
+                console.error("❌ Error generando SVG:", err);
+                return;
+            }
+            qrcodeElement.innerHTML = svgString;
+            console.log('✅ QR SVG inyectado exitosamente (Anti-Brave Bypass).');
         });
-        
-        console.log('✅ QR local generado exitosamente.');
 
         startProgressBar(30); // Rotación cada 30 segundos
     } catch (error) {
