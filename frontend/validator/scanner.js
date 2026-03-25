@@ -36,7 +36,50 @@ async function verifyAccess(qrToken) {
     try {
         console.log("Verificando:", qrToken);
         
-        // 1. Consulta atómica a Supabase (con Join para perfil)
+        // 1. Intentar parsear formato Nombre|Codigo|Carrera
+        if (qrToken.includes('|')) {
+            const parts = qrToken.split('|');
+            if (parts.length >= 2) {
+                const [name, id, program] = parts;
+                
+                // Mostrar datos extraídos de inmediato
+                showGranted({
+                    name: name,
+                    program: program || 'N/A',
+                    id: id,
+                    photo_url: null // Se buscará en DB si es posible
+                });
+
+                // Intentar enriquecer con foto y verificar status en DB
+                const { data: student, error } = await supabaseClient
+                    .from('user')
+                    .select('photo_url, status')
+                    .eq('id', id.trim())
+                    .single();
+                
+                if (!error && student) {
+                    if (student.status !== 'Active') {
+                        showDenied("Acceso Restringido", `El ESTUDIANTE ${name} tiene un estado: ${student.status}`);
+                        return;
+                    }
+                    // Actualizar foto si existe
+                    if (student.photo_url) {
+                        studentPhoto.src = student.photo_url;
+                        avatarContainer.style.display = 'block';
+                    }
+                    
+                    // Registrar acceso
+                    supabaseClient.from('accesslog').insert({
+                        user_id: id.trim(),
+                        location: "Acceso Digital (QR Directo)",
+                        status: "Granted"
+                    }).then();
+                }
+                return;
+            }
+        }
+
+        // 2. Fallback: Consulta atómica a Supabase para tokens legacy
         const { data: credential, error } = await supabaseClient
             .from('credential')
             .select('*, student:user!user_id(name, program, photo_url, status)')
@@ -44,31 +87,30 @@ async function verifyAccess(qrToken) {
             .single();
 
         if (error || !credential) {
-            showDenied("Código Inválido", "El código QR no existe o es fraudulento.");
+            showDenied("Código Inválido", "El código QR no es válido o no pertenece al sistema.");
             return;
         }
 
-        // 2. Verificar expiración temporal
+        // 3. Verificar expiración temporal (Solo para tokens en DB)
         const now = new Date();
         if (now > new Date(credential.expires_at)) {
-            showDenied("Código Expirado", "El tiempo de validez del código ha terminado. El ESTUDIANTE debe generar uno nuevo.");
+            showDenied("Código Expirado", "El tiempo de validez del código ha terminado.");
             return;
         }
 
-        // 3. Verificar estado del ESTUDIANTE
+        // 4. Verificar estado del ESTUDIANTE
         if (credential.student.status !== 'Active') {
             showDenied("Acceso Restringido", `El ESTUDIANTE ${credential.student.name} tiene un estado: ${credential.student.status}`);
             return;
         }
 
-        // 4. Registrar éxito en AccessLog (Async)
+        // 5. Registrar éxito y Mostrar
         supabaseClient.from('accesslog').insert({
             user_id: credential.user_id,
             location: "Acceso Digital",
             status: "Granted"
         }).then();
 
-        // 5. Mostrar Éxito
         showGranted(credential.student);
 
     } catch (err) {

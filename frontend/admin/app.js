@@ -15,6 +15,7 @@ if (!token || userRole !== 'ADMIN') {
 
 // Estado global simple
 let allStudents = [];
+let editingStudentId = null;
 
 // Elementos del DOM
 const menuItems = {
@@ -104,12 +105,15 @@ function renderTable(students) {
                 <span class="badge ${student.status.toLowerCase()}">${student.status}</span>
             </td>
             <td>
-                <select class="action-select" onchange="handleStatusChange('${student.id}', this.value, '${student.name}')">
-                    <option value="" disabled selected>Acciones</option>
-                    <option value="Active">Activar</option>
-                    <option value="Suspended">Suspender</option>
-                    <option value="Revoked">Revocar</option>
-                </select>
+                <div style="display: flex; gap: 8px;">
+                    <select class="action-select" onchange="handleStatusChange('${student.id}', this.value, '${student.name}')">
+                        <option value="" disabled selected>Estado</option>
+                        <option value="Active">Activar</option>
+                        <option value="Suspended">Suspender</option>
+                        <option value="Revoked">Revocar</option>
+                    </select>
+                    <button class="btn-edit" onclick="openEditModal('${student.id}')">✏️</button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
@@ -204,11 +208,31 @@ function renderLogsTable(logs) {
 
 // --- Modal ---
 document.getElementById('btn-open-modal').addEventListener('click', () => {
+    editingStudentId = null;
+    document.getElementById('modal-title').innerText = "Registrar Nuevo Estudiante";
+    studentForm.reset();
     modal.classList.remove('hidden');
     const nextYear = new Date();
     nextYear.setFullYear(nextYear.getFullYear() + 1);
     document.getElementById('expiry').value = nextYear.toISOString().split('T')[0];
 });
+
+function openEditModal(studentId) {
+    const student = allStudents.find(s => s.id === studentId);
+    if (!student) return;
+
+    editingStudentId = studentId;
+    document.getElementById('modal-title').innerText = "Editar Estudiante";
+    
+    // Llenar formulario
+    document.getElementById('name').value = student.name;
+    document.getElementById('program').value = student.program;
+    document.getElementById('expiry').value = student.expiration_date.split('T')[0];
+
+    modal.classList.remove('hidden');
+}
+
+window.openEditModal = openEditModal; // Exponer al scope global
 
 document.getElementById('btn-close-modal').addEventListener('click', () => modal.classList.add('hidden'));
 document.getElementById('btn-cancel').addEventListener('click', () => modal.classList.add('hidden'));
@@ -217,37 +241,67 @@ studentForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = new FormData(studentForm);
-    const password = "Salamanca2024"; // Contraseña inicial
-    const salt = dcodeIO.bcrypt.genSaltSync(10);
-    const password_hash = dcodeIO.bcrypt.hashSync(password, salt);
+    const name = formData.get('name');
+    const program = formData.get('program');
+    const expiry = formData.get('expiry');
 
-    const studentData = {
-        name: formData.get('name'),
-        email: `${formData.get('name').toLowerCase().replace(/\s+/g, '.')}@unisalamanca.edu.co`,
-        program: formData.get('program'),
-        expiration_date: new Date(formData.get('expiry')).toISOString(),
-        status: 'Active',
-        role: 'ESTUDIANTE',
-        password_hash: password_hash,
-        must_change_password: true
-    };
+    if (editingStudentId) {
+        // MODO EDICION
+        try {
+            const { error } = await supabaseClient
+                .from('user')
+                .update({
+                    name: name,
+                    program: program,
+                    expiration_date: new Date(expiry).toISOString()
+                })
+                .eq('id', editingStudentId);
 
-    try {
-        const { error } = await supabaseClient
-            .from('user')
-            .insert(studentData);
-
-        if (!error) {
-            showToast('Estudiante registrado con éxito', 'success');
-            modal.classList.add('hidden');
-            studentForm.reset();
-            fetchStudents();
-        } else {
-            showToast(`Error: ${error.message}`, 'error');
+            if (!error) {
+                showToast('Estudiante actualizado con éxito', 'success');
+                modal.classList.add('hidden');
+                fetchStudents();
+            } else {
+                showToast(`Error: ${error.message}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error al editar:', error);
+            showToast('Error al conectar con la base de datos', 'error');
         }
-    } catch (error) {
-        console.error('Error al guardar:', error);
-        showToast('Error al guardar el estudiante', 'error');
+    } else {
+        // MODO REGISTRO
+        const password = "Salamanca2024"; // Contraseña inicial
+        const salt = dcodeIO.bcrypt.genSaltSync(10);
+        const password_hash = dcodeIO.bcrypt.hashSync(password, salt);
+
+        const studentData = {
+            name: name,
+            email: `${name.toLowerCase().replace(/\s+/g, '.')}@unisalamanca.edu.co`,
+            program: program,
+            expiration_date: new Date(expiry).toISOString(),
+            status: 'Active',
+            role: 'ESTUDIANTE',
+            password_hash: password_hash,
+            must_change_password: true
+        };
+
+        try {
+            const { error } = await supabaseClient
+                .from('user')
+                .insert(studentData);
+
+            if (!error) {
+                showToast('Estudiante registrado con éxito', 'success');
+                modal.classList.add('hidden');
+                studentForm.reset();
+                fetchStudents();
+            } else {
+                showToast(`Error: ${error.message}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error al guardar:', error);
+            showToast('Error al guardar el estudiante', 'error');
+        }
     }
 });
 

@@ -30,14 +30,15 @@ const photoUpload = document.getElementById('photo-upload');
 let STUDENT_ID = user ? user.id : ''; 
 
 const qrcodeElement = document.getElementById('qrcode');
-const qrcode = new QRCode(qrcodeElement, {
-    text: "placeholder",
-    width: 150,
-    height: 150,
-    colorDark: "#0f172a",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
-});
+// The initial QRCode object is no longer needed as it will be regenerated in refreshQR
+// const qrcode = new QRCode(qrcodeElement, {
+//     text: "placeholder",
+//     width: 150,
+//     height: 150,
+//     colorDark: "#0f172a",
+//     colorLight: "#ffffff",
+//     correctLevel: QRCode.CorrectLevel.H
+// });
 
 async function init() {
     // Mostrar info básica de inmediato desde localStorage
