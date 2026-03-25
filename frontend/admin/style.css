@@ -473,3 +473,24 @@ td {
     height: 100%;
     object-fit: cover;
 }
+
+/* Edit Button Stylus */
+.btn-edit {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    color: var(--primary);
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1);
+}

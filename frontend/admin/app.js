@@ -218,8 +218,12 @@ document.getElementById('btn-open-modal').addEventListener('click', () => {
 });
 
 function openEditModal(studentId) {
+    console.log("Abriendo modal para ID:", studentId);
     const student = allStudents.find(s => s.id === studentId);
-    if (!student) return;
+    if (!student) {
+        console.error("Estudiante no encontrado");
+        return;
+    }
 
     editingStudentId = studentId;
     document.getElementById('modal-title').innerText = "Editar Estudiante";
@@ -232,7 +236,7 @@ function openEditModal(studentId) {
     modal.classList.remove('hidden');
 }
 
-window.openEditModal = openEditModal; // Exponer al scope global
+window.openEditModal = openEditModal;
 
 document.getElementById('btn-close-modal').addEventListener('click', () => modal.classList.add('hidden'));
 document.getElementById('btn-cancel').addEventListener('click', () => modal.classList.add('hidden'));
