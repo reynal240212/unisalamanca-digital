@@ -1,37 +1,30 @@
-# 🆔 Sistema de Identidad Digital - UniSalamanca
+# Identidad Digital UniSalamanca 🏛️📱
 
-Este proyecto es un MVP del sistema de carnetización digital para UniSalamanca, diseñado para entornos de producción reales.
+Plataforma integral de gestión de identidad estudiantil, control de acceso y seguridad para UniSalamanca.
 
-## 🚀 Arquitectura Realizada
+## 🚀 Características Principales
+*   **Carnet Digital:** Identidad móvil para estudiantes con diseño premium.
+*   **QR Dinámico Antifraude:** Generación de códigos rotativos cada 30 segundos.
+*   **Panel Administrativo:** Gestión masiva de estudiantes (Excel), auditoría y reportes.
+*   **Validador de Seguridad:** Aplicación para guardias con verificación en tiempo real y geolocalización GPS.
+*   **Cumplimiento Legal:** Onboarding con aceptación de Ley 1581 (Tratamiento de Datos).
+*   **Listo para el Futuro:** Campos preparados para integración con torniquetes RFID y barreras vehiculares (LPR).
 
-1.  **Backend (FastAPI)**: El núcleo del sistema. Gestiona la base de datos SQL (SQLite), genera tokens JWT para los QRs dinámicos y valida los accesos.
-2.  **App Estudiante (Frontend)**: Una interfaz premium que muestra el carnet digital y un código QR que se refresca cada 2 minutos automáticamente.
-3.  **Panel Admin (Frontend)**: Interfaz para que el personal universitario gestione la activación o suspensión de las credenciales en tiempo real.
+## 🛠️ Stack Tecnológico
+*   **Frontend:** HTML5, Vanilla CSS, JavaScript (ES6+).
+*   **Backend:** Supabase (PostgreSQL, Auth, Storage).
+*   **Seguridad:** Validador basado en Time-Blocks y firma institucional.
 
-## 🛠️ Cómo Ejecutar el Proyecto
+## 📂 Documentación
+Para guías detalladas, consulta la carpeta `docs/`:
+1.  [**Manual de Usuario**](docs/MANUAL_USUARIO.md): Guía para administradores, estudiantes y guardias.
+2.  [**Manual Técnico**](docs/MANUAL_TECNICO.md): Arquitectura, base de datos y despliegue.
+3.  [**Tabla de Requerimientos**](docs/REQUERIMIENTOS.md): Detalle de funcionalidades implementadas.
 
-### 1. Preparar el Backend
-Navega a la carpeta `backend` y ejecuta:
-```bash
-pip install -r requirements.txt
-python init_db.py  # Inicializa la base de datos con datos de prueba
-uvicorn main:app --reload
-```
-El API estará disponible en `http://localhost:8000`.
+## 🛠️ Instalación Local
+1.  Clona el repositorio.
+2.  Configura tus claves de Supabase en `frontend/supabase-client.js`.
+3.  Sirve la carpeta `frontend` con cualquier servidor local (ej: `npx serve frontend`).
 
-### 2. Ejecutar las Apps Web
-Puedes abrir los archivos `index.html` directamente en tu navegador o usar una extensión como "Live Server" en VS Code:
-- **Estudiante**: `frontend/student/index.html`
-- **Administrador**: `frontend/admin/index.html`
-
-## 🛡️ Seguridad Implementada
-- **QR Dinámico**: No codifica datos del estudiante en texto plano. Usa un JWT firmado por el servidor que expira en 2 minutos.
-- **Validación del Lado del Servidor**: El carnet solo se muestra si el estado del estudiante está "Active". Cada escaneo se registra en la base de datos.
-- **UUID Único**: Cada estudiante es identificado por un identificador universal único (UUID4).
-
-## 📊 Roadmap del Proyecto
-- [x] Capa 1: Núcleo de Identidad (Backend + DB)
-- [x] Capa 2: Credencial Digital (Web App Estudiante)
-- [x] Capa 3: Panel Administrativo
-- [ ] Integración con Azure SQL Server (Pendiente)
-- [ ] Integración con Tornos Físicos / Lectores QR
+---
+**Desarrollado para UniSalamanca** | 2026
