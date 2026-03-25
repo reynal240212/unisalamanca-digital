@@ -9,7 +9,8 @@
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../supabase-client.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
 </head>
 <body>
     <div class="admin-container">
@@ -34,10 +35,15 @@
             <section id="students-view">
                 <header class="content-header">
                     <div class="header-title">
-                        <h1>Gestión de Identidades</h1>
-                        <p class="subtitle">Administra los usuarios y sus credenciales digitales</p>
+                        <h1>Gestión de Estudiantes</h1>
+                        <p class="subtitle">Administra los accesos y modalidades de estudio</p>
                     </div>
-                    <button id="btn-open-modal" class="btn-primary">+ Nuevo Estudiante</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="btn-bulk-upload" class="btn-secondary">📤 Subir Listado (Excel)</button>
+                        <button id="btn-open-modal" class="btn-primary">+ Nuevo Estudiante</button>
+                    </div>
+                    <!-- Input oculto para carga masiva -->
+                    <input type="file" id="bulk-upload-input" accept=".xlsx, .xls, .csv" style="display: none;">
                 </header>
 
                 <div class="toolbar">

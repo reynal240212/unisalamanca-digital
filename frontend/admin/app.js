@@ -260,6 +260,86 @@ function renderLogsTable(logs) {
     });
 }
 
+// --- Carga Masiva (Excel/CSV) ---
+const btnBulkUpload = document.getElementById('btn-bulk-upload');
+const bulkUploadInput = document.getElementById('bulk-upload-input');
+
+if (btnBulkUpload && bulkUploadInput) {
+    btnBulkUpload.addEventListener('click', () => bulkUploadInput.click());
+    bulkUploadInput.addEventListener('change', handleFileSelect);
+}
+
+async function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const students = XLSX.utils.sheet_to_json(firstSheet);
+
+            if (students.length === 0) {
+                showToast('El archivo está vacío', 'error');
+                return;
+            }
+
+            if (confirm(`Se han encontrado ${students.length} estudiantes. ¿Confirmas la carga masiva?`)) {
+                await processBulkStudents(students);
+            }
+        } catch (error) {
+            console.error('Error al procesar archivo:', error);
+            showToast('Error al leer el archivo Excel', 'error');
+        }
+        bulkUploadInput.value = ''; // Limpiar input
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+async function processBulkStudents(studentList) {
+    showToast('Procesando carga masiva...', 'warning');
+    
+    // Configuración inicial
+    const password = "Salamanca2024"; 
+    const salt = dcodeIO.bcrypt.genSaltSync(10);
+    const password_hash = dcodeIO.bcrypt.hashSync(password, salt);
+    const expiryDate = new Date();
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+
+    // Mapeo de datos (Ajustar según encabezados del Excel)
+    // Se espera: Nombre, Codigo, Programa, Modalidad
+    const batch = studentList.map(s => ({
+        id: s.Codigo ? s.Codigo.toString() : undefined, 
+        name: s.Nombre || 'Sin Nombre',
+        email: `${(s.Nombre || 'user').toLowerCase().replace(/\s+/g, '.')}@unisalamanca.edu.co`,
+        program: s.Programa || 'Sin Programa',
+        study_modality: s.Modalidad || 'Presencial',
+        status: 'Active',
+        role: 'ESTUDIANTE',
+        password_hash: password_hash,
+        must_change_password: true,
+        expiration_date: expiryDate.toISOString()
+    }));
+
+    try {
+        const { error } = await supabaseClient
+            .from('user')
+            .upsert(batch, { onConflict: 'id' });
+
+        if (!error) {
+            showToast(`¡Éxito! ${batch.length} estudiantes procesados`, 'success');
+            fetchStudents();
+        } else {
+            showToast(`Error: ${error.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error en carga masiva:', error);
+        showToast('Error de conexión con la base de datos', 'error');
+    }
+}
+
 // Filtro de fecha
 const filterDateInput = document.getElementById('filter-date');
 if (filterDateInput) {
