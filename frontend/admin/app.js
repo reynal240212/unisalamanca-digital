@@ -1,11 +1,16 @@
 // Admin Settings
+// 0. Bloquear Retroceso
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    history.go(1);
+};
 
 // Verificar Sesión Admin
 const token = localStorage.getItem('auth_token');
 const userRole = localStorage.getItem('user_role');
 
 if (!token || userRole !== 'ADMIN') {
-    window.location.href = '../student/login.html';
+    window.location.replace('../student/login.html');
 }
 
 // Estado global simple
@@ -276,11 +281,16 @@ function showToast(message, type = 'success') {
 // --- Logout ---
 const btnLogout = document.getElementById('btn-logout');
 if (btnLogout) {
-    btnLogout.addEventListener('click', () => {
+    btnLogout.addEventListener('click', async () => {
+        try {
+            await supabaseClient.auth.signOut();
+        } catch (e) {
+            console.error("Error signing out:", e);
+        }
         localStorage.clear();
-        showToast('Cerrando sesión...', 'warning');
+        showToast('Sesión cerrada correctamente', 'warning');
         setTimeout(() => {
-            window.location.href = '../student/login.html';
+            window.location.replace('../student/login.html');
         }, 1000);
     });
 }

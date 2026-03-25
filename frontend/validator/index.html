@@ -26,8 +26,8 @@
             font-family: 'Outfit', sans-serif;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         header {
@@ -80,7 +80,7 @@
         }
 
         .scanner-frame {
-            width: 100%;
+            width: 90%;
             max-width: 400px;
             aspect-ratio: 1/1;
             background: var(--card-bg);
@@ -89,6 +89,7 @@
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            margin: 0 auto;
         }
 
         #reader {

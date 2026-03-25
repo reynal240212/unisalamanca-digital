@@ -209,8 +209,68 @@ body {
     background: white;
     border-radius: 20px;
     border: 1px solid var(--border);
-    overflow: hidden;
+    overflow-x: auto; /* Permite scroll horizontal en móviles */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+@media (max-width: 992px) {
+    .sidebar {
+        width: 80px;
+    }
+    .sidebar .logo, .sidebar nav ul li span:not(.icon) {
+        display: none;
+    }
+    .sidebar nav ul li {
+        justify-content: center;
+        padding: 20px;
+    }
+    .content {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        padding: 10px 20px;
+        height: auto;
+    }
+    .sidebar nav ul {
+        display: flex;
+    }
+    .sidebar nav ul li {
+        border-right: none;
+        border-bottom: 2px solid transparent;
+        padding: 10px 15px;
+    }
+    .sidebar nav ul li.active {
+        border-right: none;
+        border-bottom: 4px solid var(--primary);
+    }
+    .sidebar .logo {
+        display: block;
+        padding: 0;
+        margin-right: 20px;
+    }
+    .sidebar-footer {
+        display: block;
+        padding: 0;
+        margin-left: auto;
+        border: none;
+    }
+    .btn-logout {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+    .btn-logout span:not(.icon) {
+        display: none;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 tr:hover td {

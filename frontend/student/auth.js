@@ -137,23 +137,24 @@ function processLogin(user, email, rememberMe) {
     const urlParams = new URLSearchParams(window.location.search);
     const requestedRole = urlParams.get('role');
 
-    if (requestedRole === 'validador') {
+    // Redirección Basada en Rol
+    if (requestedRole === 'validador' || user.role === 'VALIDADOR') {
         if (user.role !== 'VALIDADOR' && user.role !== 'ADMIN') {
             showError("Error: Esta cuenta no tiene permisos de validador.");
             setLoading(false);
             return;
         }
         localStorage.setItem('user_role', user.role);
-        window.location.href = '../validator/index.html';
+        window.location.replace('../validator/index.html');
     } else if (user.role === 'ADMIN') {
         localStorage.setItem('user_role', 'ADMIN');
-        window.location.href = '../admin/index.html';
+        window.location.replace('../admin/index.html');
     } else {
         localStorage.setItem('student_user', JSON.stringify(user));
         if (user.must_change_password) {
-            window.location.href = 'change-password.html';
+            window.location.replace('change-password.html');
         } else {
-            window.location.href = 'index.html';
+            window.location.replace('index.html');
         }
     }
 }

@@ -1,4 +1,9 @@
 // Sesión de Validador
+// 0. Bloquear Retroceso
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    history.go(1);
+};
 const token = localStorage.getItem('auth_token');
 const userRole = localStorage.getItem('user_role');
 
@@ -116,9 +121,14 @@ html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
     });
 
 // Logout
-document.getElementById('logoutBtn').addEventListener('click', () => {
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try {
+        await supabaseClient.auth.signOut();
+    } catch (e) {
+        console.error("Error signing out:", e);
+    }
     html5QrCode.stop().then(() => {
         localStorage.clear();
-        window.location.href = '../student/login.html';
+        window.location.replace('../student/login.html');
     });
 });

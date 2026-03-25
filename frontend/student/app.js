@@ -1,15 +1,20 @@
 // Configuración
+// 0. Bloquear Retroceso (Prevenir volver al login tras entrar)
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    history.go(1);
+};
 
 // Verificar Sesión
 const token = localStorage.getItem('auth_token');
 const user = JSON.parse(localStorage.getItem('student_user'));
 
 if (!token || !user) {
-    window.location.href = 'login.html';
+    window.location.replace('login.html');
 }
 
 if (user && user.must_change_password) {
-    window.location.href = 'change-password.html';
+    window.location.replace('change-password.html');
 }
 
 // Variables de Onboarding
@@ -64,7 +69,7 @@ async function init() {
             // Si el usuario no existe o hay error crítico, re-loguear
             if (error && error.code === 'PGRST116') { // Not found
                 localStorage.clear();
-                window.location.href = 'login.html';
+                window.location.replace('login.html');
             }
         }
     } catch (error) {
@@ -281,10 +286,15 @@ function startProgressBar(seconds) {
 // Boton de Logout
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', async () => {
         if (stream) stream.getTracks().forEach(track => track.stop());
+        try {
+            await supabaseClient.auth.signOut();
+        } catch (e) {
+            console.error("Error signing out:", e);
+        }
         localStorage.clear();
-        window.location.href = 'login.html';
+        window.location.replace('login.html');
     });
 }
 
