@@ -413,6 +413,16 @@ tr:hover td {
     color: var(--danger);
 }
 
+.badge.egresado {
+    background: #eef2ff;
+    color: var(--primary);
+}
+
+.badge.revoked {
+    background: #f8fafc;
+    color: var(--text-dim);
+}
+
 /* --- Institutional Footer --- */
 .admin-footer {
     margin-top: auto;

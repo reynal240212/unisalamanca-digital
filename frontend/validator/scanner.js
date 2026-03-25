@@ -72,54 +72,30 @@ function getCoordinates() {
 
 async function verifyAccess(qrToken) {
     try {
-        console.log("Verificando:", qrToken);
+        console.log("Verificando QR Dinámico:", qrToken);
         
-        // 1. Intentar parsear formato Nombre|Codigo|Carrera|Modalidad
-        if (qrToken.includes('|')) {
-            const parts = qrToken.split('|');
-            if (parts.length >= 2) {
-                const [name, id, program, modality] = parts;
-                
-                // Mostrar datos extraídos de inmediato
-                showGranted({
-                    name: name,
-                    program: `${program || 'N/A'} [${modality || 'Presencial'}]`,
-                    id: id,
-                    photo_url: null
-                });
-
-                // Intentar enriquecer con foto y verificar status en DB
-                const { data: student, error } = await supabaseClient
-                    .from('user')
-                    .select('photo_url, status')
-                    .eq('id', id.trim())
-                    .single();
-                
-                if (!error && student) {
-                    if (student.status !== 'Active') {
-                        showDenied("Acceso Restringido", `El ESTUDIANTE ${name} tiene un estado: ${student.status}`);
-                        return;
-                    }
-                    // Actualizar foto si existe
-                    if (student.photo_url) {
-                        studentPhoto.src = student.photo_url;
-                        avatarContainer.style.display = 'block';
-                    }
-                    
-                // Registrar acceso con geolocalización
-                const locationWithCoords = await getCoordinates();
-                
-                supabaseClient.from('accesslog').insert({
-                    user_id: id.trim(),
-                    location: locationWithCoords,
-                    status: "Granted"
-                }).then();
-                }
-                return;
-            }
+        // 1. Validar Formato y Tiempo (Prevención de Fraude)
+        if (!qrToken.startsWith('UNIS|')) {
+            showDenied("Código Inválido", "El formato del código QR no es oficial o ha sido alterado.");
+            return;
         }
 
-        // 2. Fallback: Consulta atómica a Supabase para tokens legacy
+        const parts = qrToken.split('|');
+        if (parts.length < 3) {
+            showDenied("Código Corrupto", "El código no contiene la información necesaria.");
+            return;
+        }
+
+        const [prefix, studentId, timeBlock] = parts;
+        const currentTimeBlock = Math.floor(Date.now() / 30000);
+        
+        // Tolerancia de ±1 bloque (60s total) para evitar fallos por desfase de reloj
+        if (Math.abs(currentTimeBlock - parseInt(timeBlock)) > 1) {
+            showDenied("Código Expirado", "Este código QR ha caducado. Por favor, refresca tu carnet.");
+            return;
+        }
+
+        // 2. Consulta de Seguridad en Supabase (Verificar Token y Usuario)
         const { data: credential, error } = await supabaseClient
             .from('credential')
             .select('*, student:user!user_id(name, program, photo_url, status)')
@@ -127,24 +103,17 @@ async function verifyAccess(qrToken) {
             .single();
 
         if (error || !credential) {
-            showDenied("Código Inválido", "El código QR no es válido o no pertenece al sistema.");
+            showDenied("Token No Registrado", "El código es válido pero no ha sido registrado por el sistema.");
             return;
         }
 
-        // 3. Verificar expiración temporal (Solo para tokens en DB)
-        const now = new Date();
-        if (now > new Date(credential.expires_at)) {
-            showDenied("Código Expirado", "El tiempo de validez del código ha terminado.");
-            return;
-        }
-
-        // 4. Verificar estado del ESTUDIANTE
+        // 3. Verificar estado del ESTUDIANTE
         if (credential.student.status !== 'Active') {
             showDenied("Acceso Restringido", `El ESTUDIANTE ${credential.student.name} tiene un estado: ${credential.student.status}`);
             return;
         }
 
-        // 5. Registrar éxito y Mostrar
+        // 4. Registro y Feedback
         const locationWithCoords = await getCoordinates();
         
         supabaseClient.from('accesslog').insert({
@@ -157,7 +126,7 @@ async function verifyAccess(qrToken) {
 
     } catch (err) {
         console.error(err);
-        showDenied("Error de Red", "No se pudo conectar con el servidor de validación.");
+        showDenied("Error de Sistema", "No se pudo completar la validación en este momento.");
     }
 }
 

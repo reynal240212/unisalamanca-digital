@@ -242,6 +242,25 @@
                     <label for="expiry">Fecha de Vencimiento de Credencial</label>
                     <input type="date" id="expiry" name="expiry" required>
                 </div>
+                <div class="form-group">
+                    <label for="status">Estado de Cuenta</label>
+                    <select id="status" name="status">
+                        <option value="Active">Activo</option>
+                        <option value="Suspended">Suspendido</option>
+                        <option value="Egresado">Egresado (Graduado)</option>
+                        <option value="Revoked">Revocado</option>
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label for="plate">Placa Vehicular (LPR)</label>
+                        <input type="text" id="plate" name="plate" placeholder="Ej: ABC-123">
+                    </div>
+                    <div class="form-group">
+                        <label for="rfid">ID de Tarjeta (RFID)</label>
+                        <input type="text" id="rfid" name="rfid" placeholder="Código de tag">
+                    </div>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" id="btn-cancel">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar Estudiante</button>

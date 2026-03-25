@@ -157,6 +157,12 @@ document.getElementById('retake-btn').onclick = () => {
 };
 
 document.getElementById('save-photo-btn').onclick = async () => {
+    const privacyCheck = document.getElementById('privacy-check');
+    if (!privacyCheck.checked) {
+        alert("Debes aceptar la Política de Tratamiento de Datos (Ley 1581) para activar tu credencial.");
+        return;
+    }
+
     const imageData = photoCanvas.toDataURL('image/jpeg', 0.8);
     
     try {
@@ -228,37 +234,38 @@ async function refreshQR() {
     if (!STUDENT_ID) return;
 
     try {
-        console.log('Actualizando QR...');
+        console.log('Actualizando QR Dinámico...');
         
-        // Generar un token único localmente
-        const qrContent = `UNISALAMANCA|${STUDENT_ID}|${Date.now()}`;
+        // Generar un token único con bloque de tiempo (cada 30s)
+        const timeBlock = Math.floor(Date.now() / 30000);
+        const qrContent = `UNIS|${STUDENT_ID}|${timeBlock}`;
         
-        // 0. Limpiar tokens antiguos de este usuario (Mantenimiento)
-        await supabaseClient
-            .from('credential')
-            .delete()
-            .eq('user_id', STUDENT_ID);
-
-        // 1. Registrar el token en la tabla credential (Backend-less)
+        // Registrar el token en la tabla credential (Backend-less validation)
         const { error } = await supabaseClient
             .from('credential')
-            .insert({ 
+            .upsert({ 
                 user_id: STUDENT_ID, 
                 token: qrContent,
-                expires_at: new Date(Date.now() + 120000).toISOString() // 2 minutos
-            });
+                expires_at: new Date(Date.now() + 65000).toISOString() // Válido por ~1 min
+            }, { onConflict: 'user_id' });
 
         if (error) {
             console.error("Error al registrar credential:", error);
-            // Intentar de nuevo en el siguiente ciclo o mostrar error visual
             return;
         }
         
-        // Actualizar el QR
-        qrcode.clear();
-        qrcode.makeCode(qrContent);
+        // Actualizar el QR (Usando la librería global qrcode.js)
+        qrcodeElement.innerHTML = ''; // Limpiar previo
+        new QRCode(qrcodeElement, {
+            text: qrContent,
+            width: 200,
+            height: 200,
+            colorDark: "#0f172a",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
 
-        startProgressBar(120); // 2 minutos
+        startProgressBar(30); // Rotación cada 30 segundos
     } catch (error) {
         console.error('Error al refrescar QR:', error);
     }

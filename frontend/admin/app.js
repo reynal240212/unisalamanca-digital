@@ -116,8 +116,10 @@ function renderTable(students) {
             </td>
             <td>
                 <div style="display: flex; gap: 8px;">
-                    </select>
-                    <button class="btn-edit" onclick="openEditModal('${student.id}')">✏️</button>
+                    <button class="btn-action" onclick="openEditModal('${student.id}')" title="Editar">✏️</button>
+                    <button class="btn-action" onclick="handleStatusChange('${student.id}', '${student.status === 'Active' ? 'Suspended' : 'Active'}', '${student.name}')" title="${student.status === 'Active' ? 'Suspender' : 'Activar'}">
+                        ${student.status === 'Active' ? '🚫' : '✅'}
+                    </button>
                 </div>
             </td>
         `;
@@ -404,6 +406,9 @@ function openEditModal(studentId) {
     document.getElementById('email').value = student.email || '';
     document.getElementById('program').value = student.program || '';
     document.getElementById('modality').value = student.study_modality || 'Presencial';
+    document.getElementById('status').value = student.status || 'Active';
+    document.getElementById('plate').value = student.plate_number || '';
+    document.getElementById('rfid').value = student.rfid_tag || '';
     
     // Check para evitar el error del null en split()
     if (student.expiration_date) {
@@ -440,7 +445,10 @@ studentForm.addEventListener('submit', async (e) => {
                     email: email,
                     program: program,
                     study_modality: modality,
-                    expiration_date: new Date(expiry).toISOString()
+                    expiration_date: new Date(expiry).toISOString(),
+                    status: formData.get('status'),
+                    plate_number: formData.get('plate'),
+                    rfid_tag: formData.get('rfid')
                 })
                 .eq('id', editingStudentId);
 

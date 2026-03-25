@@ -448,3 +448,17 @@ footer p {
         margin-bottom: 15px;
     }
 }
+.privacy-consent {
+    color: var(--text-main);
+    transition: all 0.3s;
+}
+
+.privacy-consent label:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.privacy-consent input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 18px;
+    height: 18px;
+}
