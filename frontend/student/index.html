@@ -10,7 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../env.js"></script>
     <script src="../supabase-client.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Librería QRious (Más moderna y estable que qrcode.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body>
     <div id="onboarding" class="onboarding-overlay">
@@ -90,7 +91,9 @@
                     </div>
 
                     <div class="qr-section">
-                        <div id="qrcode" style="display: flex; justify-content: center; align-items: center; width: 150px; height: 150px; margin: 0 auto;"></div>
+                        <div id="qrcode" style="display: flex; justify-content: center; align-items: center; width: 150px; height: 150px; margin: 0 auto; background: white; border-radius: 12px; padding: 10px;">
+                            <canvas id="qr-canvas"></canvas>
+                        </div>
                         <div class="qr-overlay">
                             <div class="qr-scanner-line"></div>
                         </div>

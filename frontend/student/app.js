@@ -234,7 +234,7 @@ async function refreshQR() {
     if (!STUDENT_ID) return;
 
     try {
-        console.log('🔄 Actualizando QR Dinámico...');
+        console.log('🔄 Actualizando QR Dinámico (Local)...');
         
         // Generar un token único con bloque de tiempo (cada 30s)
         const timeBlock = Math.floor(Date.now() / 30000);
@@ -254,13 +254,22 @@ async function refreshQR() {
             if (error.message) console.error("Mensaje:", error.message);
         }
         
-        // Generar el QR usando una API robusta de imagen (Evita problemas de librería JS/Canvas)
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrContent)}&bgcolor=ffffff&color=0f172a&qzone=2`;
+        // Generar el QR localmente usando QRious
+        if (typeof QRious === 'undefined') {
+            console.error("❌ Error: La librería QRious no está cargada.");
+            return;
+        }
+
+        const qr = new QRious({
+            element: document.getElementById('qr-canvas'),
+            value: qrContent,
+            size: 130, // Tamaño interno cómodo
+            background: 'white',
+            foreground: '#0f172a',
+            level: 'H'
+        });
         
-        console.log('✅ Generando nuevo QR URL:', qrUrl);
-        
-        // Actualizar el contenedor con una imagen simple
-        qrcodeElement.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="width: 150px; height: 150px; display: block; border-radius: 8px;">`;
+        console.log('✅ QR local generado exitosamente.');
 
         startProgressBar(30); // Rotación cada 30 segundos
     } catch (error) {
