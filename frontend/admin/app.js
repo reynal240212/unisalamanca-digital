@@ -125,17 +125,38 @@ function renderTable(students) {
     });
 }
 
-// Búsqueda en tiempo real
-if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = allStudents.filter(s => 
-            s.name.toLowerCase().includes(term) || 
-            s.program.toLowerCase().includes(term)
-        );
-        renderTable(filtered);
+// Búsqueda y Filtrado Avanzado
+const filterInputs = {
+    search: document.getElementById('student-search'),
+    modality: document.getElementById('filter-modality'),
+    status: document.getElementById('filter-status')
+};
+
+function applyFilters() {
+    const term = filterInputs.search.value.toLowerCase();
+    const mod = filterInputs.modality.value;
+    const stat = filterInputs.status.value;
+
+    const filtered = allStudents.filter(s => {
+        const matchSearch = s.name.toLowerCase().includes(term) || (s.email && s.email.toLowerCase().includes(term));
+        const matchMod = mod === 'all' || s.study_modality === mod;
+        const matchStat = stat === 'all' || s.status === stat;
+        return matchSearch && matchMod && matchStat;
     });
+
+    renderTable(filtered);
 }
+
+Object.values(filterInputs).forEach(input => {
+    if (input) input.addEventListener('input', applyFilters);
+});
+
+document.getElementById('btn-clear-filters').addEventListener('click', () => {
+    filterInputs.search.value = '';
+    filterInputs.modality.value = 'all';
+    filterInputs.status.value = 'all';
+    applyFilters();
+});
 
 async function handleStatusChange(studentId, newStatus, studentName) {
     if (confirm(`¿Estás seguro de cambiar el estado de ${studentName} a ${newStatus}?`)) {
@@ -313,7 +334,7 @@ async function processBulkStudents(studentList) {
     const batch = studentList.map(s => ({
         id: s.Codigo ? s.Codigo.toString() : undefined, 
         name: s.Nombre || 'Sin Nombre',
-        email: `${(s.Nombre || 'user').toLowerCase().replace(/\s+/g, '.')}@unisalamanca.edu.co`,
+        email: s.Email || `${(s.Nombre || 'user').toLowerCase().replace(/\s+/g, '.')}@unisalamanca.edu.co`,
         program: s.Programa || 'Sin Programa',
         study_modality: s.Modalidad || 'Presencial',
         status: 'Active',
@@ -376,6 +397,7 @@ function openEditModal(studentId) {
     
     // Llenar formulario
     document.getElementById('name').value = student.name || '';
+    document.getElementById('email').value = student.email || '';
     document.getElementById('program').value = student.program || '';
     document.getElementById('modality').value = student.study_modality || 'Presencial';
     
@@ -399,6 +421,7 @@ studentForm.addEventListener('submit', async (e) => {
     
     const formData = new FormData(studentForm);
     const name = formData.get('name');
+    const email = formData.get('email');
     const program = formData.get('program');
     const modality = formData.get('modality');
     const expiry = formData.get('expiry');
@@ -410,6 +433,7 @@ studentForm.addEventListener('submit', async (e) => {
                 .from('user')
                 .update({
                     name: name,
+                    email: email,
                     program: program,
                     study_modality: modality,
                     expiration_date: new Date(expiry).toISOString()
@@ -435,7 +459,7 @@ studentForm.addEventListener('submit', async (e) => {
 
         const studentData = {
             name: name,
-            email: `${name.toLowerCase().replace(/\s+/g, '.')}@unisalamanca.edu.co`,
+            email: email,
             program: program,
             study_modality: modality,
             expiration_date: new Date(expiry).toISOString(),

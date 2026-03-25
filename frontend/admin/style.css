@@ -141,14 +141,19 @@ body {
 /* Toolbar & Search */
 .toolbar {
     margin-bottom: 32px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
-.search-wrapper {
+.search-box {
     position: relative;
-    max-width: 500px;
+    flex: 1;
+    min-width: 280px;
 }
 
-.search-icon {
+.search-box span {
     position: absolute;
     left: 16px;
     top: 50%;
@@ -156,21 +161,41 @@ body {
     color: var(--text-dim);
 }
 
-.search-wrapper input {
+.search-box input {
     width: 100%;
-    padding: 14px 14px 14px 48px;
-    border-radius: 16px;
+    padding: 12px 12px 12px 44px;
+    border-radius: 12px;
     border: 1px solid var(--border);
     background: white;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     transition: all 0.3s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    outline: none;
 }
 
-.search-wrapper input:focus {
-    outline: none;
+.search-box input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.action-select {
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.action-select:hover {
+    border-color: var(--primary-light);
+}
+
+.action-select:focus {
+    border-color: var(--primary);
 }
 
 /* Stats */
