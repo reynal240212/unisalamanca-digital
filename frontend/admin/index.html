@@ -185,6 +185,14 @@
         </main>
     </div>
 
+    <!-- Modal para Zoom de Foto -->
+    <div id="photo-modal" class="modal-overlay hidden" onclick="closePhotoModal()">
+        <div class="photo-zoom-container">
+            <img id="zoom-img" src="" alt="Foto Estudiante">
+            <button class="btn-close-zoom" onclick="closePhotoModal()">×</button>
+        </div>
+    </div>
+
     <!-- Modal: Nuevo Estudiante -->
     <div id="student-modal" class="modal-overlay hidden">
         <div class="modal">

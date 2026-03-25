@@ -90,11 +90,12 @@ function renderTable(students) {
         return;
     }
     students.forEach(student => {
+        const photoUrl = student.photo_url || '../img/default-avatar.png';
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>
-                <div class="student-thumb">
-                    <img src="${student.photo_url || '../img/default-avatar.png'}" onerror="this.src='../img/default-avatar.png'">
+                <div class="student-thumb" onclick="showPhotoModal('${photoUrl}', '${student.name}')" title="Ver foto ampliada">
+                    <img src="${photoUrl}" onerror="this.src='../img/default-avatar.png'">
                 </div>
             </td>
             <td>
@@ -538,3 +539,31 @@ if (btnLogout) {
 
 // Cargar al inicio
 fetchStudents();
+// --- Zoom de Foto ---
+function showPhotoModal(url, name) {
+    const photoModal = document.getElementById('photo-modal');
+    const zoomImg = document.getElementById('zoom-img');
+    
+    if (!photoModal || !zoomImg) return;
+
+    zoomImg.src = url;
+    photoModal.classList.remove('hidden');
+    // Prevenir scroll del body
+    document.body.style.overflow = 'hidden';
+}
+
+function closePhotoModal() {
+    const photoModal = document.getElementById('photo-modal');
+    if (photoModal) {
+        photoModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Cerrar modal con la tecla Esc
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closePhotoModal();
+        if (!modal.classList.contains('hidden')) closeModal();
+    }
+});
