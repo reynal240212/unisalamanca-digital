@@ -229,9 +229,15 @@ function openEditModal(studentId) {
     document.getElementById('modal-title').innerText = "Editar Estudiante";
     
     // Llenar formulario
-    document.getElementById('name').value = student.name;
-    document.getElementById('program').value = student.program;
-    document.getElementById('expiry').value = student.expiration_date.split('T')[0];
+    document.getElementById('name').value = student.name || '';
+    document.getElementById('program').value = student.program || '';
+    
+    // Check para evitar el error del null en split()
+    if (student.expiration_date) {
+        document.getElementById('expiry').value = student.expiration_date.split('T')[0];
+    } else {
+        document.getElementById('expiry').value = '';
+    }
 
     modal.classList.remove('hidden');
 }
