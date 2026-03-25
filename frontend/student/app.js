@@ -251,34 +251,16 @@ async function refreshQR() {
 
         if (error) {
             console.error("❌ Error al registrar credential:", error);
-            // Mostrar más detalle si está disponible
             if (error.message) console.error("Mensaje:", error.message);
-            if (error.details) console.error("Detalles:", error.details);
-            // Intentamos mostrar el QR de todos modos para depuración visual
         }
         
-        // Actualizar el QR (Usando la librería global qrcode.js)
-        if (typeof QRCode === 'undefined') {
-            console.error("❌ Error: La librería QRCode no está cargada.");
-            qrcodeElement.innerHTML = '<p style="color:red; font-size:10px;">Error: QRCode Lib missing</p>';
-            return;
-        }
-
-        qrcodeElement.innerHTML = ''; // Limpiar previo
-        console.log('✅ Generando nuevo QR para:', qrContent);
+        // Generar el QR usando una API robusta de imagen (Evita problemas de librería JS/Canvas)
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrContent)}&bgcolor=ffffff&color=0f172a&qzone=2`;
         
-        try {
-            new QRCode(qrcodeElement, {
-                text: qrContent,
-                width: 150, // Ajustado a CSS
-                height: 150, // Ajustado a CSS
-                colorDark: "#0f172a",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        } catch (qrErr) {
-            console.error("❌ Error al renderizar QRCode:", qrErr);
-        }
+        console.log('✅ Generando nuevo QR URL:', qrUrl);
+        
+        // Actualizar el contenedor con una imagen simple
+        qrcodeElement.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="width: 150px; height: 150px; display: block; border-radius: 8px;">`;
 
         startProgressBar(30); // Rotación cada 30 segundos
     } catch (error) {
