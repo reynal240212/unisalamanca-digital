@@ -295,6 +295,11 @@ function startProgressBar(seconds) {
         const percent = (timeLeft / seconds) * 100;
         progressBar.style.width = `${percent}%`;
         
+        const timerText = document.getElementById('timer-text');
+        if (timerText) {
+            timerText.innerText = `El código se actualiza en ${timeLeft}s`;
+        }
+        
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             refreshQR(); // Auto refrescar
