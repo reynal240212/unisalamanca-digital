@@ -89,7 +89,6 @@ function renderTable(students) {
         `;
         return;
     }
-
     students.forEach(student => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -98,24 +97,24 @@ function renderTable(students) {
                     <img src="${student.photo_url || '../img/default-avatar.png'}" onerror="this.src='../img/default-avatar.png'">
                 </div>
             </td>
-            <td style="font-weight: 600;">${student.name}</td>
-            <td style="color: var(--text-dim);">${student.program}</td>
             <td>
-                <span class="badge ${student.study_modality === 'PAT' ? 'suspended' : 'active'}" style="background: ${student.study_modality === 'PAT' ? '#e0f2fe' : '#f0fdf4'}; color: ${student.study_modality === 'PAT' ? '#0369a1' : '#166534'};">
+                <div class="student-row-info">
+                    <span class="student-name">${student.name}</span>
+                    <span class="student-sub">${student.email || 'No email'}</span>
+                </div>
+            </td>
+            <td style="color: var(--text-dim); font-size: 0.9rem;">${student.program}</td>
+            <td>
+                <span class="badge ${student.study_modality === 'PAT' ? 'warning' : 'active'}">
                     ${student.study_modality || 'Presencial'}
                 </span>
             </td>
-            <td style="font-family: monospace; font-size: 0.8rem;">${student.id.split('-')[0]}...</td>
+            <td style="font-family: monospace; font-size: 0.8rem; color: var(--text-dim);">${student.id.split('-')[0]}...</td>
             <td>
                 <span class="badge ${student.status.toLowerCase()}">${student.status}</span>
             </td>
             <td>
                 <div style="display: flex; gap: 8px;">
-                    <select class="action-select" onchange="handleStatusChange('${student.id}', this.value, '${student.name}')">
-                        <option value="" disabled selected>Estado</option>
-                        <option value="Active">Activar</option>
-                        <option value="Suspended">Suspender</option>
-                        <option value="Revoked">Revocar</option>
                     </select>
                     <button class="btn-edit" onclick="openEditModal('${student.id}')">✏️</button>
                 </div>
@@ -263,16 +262,20 @@ function renderLogsTable(logs) {
         const modality = log.student ? (log.student.study_modality || 'Presencial') : 'N/A';
 
         tr.innerHTML = `
-            <td style="font-weight: 600;">${studentName}</td>
-            <td style="color: var(--text-dim); font-size: 0.85rem;">
-                ${studentProgram}
-                <div style="font-size: 0.7rem; color: var(--primary); font-weight: 600;">${modality}</div>
+            <td>
+                <div class="student-row-info">
+                    <span class="student-name">${studentName}</span>
+                    <span class="student-sub">${studentProgram}</span>
+                </div>
             </td>
             <td>
-                <div>${dateStr}</div>
+                <span class="badge ${modality === 'PAT' ? 'warning' : 'active'}">${modality}</span>
+            </td>
+            <td>
+                <div style="font-weight: 600;">${dateStr}</div>
                 <div style="font-size: 0.75rem; color: var(--text-dim);">${timeStr}</div>
             </td>
-            <td>${log.location}</td>
+            <td style="font-size: 0.9rem;">${log.location}</td>
             <td>
                 <span class="badge ${log.status === 'Granted' ? 'active' : 'suspended'}">${log.status}</span>
             </td>

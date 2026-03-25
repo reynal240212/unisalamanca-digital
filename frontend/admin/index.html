@@ -15,17 +15,36 @@
 <body>
     <div class="admin-container">
         <aside class="sidebar">
-            <div class="logo">UniSalamanca</div>
+            <div class="sidebar-brand">
+                <div class="logo-icon">US</div>
+                <span>UniSalamanca</span>
+            </div>
+            
             <nav>
-                <ul id="menu">
-                    <li id="menu-students" class="active"><span class="icon">👥</span> Estudiantes</li>
-                    <li id="menu-reports"><span class="icon">📊</span> Reportes de Acceso</li>
-                    <li id="menu-settings"><span class="icon">⚙️</span> Configuración</li>
+                <ul>
+                    <li id="menu-students" class="active">
+                        <span class="icon">👥</span>
+                        <span>Estudiantes</span>
+                    </li>
+                    <li id="menu-reports">
+                        <span class="icon">📊</span>
+                        <span>Reportes</span>
+                    </li>
+                    <li id="menu-settings">
+                        <span class="icon">⚙️</span>
+                        <span>Ajustes</span>
+                    </li>
                 </ul>
             </nav>
-            <div class="sidebar-footer">
-                <button id="btn-logout" class="btn-logout">
-                    <span class="icon">🚪</span> Cerrar Sesión
+
+            <div class="sidebar-user">
+                <div class="user-avatar">AD</div>
+                <div class="user-info">
+                    <p class="user-name">Administrador</p>
+                    <p class="user-role">Sede Central</p>
+                </div>
+                <button id="btn-logout" class="btn-icon-logout" title="Cerrar Sesión">
+                    🚪
                 </button>
             </div>
         </aside>
@@ -100,6 +119,20 @@
                         </tbody>
                     </table>
                 </section>
+                
+                <footer class="admin-footer">
+                    <div class="footer-content">
+                        <div class="footer-left">
+                            <p>© 2024 Corporación Universitaria de Salamanca</p>
+                            <span class="footer-tag">Sistema Digital de Identificación</span>
+                        </div>
+                        <div class="footer-links">
+                            <a href="#">Soporte</a>
+                            <a href="#">Privacidad</a>
+                            <a href="#">Sede Principal: Cra. 50 #79 -155</a>
+                        </div>
+                    </div>
+                </footer>
             </section>
 
             <!-- Sección: Reportes -->
@@ -126,8 +159,8 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Estudiante</th>
-                                <th>Programa</th>
+                                <th>Estudiante / Programa</th>
+                                <th>Modalidad</th>
                                 <th>Fecha/Hora</th>
                                 <th>Ubicación</th>
                                 <th>Resultado</th>
