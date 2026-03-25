@@ -29,7 +29,7 @@ const photoUpload = document.getElementById('photo-upload');
 
 let STUDENT_ID = user ? user.id : ''; 
 
-const qrcodeElement = document.getElementById('qrcode');
+const qrcodeElement = document.getElementById('qrcode-v2');
 // The initial QRCode object is no longer needed as it will be regenerated in refreshQR
 // const qrcode = new QRCode(qrcodeElement, {
 //     text: "placeholder",
@@ -275,7 +275,7 @@ async function refreshQR() {
                 return;
             }
             qrcodeElement.innerHTML = svgString;
-            console.log('✅ QR SVG inyectado exitosamente (Anti-Brave Bypass).');
+            console.log('✅ QR SVG inyectado en qrcode-v2.');
         });
 
         startProgressBar(30); // Rotación cada 30 segundos
