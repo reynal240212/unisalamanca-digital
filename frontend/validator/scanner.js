@@ -32,15 +32,39 @@ function onScanSuccess(decodedText) {
     verifyAccess(decodedText);
 }
 // --- Auxiliares ---
+const CAMPUS_COORDS = { lat: 11.0028, lon: -74.8081 };
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // Radio de la Tierra en metros
+    const φ1 = lat1 * Math.PI/180;
+    const φ2 = lat2 * Math.PI/180;
+    const Δφ = (lat2-lat1) * Math.PI/180;
+    const Δλ = (lon2-lon1) * Math.PI/180;
+
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    return R * c; // Distancia en metros
+}
+
 function getCoordinates() {
     return new Promise((resolve) => {
         if (!navigator.geolocation) {
-            resolve("Ubicación no soportada");
+            resolve("Dispositivo sin GPS");
             return;
         }
         navigator.geolocation.getCurrentPosition(
-            (pos) => resolve(`Sede Principal (Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)})`),
-            (err) => resolve("Sede Principal (Sin GPS)"),
+            (pos) => {
+                const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, CAMPUS_COORDS.lat, CAMPUS_COORDS.lon);
+                if (dist <= 500) {
+                    resolve("Sede Principal (Cra 50 #79-155)");
+                } else {
+                    resolve(`Ubicación Remota (Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)})`);
+                }
+            },
+            (err) => resolve("Ubicación No Autorizada"),
             { timeout: 5000 }
         );
     });
@@ -50,18 +74,18 @@ async function verifyAccess(qrToken) {
     try {
         console.log("Verificando:", qrToken);
         
-        // 1. Intentar parsear formato Nombre|Codigo|Carrera
+        // 1. Intentar parsear formato Nombre|Codigo|Carrera|Modalidad
         if (qrToken.includes('|')) {
             const parts = qrToken.split('|');
             if (parts.length >= 2) {
-                const [name, id, program] = parts;
+                const [name, id, program, modality] = parts;
                 
                 // Mostrar datos extraídos de inmediato
                 showGranted({
                     name: name,
-                    program: program || 'N/A',
+                    program: `${program || 'N/A'} [${modality || 'Presencial'}]`,
                     id: id,
-                    photo_url: null // Se buscará en DB si es posible
+                    photo_url: null
                 });
 
                 // Intentar enriquecer con foto y verificar status en DB

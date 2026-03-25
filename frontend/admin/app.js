@@ -100,6 +100,11 @@ function renderTable(students) {
             </td>
             <td style="font-weight: 600;">${student.name}</td>
             <td style="color: var(--text-dim);">${student.program}</td>
+            <td>
+                <span class="badge ${student.study_modality === 'PAT' ? 'suspended' : 'active'}" style="background: ${student.study_modality === 'PAT' ? '#e0f2fe' : '#f0fdf4'}; color: ${student.study_modality === 'PAT' ? '#0369a1' : '#166534'};">
+                    ${student.study_modality || 'Presencial'}
+                </span>
+            </td>
             <td style="font-family: monospace; font-size: 0.8rem;">${student.id.split('-')[0]}...</td>
             <td>
                 <span class="badge ${student.status.toLowerCase()}">${student.status}</span>
@@ -195,7 +200,14 @@ async function fetchLogs(selectedDate = null) {
         const { data: logs, error } = await query;
 
         if (error) throw error;
-        renderLogsTable(logs);
+
+        // Enriquecer logs con modalidad si viene del join
+        const enrichedLogs = logs.map(log => ({
+            ...log,
+            modality: log.student ? log.student.study_modality : 'Presencial'
+        }));
+
+        renderLogsTable(enrichedLogs);
         
         // Actualizar dashboard reporte
         if (selectedDate) {
@@ -215,7 +227,7 @@ function renderLogsTable(logs) {
     tbody.innerHTML = '';
 
     if (!logs || logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No hay registros para este criterio.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay registros para este criterio.</td></tr>';
         return;
     }
 
@@ -227,10 +239,14 @@ function renderLogsTable(logs) {
         
         const studentName = log.student ? log.student.name : 'Unknown';
         const studentProgram = log.student ? log.student.program : 'N/A';
+        const modality = log.student ? (log.student.study_modality || 'Presencial') : 'N/A';
 
         tr.innerHTML = `
             <td style="font-weight: 600;">${studentName}</td>
-            <td style="color: var(--text-dim); font-size: 0.85rem;">${studentProgram}</td>
+            <td style="color: var(--text-dim); font-size: 0.85rem;">
+                ${studentProgram}
+                <div style="font-size: 0.7rem; color: var(--primary); font-weight: 600;">${modality}</div>
+            </td>
             <td>
                 <div>${dateStr}</div>
                 <div style="font-size: 0.75rem; color: var(--text-dim);">${timeStr}</div>
@@ -281,6 +297,7 @@ function openEditModal(studentId) {
     // Llenar formulario
     document.getElementById('name').value = student.name || '';
     document.getElementById('program').value = student.program || '';
+    document.getElementById('modality').value = student.study_modality || 'Presencial';
     
     // Check para evitar el error del null en split()
     if (student.expiration_date) {
@@ -303,6 +320,7 @@ studentForm.addEventListener('submit', async (e) => {
     const formData = new FormData(studentForm);
     const name = formData.get('name');
     const program = formData.get('program');
+    const modality = formData.get('modality');
     const expiry = formData.get('expiry');
 
     if (editingStudentId) {
@@ -313,6 +331,7 @@ studentForm.addEventListener('submit', async (e) => {
                 .update({
                     name: name,
                     program: program,
+                    study_modality: modality,
                     expiration_date: new Date(expiry).toISOString()
                 })
                 .eq('id', editingStudentId);
@@ -338,6 +357,7 @@ studentForm.addEventListener('submit', async (e) => {
             name: name,
             email: `${name.toLowerCase().replace(/\s+/g, '.')}@unisalamanca.edu.co`,
             program: program,
+            study_modality: modality,
             expiration_date: new Date(expiry).toISOString(),
             status: 'Active',
             role: 'ESTUDIANTE',
