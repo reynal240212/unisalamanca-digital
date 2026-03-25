@@ -31,6 +31,20 @@ function onScanSuccess(decodedText) {
     html5QrCode.pause();
     verifyAccess(decodedText);
 }
+// --- Auxiliares ---
+function getCoordinates() {
+    return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+            resolve("Ubicación no soportada");
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            (pos) => resolve(`Sede Principal (Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)})`),
+            (err) => resolve("Sede Principal (Sin GPS)"),
+            { timeout: 5000 }
+        );
+    });
+}
 
 async function verifyAccess(qrToken) {
     try {
@@ -68,12 +82,14 @@ async function verifyAccess(qrToken) {
                         avatarContainer.style.display = 'block';
                     }
                     
-                    // Registrar acceso
-                    supabaseClient.from('accesslog').insert({
-                        user_id: id.trim(),
-                        location: "Acceso Digital (QR Directo)",
-                        status: "Granted"
-                    }).then();
+                // Registrar acceso con geolocalización
+                const locationWithCoords = await getCoordinates();
+                
+                supabaseClient.from('accesslog').insert({
+                    user_id: id.trim(),
+                    location: locationWithCoords,
+                    status: "Granted"
+                }).then();
                 }
                 return;
             }
@@ -105,9 +121,11 @@ async function verifyAccess(qrToken) {
         }
 
         // 5. Registrar éxito y Mostrar
+        const locationWithCoords = await getCoordinates();
+        
         supabaseClient.from('accesslog').insert({
             user_id: credential.user_id,
-            location: "Acceso Digital",
+            location: locationWithCoords,
             status: "Granted"
         }).then();
 
