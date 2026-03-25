@@ -21,10 +21,16 @@ Para guías detalladas, consulta la carpeta `docs/`:
 2.  [**Manual Técnico**](docs/MANUAL_TECNICO.md): Arquitectura, base de datos y despliegue.
 3.  [**Tabla de Requerimientos**](docs/REQUERIMIENTOS.md): Detalle de funcionalidades implementadas.
 
+## 🛠️ Despliegue en Vercel
+Para desplegar correctamente en Vercel, sigue estas configuraciones:
+1.  **Build Command:** `npm run build`
+2.  **Output Directory:** `.` (Esencial para que Vercel encuentre la carpeta `frontend/`)
+3.  **Variables de Entorno:** Configura `SUPABASE_URL` y `SUPABASE_ANON_KEY` en los ajustes de Vercel.
+
 ## 🛠️ Instalación Local
 1.  Clona el repositorio.
-2.  Configura tus claves de Supabase en `frontend/supabase-client.js`.
-3.  Sirve la carpeta `frontend` con cualquier servidor local (ej: `npx serve frontend`).
+2.  Copia `frontend/env.example.js` a `frontend/env.js` y pon tus llaves.
+3.  Sirve la carpeta raíz con cualquier servidor local (ej: `npx serve .`).
 
 ---
 **Desarrollado para UniSalamanca** | 2026
