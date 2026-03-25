@@ -454,13 +454,30 @@ td {
     display: none !important;
 }
 
-.card {
+/* Reports Specific */
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     background: white;
-    padding: 40px;
-    border-radius: 20px;
+    padding: 8px 16px;
+    border-radius: 12px;
     border: 1px solid var(--border);
-    text-align: center;
+}
+
+.filter-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
     color: var(--text-dim);
+}
+
+.filter-group input {
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
 }
 
 /* Toast System */

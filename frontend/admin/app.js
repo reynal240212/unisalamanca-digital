@@ -167,18 +167,46 @@ function updateStats(students) {
 }
 
 // --- Reportes ---
-async function fetchLogs() {
+async function fetchLogs(selectedDate = null) {
     try {
-        const { data: logs, error } = await supabaseClient
+        const tbody = document.getElementById('logs-table-body');
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Filtrando datos...</td></tr>';
+
+        let query = supabaseClient
             .from('accesslog')
-            .select('*')
-            .order('timestamp', { ascending: false })
-            .limit(100);
+            .select('*, student:user(name, program)')
+            .order('timestamp', { ascending: false });
+
+        // Si hay fecha, filtrar por el rango del día
+        if (selectedDate) {
+            const start = new Date(selectedDate);
+            start.setHours(0,0,0,0);
+            const end = new Date(selectedDate);
+            end.setHours(23,59,59,999);
+            
+            query = query
+                .gte('timestamp', start.toISOString())
+                .lte('timestamp', end.toISOString());
+        } else {
+            // Por defecto, mostrar los últimos 100
+            query = query.limit(100);
+        }
+
+        const { data: logs, error } = await query;
 
         if (error) throw error;
         renderLogsTable(logs);
+        
+        // Actualizar dashboard reporte
+        if (selectedDate) {
+            document.getElementById('day-total').innerText = logs.length;
+        } else {
+            document.getElementById('day-total').innerText = logs.length + " (Recientes)";
+        }
+
     } catch (error) {
         console.error('Error al obtener logs:', error);
+        showToast('Error al cargar reportes', 'error');
     }
 }
 
@@ -187,22 +215,44 @@ function renderLogsTable(logs) {
     tbody.innerHTML = '';
 
     if (!logs || logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No hay registros de acceso aún.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No hay registros para este criterio.</td></tr>';
         return;
     }
 
     logs.forEach(log => {
         const tr = document.createElement('tr');
-        const date = new Date(log.timestamp).toLocaleString();
+        const dateObj = new Date(log.timestamp);
+        const dateStr = dateObj.toLocaleDateString();
+        const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        const studentName = log.student ? log.student.name : 'Unknown';
+        const studentProgram = log.student ? log.student.program : 'N/A';
+
         tr.innerHTML = `
-            <td style="font-family: monospace; font-size: 0.8rem;">${log.user_id.split('-')[0]}...</td>
-            <td>${date}</td>
+            <td style="font-weight: 600;">${studentName}</td>
+            <td style="color: var(--text-dim); font-size: 0.85rem;">${studentProgram}</td>
+            <td>
+                <div>${dateStr}</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">${timeStr}</div>
+            </td>
             <td>${log.location}</td>
             <td>
                 <span class="badge ${log.status === 'Granted' ? 'active' : 'suspended'}">${log.status}</span>
             </td>
         `;
         tbody.appendChild(tr);
+    });
+}
+
+// Filtro de fecha
+const filterDateInput = document.getElementById('filter-date');
+if (filterDateInput) {
+    // Poner fecha de hoy por defecto
+    const hoy = new Date().toISOString().split('T')[0];
+    filterDateInput.value = hoy;
+
+    filterDateInput.addEventListener('change', (e) => {
+        fetchLogs(e.target.value);
     });
 }
 

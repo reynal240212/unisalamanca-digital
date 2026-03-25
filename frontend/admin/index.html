@@ -86,13 +86,29 @@
             <!-- Sección: Reportes -->
             <section id="reports-view" class="hidden">
                 <header class="content-header">
-                    <h1>Reportes de Acceso</h1>
+                    <div class="header-title">
+                        <h1>Reportes de Acceso</h1>
+                        <p class="subtitle">Monitoreo de ingresos al campus en tiempo real</p>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-date">Fecha:</label>
+                        <input type="date" id="filter-date" class="action-select">
+                    </div>
                 </header>
+
+                <div class="stats-grid" style="margin-bottom: 24px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                    <div class="stat-card success">
+                        <span class="stat-label">Ingresos Totales (Día)</span>
+                        <span id="day-total" class="stat-value">0</span>
+                    </div>
+                </div>
+
                 <section class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>Estudiante ID</th>
+                                <th>Estudiante</th>
+                                <th>Programa</th>
                                 <th>Fecha/Hora</th>
                                 <th>Ubicación</th>
                                 <th>Resultado</th>
