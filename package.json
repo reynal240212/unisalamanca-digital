@@ -1,0 +1,10 @@
+{
+  "name": "unisalamanca-digital",
+  "version": "1.0.0",
+  "description": "Digital Identity Platform for UniSalamanca",
+  "scripts": {
+    "build": "node scripts/build-env.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

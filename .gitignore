@@ -22,5 +22,6 @@ Thumbs.db
 # Project specific
 frontend/uploads/*
 !frontend/uploads/.gitkeep
+frontend/env.js
 api/.env
 backend/.env
