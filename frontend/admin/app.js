@@ -95,7 +95,7 @@ function renderTable(students) {
         tr.innerHTML = `
             <td>
                 <div class="student-thumb">
-                    <img src="${student.photo_url || '../student/img/default-avatar.png'}" onerror="this.src='../student/img/default-avatar.png'">
+                    <img src="${student.photo_url || '../img/default-avatar.png'}" onerror="this.src='../img/default-avatar.png'">
                 </div>
             </td>
             <td style="font-weight: 600;">${student.name}</td>
