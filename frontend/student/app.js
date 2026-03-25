@@ -234,7 +234,7 @@ async function refreshQR() {
     if (!STUDENT_ID) return;
 
     try {
-        console.log('Actualizando QR Dinámico...');
+        console.log('🔄 Actualizando QR Dinámico...');
         
         // Generar un token único con bloque de tiempo (cada 30s)
         const timeBlock = Math.floor(Date.now() / 30000);
@@ -250,24 +250,36 @@ async function refreshQR() {
             }, { onConflict: 'user_id' });
 
         if (error) {
-            console.error("Error al registrar credential:", error);
-            return;
+            console.error("❌ Error al registrar credential:", error);
+            // Intentamos mostrar el QR de todos modos para depuración visual
         }
         
         // Actualizar el QR (Usando la librería global qrcode.js)
+        if (typeof QRCode === 'undefined') {
+            console.error("❌ Error: La librería QRCode no está cargada.");
+            qrcodeElement.innerHTML = '<p style="color:red; font-size:10px;">Error: QRCode Lib missing</p>';
+            return;
+        }
+
         qrcodeElement.innerHTML = ''; // Limpiar previo
-        new QRCode(qrcodeElement, {
-            text: qrContent,
-            width: 200,
-            height: 200,
-            colorDark: "#0f172a",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
+        console.log('✅ Generando nuevo QR para:', qrContent);
+        
+        try {
+            new QRCode(qrcodeElement, {
+                text: qrContent,
+                width: 150, // Ajustado a CSS
+                height: 150, // Ajustado a CSS
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        } catch (qrErr) {
+            console.error("❌ Error al renderizar QRCode:", qrErr);
+        }
 
         startProgressBar(30); // Rotación cada 30 segundos
     } catch (error) {
-        console.error('Error al refrescar QR:', error);
+        console.error('❌ Error general en refreshQR:', error);
     }
 }
 
