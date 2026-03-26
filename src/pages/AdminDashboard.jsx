@@ -20,7 +20,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
     program: student?.program || '',
     role: student?.role || 'ESTUDIANTE',
     status: student?.status || 'Active',
-    password: '',
+    password: isEdit ? '' : 'Unisalamanca2026*',
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -127,6 +127,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
                 style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontFamily: 'inherit', fontSize: '0.9rem', outline: 'none', background: 'white' }}>
                 <option value="ESTUDIANTE">Estudiante</option>
                 <option value="EGRESADO">Egresado</option>
+                <option value="ADMINISTRATIVO">Administrativo</option>
                 <option value="VALIDADOR">Validador</option>
                 <option value="ADMIN">Admin</option>
               </select>
