@@ -15,6 +15,10 @@ venv/
 node_modules/
 .vercel/
 
+# Build
+dist/
+.output/
+
 # OS
 .DS_Store
 Thumbs.db
