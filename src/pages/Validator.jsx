@@ -38,9 +38,31 @@ const Validator = () => {
     }
   };
 
+  const playSound = (type) => {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.connect(g);
+    g.connect(ctx.destination);
+    
+    if (type === 'success') {
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
+      g.gain.setValueAtTime(0.1, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+    } else {
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.2);
+      g.gain.setValueAtTime(0.1, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+    }
+    
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+  };
+
   const onScanSuccess = async (decodedText) => {
     try {
-      // Formato esperado: UNIS|{studentId}|{timeBlock}
       const parts = decodedText.split('|');
       if (parts[0] !== 'UNIS' || parts.length !== 3) throw new Error("QR No institucional");
 
@@ -48,18 +70,16 @@ const Validator = () => {
       const receivedBlock = parseInt(parts[2]);
       const currentBlock = Math.floor(Date.now() / 30000);
 
-      // Parada temporal del scanner
       await scannerRef.current.stop();
       setIsScanning(false);
 
-      // Validación del bloque de tiempo (±1 bloque = 60s ventana)
       const diff = Math.abs(currentBlock - receivedBlock);
       if (diff > 1) {
+        playSound('error');
         setScanResult({ success: false, message: "CÓDIGO EXPIRADO (Captura detectada)" });
         return;
       }
 
-      // Consulta a Supabase
       const { data: student, error } = await supabase
         .from('user')
         .select('*')
@@ -69,15 +89,16 @@ const Validator = () => {
       if (error || !student) throw new Error("Estudiante no registrado");
 
       if (student.status !== 'Active') {
+        playSound('error');
         setScanResult({ success: false, message: `ACCESO DENEGADO: Cuenta ${student.status}` });
         setStudentData(student);
         return;
       }
 
+      playSound('success');
       setScanResult({ success: true, message: "ACCESO PERMITIDO" });
       setStudentData(student);
 
-      // Registro de Log (RF-05)
       await supabase.from('access_logs').insert({
         user_id: studentId,
         status: 'GRANTED',
@@ -85,6 +106,7 @@ const Validator = () => {
       });
 
     } catch (err) {
+      playSound('error');
       setScanResult({ success: false, message: err.message });
     }
   };
@@ -97,51 +119,51 @@ const Validator = () => {
   };
 
   return (
-    <div className="login-page" style={{ flexDirection: 'column' }}>
-      <header style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', width: '100%', color: '#4f46e5' }}>
-        <h2 style={{ fontSize: '1rem' }}>UniSalamanca <span style={{ fontWeight: 300 }}>Validador</span></h2>
-        <button onClick={logout} className="btn-primary" style={{ padding: '5px 10px', fontSize: '0.7rem' }}>SALIR</button>
+    <div className="login-page" style={{ flexDirection: 'column', background: 'var(--footer-bg)' }}>
+      <header style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', width: '100%', color: 'white', background: 'rgba(0,0,0,0.2)' }}>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 900 }}>
+          <span style={{ color: 'var(--secondary)' }}>Uni</span>Salamanca <span style={{ fontWeight: 300, fontSize: '0.8rem', opacity: 0.8 }}>| VALIDADOR</span>
+        </h2>
+        <button onClick={logout} className="btn-primary" style={{ padding: '8px 15px', fontSize: '0.75rem', background: 'var(--primary)' }}>SALIR</button>
       </header>
 
       <div className="scanner-view" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-        <div style={{ width: '90%', maxWidth: '400px', background: 'white', borderRadius: '40px', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0' }}>
+        <div style={{ width: '85%', maxWidth: '380px', background: 'white', borderRadius: '40px', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,0,0,0.5)', border: '4px solid var(--secondary)' }}>
            <div id="reader" style={{ width: '100%', height: '100%' }}></div>
         </div>
         
-        <div style={{ marginTop: '30px', textAlign: 'center' }}>
-          <h3>Escaner de Identidad</h3>
-          <p style={{ color: '#64748b' }}>Apunta al código QR del estudiante</p>
+        <div style={{ marginTop: '40px', textAlign: 'center', color: 'white' }}>
+          <h3 style={{ fontWeight: 800, fontSize: '1.4rem' }}>Escáner de Seguridad</h3>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>Apunta al código QR del carnet digital</p>
         </div>
       </div>
 
       {scanResult && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(255,255,255,0.98)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-           <div className="login-card" style={{ maxWidth: '400px', padding: '40px', textAlign: 'center', flexDirection: 'column', border: '1px solid #e2e8f0' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(15,23,42,0.98)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+           <div className="login-card" style={{ maxWidth: '400px', padding: '40px', textAlign: 'center', flexDirection: 'column', background: 'white', borderRadius: '40px' }}>
               <div style={{ 
-                width: '80px', height: '80px', borderRadius: '25px', 
+                width: '80px', height: '80px', borderRadius: '30px', 
                 display: 'flex', justifyContent: 'center', alignItems: 'center', 
                 margin: '0 auto 20px',
-                background: scanResult.success ? '#ecfdf5' : '#fef2f2',
-                color: scanResult.success ? '#10b981' : '#ef4444'
+                background: scanResult.success ? '#f0fdf4' : '#fef2f2',
+                color: scanResult.success ? '#16A34A' : '#ef4444'
               }}>
-                 {scanResult.success ? <CheckCircle size={40} /> : <XCircle size={40} />}
+                 {scanResult.success ? <CheckCircle size={50} /> : <XCircle size={50} />}
               </div>
               
               {studentData && (
-                <div style={{ width: '100px', height: '100px', borderRadius: '30px', overflow: 'hidden', margin: '0 auto 20px', border: '3px solid #4f46e5' }}>
+                <div style={{ width: '140px', height: '140px', borderRadius: '40px', overflow: 'hidden', margin: '0 auto 20px', border: '5px solid var(--secondary)', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
                   <img src={studentData.photo_url || '/images/default-avatar.png'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               )}
 
-              <h2>{scanResult.message}</h2>
-              {studentData && <p style={{ color: '#64748b', marginBottom: '30px' }}>{studentData.name}<br/>{studentData.program}</p>}
+              <h2 style={{ color: 'var(--primary)', fontWeight: 900, fontSize: '1.5rem', marginBottom: '10px' }}>{scanResult.message}</h2>
+              {studentData && <p style={{ color: 'var(--text-muted)', marginBottom: '30px', fontWeight: 700 }}>{studentData.name}<br/>{studentData.program}</p>}
 
-              <button className="btn-primary" style={{ width: '100%', padding: '18px' }} onClick={resetScanner}>SIGUIENTE</button>
+              <button className="btn-primary" style={{ width: '100%', padding: '20px', borderRadius: '15px', fontWeight: 900, background: 'var(--primary)' }} onClick={resetScanner}>CONTINUAR ESCANEO</button>
            </div>
         </div>
       )}
     </div>
   );
-};
-
-export default Validator;
+}; export default Validator;tor;

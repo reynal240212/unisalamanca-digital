@@ -176,18 +176,20 @@ const ReportesSection = ({ students }) => {
 };
 
 /* ─── SECCIÓN SEGURIDAD ─────────────────────────────────────────── */
-const SeguridadSection = ({ students }) => {
+const SeguridadSection = ({ students, logs = [] }) => {
   const validators = students.filter(s => s.role === 'VALIDADOR');
+  const todayLogs = logs.filter(l => new Date(l.created_at).toDateString() === new Date().toDateString());
+  
   return (
     <div>
       <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#1e293b', marginBottom: '6px' }}>Seguridad del Campus</h1>
-      <p style={{ color: '#64748b', marginBottom: '32px' }}>Gestión de agentes validadores y accesos al sistema</p>
+      <p style={{ color: '#64748b', marginBottom: '32px' }}>Actividad de acceso y gestión de validadores</p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}>
         {[
           { icon: <Shield size={22} />, label: 'Validadores Activos', value: validators.length, color: '#2A2266', bg: '#eef2ff' },
-          { icon: <Activity size={22} />, label: 'Escaneos Hoy', value: '—', color: '#16A34A', bg: '#f0fdf4' },
-          { icon: <AlertTriangle size={22} />, label: 'Alertas Pendientes', value: '0', color: '#f59e0b', bg: '#fef9c3' },
+          { icon: <Activity size={22} />, label: 'Escaneos Hoy', value: todayLogs.length, color: '#16A34A', bg: '#f0fdf4' },
+          { icon: <AlertTriangle size={22} />, label: 'Alertas Pendientes', value: logs.filter(l => l.status === 'DENIED').length, color: '#f59e0b', bg: '#fef9c3' },
         ].map((c, i) => (
           <div key={i} style={{ background: 'white', borderRadius: '20px', padding: '24px', border: '1px solid #f1f5f9' }}>
             <div style={{ width: '44px', height: '44px', background: c.bg, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: c.color, marginBottom: '14px' }}>{c.icon}</div>
@@ -197,30 +199,67 @@ const SeguridadSection = ({ students }) => {
         ))}
       </div>
 
-      <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9' }}>
-          <h3 style={{ fontWeight: 800, color: '#1e293b' }}>Agentes Validadores</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '24px' }}>
+        {/* RECENT ACTIVITY LOGS */}
+        <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontWeight: 800, color: '#1e293b' }}>Actividad Reciente</h3>
+            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#16B6D6', background: '#ecfeff', padding: '4px 8px', borderRadius: '6px' }}>EN VIVO</span>
+          </div>
+          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead><tr style={{ background: '#fafafa', position: 'sticky', top: 0 }}>
+                {['HORA', 'USUARIO', 'ESTADO'].map(h => <th key={h} style={{ padding: '12px 24px', fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textAlign: 'left' }}>{h}</th>)}
+              </tr></thead>
+              <tbody>
+                {logs.length === 0 ? (
+                  <tr><td colSpan={3} style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>No hay registros de acceso aún.</td></tr>
+                ) : logs.map(l => (
+                  <tr key={l.id} style={{ borderTop: '1px solid #f8fafc' }}>
+                    <td style={{ padding: '12px 24px', fontSize: '0.8rem', color: '#64748b' }}>
+                      {new Date(l.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td style={{ padding: '12px 24px' }}>
+                      <p style={{ fontWeight: 700, fontSize: '0.85rem', color: '#1e293b' }}>{l.user?.name || 'Usuario desconocido'}</p>
+                      <p style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{l.user?.program || 'Invitado'}</p>
+                    </td>
+                    <td style={{ padding: '12px 24px' }}>
+                      <span style={{ 
+                        padding: '4px 8px', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 800,
+                        background: l.status === 'GRANTED' ? '#f0fdf4' : '#fef2f2',
+                        color: l.status === 'GRANTED' ? '#16A34A' : '#ef4444'
+                      }}>
+                        {l.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-        {validators.length === 0 ? (
-          <p style={{ textAlign: 'center', padding: '50px', color: '#94a3b8' }}>No hay validadores registrados aún.</p>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead><tr style={{ background: '#fafafa' }}>
-              {['NOMBRE', 'EMAIL', 'ESTADO'].map(h => <th key={h} style={{ padding: '14px 24px', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textAlign: 'left' }}>{h}</th>)}
-            </tr></thead>
-            <tbody>
-              {validators.map(v => (
-                <tr key={v.id} style={{ borderTop: '1px solid #f8fafc' }}>
-                  <td style={{ padding: '14px 24px', fontWeight: 700 }}>{v.name}</td>
-                  <td style={{ padding: '14px 24px', color: '#64748b', fontSize: '0.85rem' }}>{v.email}</td>
-                  <td style={{ padding: '14px 24px' }}>
-                    <span style={{ background: '#f0fdf4', color: '#16a34a', padding: '4px 10px', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700 }}>● Activo</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+
+        {/* VALIDATORS LIST */}
+        <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9' }}>
+            <h3 style={{ fontWeight: 800, color: '#1e293b' }}>Agentes Validadores</h3>
+          </div>
+          <div style={{ padding: '20px' }}>
+            {validators.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>Sin validadores.</p>
+            ) : validators.map(v => (
+              <div key={v.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #f8fafc' }}>
+                <div style={{ width: '36px', height: '36px', background: 'var(--secondary)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900 }}>
+                  {v.name.charAt(0)}
+                </div>
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: '0.85rem', color: '#1e293b' }}>{v.name}</p>
+                  <p style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{v.email}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -260,6 +299,7 @@ const ConfigSection = () => (
 /* ─── ADMIN DASHBOARD PRINCIPAL ─────────────────────────────────── */
 const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
+  const [logs, setLogs] = useState([]);
   const [stats, setStats] = useState({ total: 0, active: 0, suspended: 0, validators: 0, egresados: 0 });
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -272,6 +312,19 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (!user || user.role !== 'ADMIN') navigate('/login');
     fetchStudents();
+    fetchLogs();
+
+    // Suscripción en tiempo real para Logs
+    const channel = supabase
+      .channel('access_logs_changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'access_logs' }, () => {
+        fetchLogs();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const fetchStudents = async () => {
@@ -287,6 +340,16 @@ const AdminDashboard = () => {
         egresados: data.filter(s => s.role === 'EGRESADO').length,
       });
     }
+  };
+
+  const fetchLogs = async () => {
+    const { data, error } = await supabase
+      .from('access_logs')
+      .select('*, user:user_id(name, program)')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    
+    if (!error && data) setLogs(data);
   };
 
   const handleFileUpload = (e) => {
@@ -386,7 +449,7 @@ const AdminDashboard = () => {
       {/* MAIN */}
       <main style={{ marginLeft: '260px', flex: 1, padding: '40px' }}>
         {activeNav === 'reportes' && <ReportesSection students={students} />}
-        {activeNav === 'seguridad' && <SeguridadSection students={students} />}
+        {activeNav === 'seguridad' && <SeguridadSection students={students} logs={logs} />}
         {activeNav === 'config' && <ConfigSection />}
 
         {activeNav === 'estudiantes' && (
