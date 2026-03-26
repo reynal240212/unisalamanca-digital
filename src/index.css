@@ -342,19 +342,37 @@ body { background: var(--bg-light); color: var(--text-main); overflow-x: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-light);
+  background: linear-gradient(-45deg, #2A2266, #16B6D6, #1e293b, #2A2266);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
   padding: 20px;
+  overflow: hidden;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .login-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: white;
-  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 32px;
   overflow: hidden;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.08);
-  max-width: 900px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.2);
+  max-width: 940px;
   width: 100%;
+  animation: cardAppear 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cardAppear {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @media (max-width: 768px) {
@@ -363,17 +381,32 @@ body { background: var(--bg-light); color: var(--text-main); overflow-x: hidden;
     max-width: 480px !important;
     width: 95% !important;
     margin: 0 auto !important;
+    border-radius: 24px !important;
   }
 }
 
 .login-info {
-  background: var(--primary);
+  background: linear-gradient(135deg, rgba(42, 34, 102, 0.95), rgba(22, 182, 214, 0.8));
   padding: 60px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  color: white;
+  position: relative;
+}
+
+.login-info img[alt="Salmi"] {
+  width: 180px;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
 }
 
 @media (max-width: 768px) {
@@ -381,44 +414,76 @@ body { background: var(--bg-light); color: var(--text-main); overflow-x: hidden;
     padding: 40px 20px;
   }
   .login-info img[alt="Salmi"] {
-    width: 60% !important;
+    width: 140px !important;
   }
 }
 
 .login-form-side {
-  padding: 60px 40px;
+  padding: 60px 50px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.4);
 }
 
 @media (max-width: 768px) {
   .login-form-side {
-    padding: 40px 25px;
+    padding: 40px 30px;
   }
 }
 
-.input-group { margin-bottom: 20px; }
+.input-group { margin-bottom: 24px; }
 .input-group label {
   display: block;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #475569;
+  margin-bottom: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 .input-group input {
   width: 100%;
-  padding: 12px 16px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 0.95rem;
+  padding: 14px 18px;
+  border: 1.5px solid rgba(226, 232, 240, 0.8);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  font-size: 1rem;
   outline: none;
-  transition: border 0.3s;
+  transition: all 0.3s;
   font-family: inherit;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
-.input-group input:focus { border-color: var(--primary); }
+.input-group input:focus { 
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 8px 20px rgba(42, 34, 102, 0.1);
+  transform: translateY(-1px);
+}
+
+.login-button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 10px;
+  box-shadow: 0 10px 25px rgba(42, 34, 102, 0.2);
+}
+
+.login-button:hover {
+  background: #1e174d;
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(42, 34, 102, 0.3);
+}
+
+.login-button:active {
+  transform: translateY(0);
+}
 
 /* ===== ADMIN DASHBOARD ===== */
 .admin-wrapper {
