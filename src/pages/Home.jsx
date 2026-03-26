@@ -59,7 +59,7 @@ const Home = () => {
                            <div className="card-top">
                               <span className="uni">Uni</span><span className="sal">Salamanca</span>
                            </div>
-                           <img src="https://newsite.unisalamanca.edu.co/api/uploads/imgs/mascota/salmi.webp" alt="Salmi" style={{ width: '80px', marginBottom: '10px' }} onError={(e) => e.target.style.display = 'none'} />
+                           <img src="/images/salmi.png" alt="Salmi" style={{ width: '80px', marginBottom: '10px' }} />
                            <div className="card-qr">
                               <QrCode size={120} color="#2A2266" />
                            </div>

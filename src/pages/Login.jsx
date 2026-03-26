@@ -62,7 +62,7 @@ const Login = () => {
 
           <div style={{ transform: 'translateY(-20px)' }}>
             <img 
-              src="/images/salmi.webp"
+              src="/images/salmi.png"
               alt="Salmi" 
               className="salmi-animation"
             />
