@@ -142,7 +142,7 @@ const StudentCard = () => {
       </div>
 
       {showOnboarding && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(15,23,42,0.95)', z-index: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(15,23,42,0.95)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
            <div className="login-card" style={{ maxWidth: '450px', padding: '40px', textAlign: 'center', flexDirection: 'column' }}>
               <h3>¡Bienvenido Estudiante!</h3>
               <p style={{ color: '#64748b', marginBottom: '20px' }}>Activa tu carnet digital capturando tu foto de perfil.</p>

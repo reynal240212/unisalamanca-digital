@@ -115,7 +115,7 @@ const Validator = () => {
       </div>
 
       {scanResult && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(255,255,255,0.98)', z-index: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(255,255,255,0.98)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
            <div className="login-card" style={{ maxWidth: '400px', padding: '40px', textAlign: 'center', flexDirection: 'column', border: '1px solid #e2e8f0' }}>
               <div style={{ 
                 width: '80px', height: '80px', borderRadius: '25px', 

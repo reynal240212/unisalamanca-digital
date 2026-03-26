@@ -88,7 +88,7 @@ const AdminDashboard = () => {
           <p style={{ fontSize: '0.7rem', color: '#94a3b8' }}>ADMIN PORTAL</p>
         </div>
         <nav style={{ flex: 1, padding: '20px' }}>
-          <ul style={{ list-style: 'none' }}>
+          <ul style={{ listStyle: 'none' }}>
             <li style={{ padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '10px' }}>
               <Users size={18} style={{ marginRight: '10px' }} /> Estudiantes
             </li>
