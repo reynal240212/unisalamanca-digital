@@ -50,15 +50,13 @@ const Login = () => {
     <div className="login-page">
       <div className="login-card">
         <div className="login-info" style={{ background: 'var(--primary)' }}>
+          <img src="/images/escudo.png" alt="Escudo UniSalamanca" style={{ width: '80px', marginBottom: '10px', filter: 'brightness(0) invert(1)' }} />
           <img 
-            src="https://newsite.unisalamanca.edu.co/api/uploads/imgs/mascota/salmi.webp"
+            src="/images/salmi.webp"
             alt="Salmi" 
-            style={{ width: '80%', marginBottom: '20px' }}
-            onError={(e) => { e.target.onerror = null; e.target.src='/images/escudo.png'; }}
+            style={{ width: '85%', marginBottom: '5px' }}
           />
-          <img src="/images/escudo.png" alt="Escudo UniSalamanca" style={{ width: '70px', marginBottom: '15px', filter: 'brightness(0) invert(1)' }} />
-          <h2 style={{ color: 'white' }}>IDENTIDAD DIGITAL</h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)' }}>UniSalamanca - Innovación y Seguridad</p>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>UniSalamanca - Innovación y Seguridad</p>
           <button 
             onClick={() => navigate('/')} 
             className="btn-outline-white" 
