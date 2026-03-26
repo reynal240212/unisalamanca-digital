@@ -63,6 +63,7 @@ const EditModal = ({ student, onClose, onSave }) => {
               <select value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
                 style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontFamily: 'inherit', fontSize: '0.9rem', outline: 'none', background: 'white' }}>
                 <option value="ESTUDIANTE">Estudiante</option>
+                <option value="EGRESADO">Egresado</option>
                 <option value="VALIDADOR">Validador</option>
                 <option value="ADMIN">Admin</option>
               </select>
@@ -231,7 +232,7 @@ const ConfigSection = () => (
 /* ─── ADMIN DASHBOARD PRINCIPAL ─────────────────────────────────── */
 const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
-  const [stats, setStats] = useState({ total: 0, active: 0, suspended: 0, validators: 0 });
+  const [stats, setStats] = useState({ total: 0, active: 0, suspended: 0, validators: 0, egresados: 0 });
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [activeNav, setActiveNav] = useState('estudiantes');
@@ -255,6 +256,7 @@ const AdminDashboard = () => {
         active: data.filter(s => s.status === 'Active').length,
         suspended: data.filter(s => s.status === 'Suspended').length,
         validators: data.filter(s => s.role === 'VALIDADOR').length,
+        egresados: data.filter(s => s.role === 'EGRESADO').length,
       });
     }
   };
@@ -382,7 +384,7 @@ const AdminDashboard = () => {
               {[
                 { label: 'ESTUDIANTES', value: stats.total, color: '#2A2266', bg: '#eef2ff', icon: <Users size={20} />, sub: 'Total inscritos' },
                 { label: 'ACTIVOS', value: stats.active, color: '#16A34A', bg: '#f0fdf4', icon: <CheckCircle2 size={20} />, sub: 'Acceso habilitado' },
-                { label: 'SUSPENDIDOS', value: stats.suspended, color: '#ef4444', bg: '#fef2f2', icon: <XCircle size={20} />, sub: 'Requieren acción' },
+                { label: 'EGRESADOS', value: stats.egresados, color: '#f59e0b', bg: '#fef9c3', icon: <TrendingUp size={20} />, sub: 'Alumni registrados' },
                 { label: 'VALIDADORES', value: stats.validators, color: '#16B6D6', bg: '#ecfeff', icon: <ShieldCheck size={20} />, sub: 'Agentes activos' },
               ].map((s, i) => (
                 <div key={i} style={{ background: 'white', borderRadius: '20px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9' }}>
@@ -435,7 +437,9 @@ const AdminDashboard = () => {
                       </td>
                       <td style={{ padding: '14px 24px', fontSize: '0.83rem', color: '#475569' }}>{s.program || '—'}</td>
                       <td style={{ padding: '14px 24px' }}>
-                        <span style={{ padding: '3px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700, background: s.role === 'VALIDADOR' ? '#ecfeff' : '#eef2ff', color: s.role === 'VALIDADOR' ? '#0891b2' : '#4338ca' }}>
+                        <span style={{ padding: '3px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700,
+                          background: s.role === 'VALIDADOR' ? '#ecfeff' : s.role === 'EGRESADO' ? '#fef9c3' : '#eef2ff',
+                          color: s.role === 'VALIDADOR' ? '#0891b2' : s.role === 'EGRESADO' ? '#92400e' : '#4338ca' }}>
                           {s.role || 'ESTUDIANTE'}
                         </span>
                       </td>
