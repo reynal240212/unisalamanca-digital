@@ -50,7 +50,13 @@ const Login = () => {
     <div className="login-page">
       <div className="login-card">
         <div className="login-info" style={{ background: 'var(--primary)' }}>
-          <img src="/images/squirrel.png" alt="Mascota" style={{ width: '80%', marginBottom: '20px' }} />
+          <img 
+            src="https://newsite.unisalamanca.edu.co/api/uploads/imgs/mascota/salmi.webp"
+            alt="Salmi" 
+            style={{ width: '80%', marginBottom: '20px' }}
+            onError={(e) => { e.target.onerror = null; e.target.src='/images/escudo.png'; }}
+          />
+          <img src="/images/escudo.png" alt="Escudo UniSalamanca" style={{ width: '70px', marginBottom: '15px', filter: 'brightness(0) invert(1)' }} />
           <h2 style={{ color: 'white' }}>IDENTIDAD DIGITAL</h2>
           <p style={{ color: 'rgba(255,255,255,0.7)' }}>UniSalamanca - Innovación y Seguridad</p>
           <button 
@@ -63,8 +69,11 @@ const Login = () => {
         </div>
         <div className="login-form-side">
           <div style={{ marginBottom: '30px', textAlign: 'center' }}>
-            <img src="/images/logo.png" alt="Logo" style={{ maxWidth: '180px' }} />
-            <h3 style={{ marginTop: '10px', fontSize: '0.9rem', color: 'var(--primary)', letterSpacing: '1px' }}>ACCESO INSTITUCIONAL</h3>
+            <img src="/images/escudo.png" alt="Escudo UniSalamanca" style={{ width: '70px', marginBottom: '12px' }} />
+            <div style={{ fontWeight: 900, fontSize: '1.1rem' }}>
+              <span style={{ color: 'var(--secondary)' }}>Uni</span><span style={{ color: 'var(--primary)' }}>Salamanca</span>
+            </div>
+            <h3 style={{ marginTop: '5px', fontSize: '0.8rem', color: 'var(--text-muted)', letterSpacing: '1px', fontWeight: 600 }}>ACCESO INSTITUCIONAL</h3>
           </div>
           <form onSubmit={handleLogin}>
             <div className="input-group">
