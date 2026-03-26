@@ -357,6 +357,14 @@ body { background: var(--bg-light); color: var(--text-main); overflow-x: hidden;
   width: 100%;
 }
 
+@media (max-width: 768px) {
+  .login-card {
+    grid-template-columns: 1fr;
+    max-width: 450px;
+    margin: 0 auto;
+  }
+}
+
 .login-info {
   background: var(--primary);
   padding: 60px 40px;
@@ -367,11 +375,26 @@ body { background: var(--bg-light); color: var(--text-main); overflow-x: hidden;
   text-align: center;
 }
 
+@media (max-width: 768px) {
+  .login-info {
+    padding: 40px 20px;
+  }
+  .login-info img[alt="Salmi"] {
+    width: 60% !important;
+  }
+}
+
 .login-form-side {
   padding: 60px 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .login-form-side {
+    padding: 40px 25px;
+  }
 }
 
 .input-group { margin-bottom: 20px; }
