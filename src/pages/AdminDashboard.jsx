@@ -45,7 +45,6 @@ const EditModal = ({ student, onClose, onSave }) => {
           {[
             { label: 'Nombre Completo', key: 'name', type: 'text', placeholder: 'Ej: Juan Pérez' },
             { label: 'Correo Institucional', key: 'email', type: 'email', placeholder: 'ejemplo@unisalamanca.edu.co' },
-            { label: 'Programa', key: 'program', type: 'text', placeholder: 'Ej: Ingeniería de Sistemas' },
           ].map(f => (
             <div key={f.key} style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '7px' }}>{f.label}</label>
@@ -56,6 +55,35 @@ const EditModal = ({ student, onClose, onSave }) => {
               />
             </div>
           ))}
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '7px' }}>Programa Académico</label>
+            <select value={form.program} onChange={e => setForm(p => ({ ...p, program: e.target.value }))}
+              style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontFamily: 'inherit', fontSize: '0.9rem', outline: 'none', background: 'white', color: '#374151' }}>
+              <option value="">— Seleccionar programa —</option>
+              <optgroup label="📚 Ciencias Económicas y Administrativas">
+                <option>Administración de Empresas</option>
+                <option>Contaduría Pública</option>
+                <option>Negocios Internacionales</option>
+                <option>Mercadeo y Publicidad</option>
+              </optgroup>
+              <optgroup label="💻 Ingeniería y Tecnología">
+                <option>Ingeniería de Sistemas</option>
+                <option>Ingeniería Industrial</option>
+                <option>Tecnología en Gestión Empresarial</option>
+                <option>Tecnología en Desarrollo de Software</option>
+              </optgroup>
+              <optgroup label="⚖️ Ciencias Jurídicas y Sociales">
+                <option>Derecho</option>
+                <option>Trabajo Social</option>
+                <option>Comunicación Social y Periodismo</option>
+              </optgroup>
+              <optgroup label="🧠 Ciencias de la Salud">
+                <option>Psicología</option>
+                <option>Administración en Salud Ocupacional</option>
+              </optgroup>
+            </select>
+          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
             <div>
