@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Digital Identity Platform for UniSalamanca",
   "scripts": {
-    "build": "node scripts/build-env.js"
+    "build": "node scripts/build-env.js && node scripts/prepare-public.js"
   },
   "dependencies": {},
   "devDependencies": {}

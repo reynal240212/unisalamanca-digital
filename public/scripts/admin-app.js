@@ -90,12 +90,12 @@ function renderTable(students) {
         return;
     }
     students.forEach(student => {
-        const photoUrl = student.photo_url || '../img/default-avatar.png';
+        const photoUrl = student.photo_url || '../images/default-avatar.png';
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>
                 <div class="student-thumb" onclick="showPhotoModal('${photoUrl}', '${student.name}')" title="Ver foto ampliada">
-                    <img src="${photoUrl}" onerror="this.src='../img/default-avatar.png'">
+                    <img src="${photoUrl}" onerror="this.src='../images/default-avatar.png'">
                 </div>
             </td>
             <td>

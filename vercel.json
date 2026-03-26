@@ -1,17 +1,18 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/student/style.css", "destination": "/frontend/student/style.css" },
-    { "source": "/student/app.js", "destination": "/frontend/student/app.js" },
-    { "source": "/auth.js", "destination": "/frontend/auth.js" },
-    { "source": "/supabase-client.js", "destination": "/frontend/supabase-client.js" },
-    { "source": "/student/(.*).html", "destination": "/frontend/student/$1.html" },
-    { "source": "/student/(.*)", "destination": "/frontend/student/$1" },
-    { "source": "/admin/(.*)", "destination": "/frontend/admin/$1" },
-    { "source": "/validator/(.*)", "destination": "/frontend/validator/$1" },
-    { "source": "/img/(.*)", "destination": "/frontend/img/$1" },
-    { "source": "/login.html", "destination": "/frontend/login.html" },
-    { "source": "/", "destination": "/frontend/login.html" },
-    { "source": "/(.*)", "destination": "/frontend/student/$1" }
+    { "source": "/", "destination": "/public/login.html" },
+    { "source": "/login", "destination": "/public/login.html" },
+    { "source": "/admin", "destination": "/public/admin/index.html" },
+    { "source": "/student", "destination": "/public/student/index.html" },
+    { "source": "/validator", "destination": "/public/validator/index.html" },
+    { "source": "/images/(.*)", "destination": "/public/images/$1" },
+    { "source": "/styles/(.*)", "destination": "/public/styles/$1" },
+    { "source": "/scripts/(.*)", "destination": "/public/scripts/$1" },
+    { "source": "/src/(.*)", "destination": "/public/src/$1" },
+    { "source": "/uploads/(.*)", "destination": "/public/uploads/$1" },
+    { "source": "/admin/(.*)", "destination": "/public/admin/$1" },
+    { "source": "/student/(.*)", "destination": "/public/student/$1" },
+    { "source": "/validator/(.*)", "destination": "/public/validator/$1" }
   ]
 }

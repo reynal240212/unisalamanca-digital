@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credencial Digital | UniSalamanca</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../styles/student.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../env.js"></script>
-    <script src="../supabase-client.js"></script>
+    <script src="../src/env.js"></script>
+    <script src="../src/supabase-client.js"></script>
     <!-- Librería QRCode (Soporta SVG, evita bloqueo de Canvas en Brave) -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
@@ -21,11 +21,11 @@
             
             <div class="examples-grid">
                 <div class="example-item">
-                    <img src="examples/example_h_v2.png" alt="Ejemplo Hombre">
+                    <img src="../images/examples/example_h_v2.png" alt="Ejemplo Hombre">
                     <span>Ejemplo Hombre</span>
                 </div>
                 <div class="example-item">
-                    <img src="examples/example_m_v2.png" alt="Ejemplo Mujer">
+                    <img src="../images/examples/example_m_v2.png" alt="Ejemplo Mujer">
                     <span>Ejemplo Mujer</span>
                 </div>
             </div>
@@ -117,6 +117,6 @@
             <span></span><span></span><span></span>
         </div>
     </footer>
-    <script src="app.js?v=1.0.5"></script>
+    <script src="../scripts/student-app.js?v=1.0.5"></script>
 </body>
 </html>
