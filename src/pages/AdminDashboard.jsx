@@ -10,19 +10,47 @@ import {
   Activity, Database, Key
 } from 'lucide-react';
 
-/* ─── MODAL EDITAR USUARIO ─────────────────────────────────────── */
-const EditModal = ({ student, onClose, onSave }) => {
+/* ─── MODAL USUARIO (CREAR/EDITAR) ─────────────────────────────────── */
+const UserFormModal = ({ student, onClose, onSave }) => {
+  const isEdit = !!student?.id;
   const [form, setForm] = useState({
-    name: student.name || '',
-    email: student.email || '',
-    program: student.program || '',
-    role: student.role || 'ESTUDIANTE',
-    status: student.status || 'Active',
+    name: student?.name || '',
+    email: student?.email || '',
+    program: student?.program || '',
+    role: student?.role || 'ESTUDIANTE',
+    status: student?.status || 'Active',
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(student.id, form);
+    onSave(student?.id, form);
+  };
+
+  const programs = {
+    "Programas Profesionales": [
+      "Ingeniería de Sistemas de Información",
+      "Finanzas y Comercio Internacional",
+      "Administración de Empresas",
+      "Contaduría Pública"
+    ],
+    "Programas Tecnólogos": [
+      "Gestión de Comercio Exterior",
+      "Gestión Bancaria y Financiera",
+      "Desarrollo de Software"
+    ],
+    "Técnicos Laborales": [
+      "Auxiliar Administrativo",
+      "Auxiliar de Seguridad en el Trabajo",
+      "Bodega y Distribución",
+      "Auxiliar de Servicios Estadísticos y Financieros",
+      "Auxiliar de Primera Infancia",
+      "Auxiliar de Servicio Social y Apoyo Comunitario",
+      "Instalación, mantenimiento y reparación de sistemas de telecomunicaciones",
+      "Investigación Criminalística y Judicial",
+      "Mecánica Automotriz",
+      "Servicios de Recreación y Deportes",
+      "Inglés"
+    ]
   };
 
   return (
@@ -33,8 +61,10 @@ const EditModal = ({ student, onClose, onSave }) => {
       <div style={{ background: 'white', borderRadius: '20px', padding: '36px', width: '480px', boxShadow: '0 25px 60px rgba(0,0,0,0.15)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
           <div>
-            <h2 style={{ fontWeight: 900, fontSize: '1.2rem', color: '#1e293b' }}>Editar Usuario</h2>
-            <p style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '3px' }}>ID: {student.id?.substring(0, 8)}...</p>
+            <h2 style={{ fontWeight: 900, fontSize: '1.2rem', color: '#1e293b' }}>{isEdit ? 'Editar Usuario' : 'Nuevo Usuario'}</h2>
+            <p style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '3px' }}>
+              {isEdit ? `ID: ${student.id?.substring(0, 8)}...` : 'Registro manual de identidad'}
+            </p>
           </div>
           <button onClick={onClose} style={{ background: '#f1f5f9', border: 'none', borderRadius: '10px', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <X size={18} color="#64748b" />
@@ -49,7 +79,7 @@ const EditModal = ({ student, onClose, onSave }) => {
             <div key={f.key} style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '7px' }}>{f.label}</label>
               <input
-                type={f.type} value={form[f.key]} placeholder={f.placeholder}
+                type={f.type} value={form[f.key]} placeholder={f.placeholder} required
                 onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
                 style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontFamily: 'inherit', fontSize: '0.9rem', outline: 'none' }}
               />
@@ -58,30 +88,14 @@ const EditModal = ({ student, onClose, onSave }) => {
 
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '7px' }}>Programa Académico</label>
-            <select value={form.program} onChange={e => setForm(p => ({ ...p, program: e.target.value }))}
+            <select value={form.program} onChange={e => setForm(p => ({ ...p, program: e.target.value }))} required
               style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontFamily: 'inherit', fontSize: '0.9rem', outline: 'none', background: 'white', color: '#374151' }}>
               <option value="">— Seleccionar programa —</option>
-              <optgroup label="📚 Ciencias Económicas y Administrativas">
-                <option>Administración de Empresas</option>
-                <option>Contaduría Pública</option>
-                <option>Negocios Internacionales</option>
-                <option>Mercadeo y Publicidad</option>
-              </optgroup>
-              <optgroup label="💻 Ingeniería y Tecnología">
-                <option>Ingeniería de Sistemas</option>
-                <option>Ingeniería Industrial</option>
-                <option>Tecnología en Gestión Empresarial</option>
-                <option>Tecnología en Desarrollo de Software</option>
-              </optgroup>
-              <optgroup label="⚖️ Ciencias Jurídicas y Sociales">
-                <option>Derecho</option>
-                <option>Trabajo Social</option>
-                <option>Comunicación Social y Periodismo</option>
-              </optgroup>
-              <optgroup label="🧠 Ciencias de la Salud">
-                <option>Psicología</option>
-                <option>Administración en Salud Ocupacional</option>
-              </optgroup>
+              {Object.entries(programs).map(([category, items]) => (
+                <optgroup key={category} label={category}>
+                  {items.map(it => <option key={it}>{it}</option>)}
+                </optgroup>
+              ))}
             </select>
           </div>
 
@@ -111,7 +125,7 @@ const EditModal = ({ student, onClose, onSave }) => {
               Cancelar
             </button>
             <button type="submit" style={{ flex: 2, padding: '12px', borderRadius: '10px', border: 'none', background: '#2A2266', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <Save size={16} /> Guardar Cambios
+              <Save size={16} /> {isEdit ? 'Guardar Cambios' : 'Crear Usuario'}
             </button>
           </div>
         </form>
@@ -326,6 +340,7 @@ const AdminDashboard = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [activeNav, setActiveNav] = useState('estudiantes');
   const [editingStudent, setEditingStudent] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -405,10 +420,26 @@ const AdminDashboard = () => {
     XLSX.writeFile(wb, `UniSalamanca_Directorio_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
-  const handleSaveEdit = async (id, form) => {
-    await supabase.from('user').update(form).eq('id', id);
-    setEditingStudent(null);
-    fetchStudents();
+  const handleSaveUser = async (id, form) => {
+    if (id) {
+       // UPDATE
+       const { error } = await supabase.from('user').update(form).eq('id', id);
+       if (!error) {
+         setEditingStudent(null);
+         fetchStudents();
+       } else {
+         alert("Error al actualizar: " + error.message);
+       }
+    } else {
+       // CREATE
+       const { error } = await supabase.from('user').insert([form]);
+       if (!error) {
+         setShowCreateModal(false);
+         fetchStudents();
+       } else {
+         alert("Error al crear: " + error.message);
+       }
+    }
   };
 
   const toggleStatus = async (student) => {
@@ -437,9 +468,12 @@ const AdminDashboard = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#F1F5F9', fontFamily: "'Outfit', sans-serif" }}>
-      {/* MODAL EDITAR */}
+      {/* MODALES */}
       {editingStudent && (
-        <EditModal student={editingStudent} onClose={() => setEditingStudent(null)} onSave={handleSaveEdit} />
+        <UserFormModal student={editingStudent} onClose={() => setEditingStudent(null)} onSave={handleSaveUser} />
+      )}
+      {showCreateModal && (
+        <UserFormModal onClose={() => setShowCreateModal(false)} onSave={handleSaveUser} />
       )}
 
       {/* SIDEBAR */}
@@ -501,6 +535,9 @@ const AdminDashboard = () => {
                 <p style={{ color: '#64748b', marginTop: '4px' }}>Panel central de identidad digital — UniSalamanca</p>
               </div>
               <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => setShowCreateModal(true)} style={{ background: 'var(--secondary)', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '10px', cursor: 'pointer', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(22,182,214,0.3)' }}>
+                  <UserPlus size={16} /> Nuevo Usuario
+                </button>
                 <button onClick={handleExport} style={{ background: '#16a34a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '10px', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <FileUp size={16} /> Exportar Excel
                 </button>
