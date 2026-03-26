@@ -9,7 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check local storage for session
     const storedUser = localStorage.getItem('auth_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -27,6 +26,7 @@ export const AuthProvider = ({ children }) => {
 
       if (error || !data) throw new Error('Usuario no encontrado');
 
+      // En el PRD se menciona bcrypt para seguridad
       const isValid = await bcrypt.compare(password, data.password_hash);
       if (!isValid) throw new Error('Contraseña incorrecta');
 
@@ -34,14 +34,11 @@ export const AuthProvider = ({ children }) => {
         id: data.id,
         email: data.email,
         name: data.name,
-        role: data.role,
-        must_change_password: data.must_change_password
+        role: data.role
       };
 
       setUser(sessionUser);
       localStorage.setItem('auth_user', JSON.stringify(sessionUser));
-      localStorage.setItem('auth_token', 'dummy-token'); // For compatibility with old scripts if any
-      
       return sessionUser;
     } catch (err) {
       throw err;
@@ -51,9 +48,6 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('auth_user');
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('student_user');
-    localStorage.removeItem('user_role');
   };
 
   return (

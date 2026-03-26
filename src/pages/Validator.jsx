@@ -3,7 +3,7 @@ import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Html5Qrcode } from 'html5-qrcode';
-import { LogOut, CheckCircle, XCircle } from 'lucide-react';
+import { LogOut, ShieldAlert, CheckCircle, XCircle } from 'lucide-react';
 
 const Validator = () => {
   const [scanResult, setScanResult] = useState(null);
@@ -11,13 +11,12 @@ const Validator = () => {
   const [isScanning, setIsScanning] = useState(true);
   
   const scannerRef = useRef(null);
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     const html5QrCode = new Html5Qrcode("reader");
     scannerRef.current = html5QrCode;
-
     startScanner();
 
     return () => {
@@ -31,62 +30,62 @@ const Validator = () => {
     try {
       await scannerRef.current.start(
         { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 }
-        },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
         onScanSuccess
       );
     } catch (err) {
-      console.error("Error starting scanner:", err);
+      console.error("Scanner error:", err);
     }
   };
 
   const onScanSuccess = async (decodedText) => {
     try {
-      const data = JSON.parse(decodedText);
-      if (!data.id || !data.ts) throw new Error("QR Inválido");
+      // Formato esperado: UNIS|{studentId}|{timeBlock}
+      const parts = decodedText.split('|');
+      if (parts[0] !== 'UNIS' || parts.length !== 3) throw new Error("QR No institucional");
 
-      // Stop scanner temporarily
+      const studentId = parts[1];
+      const receivedBlock = parseInt(parts[2]);
+      const currentBlock = Math.floor(Date.now() / 30000);
+
+      // Parada temporal del scanner
       await scannerRef.current.stop();
       setIsScanning(false);
 
-      // Check for security: Time difference
-      const now = Date.now();
-      const diff = (now - data.ts) / 1000;
-      if (diff > 60) { // Max 60 seconds
-        setScanResult({ success: false, message: "Código QR expirado" });
+      // Validación del bloque de tiempo (±1 bloque = 60s ventana)
+      const diff = Math.abs(currentBlock - receivedBlock);
+      if (diff > 1) {
+        setScanResult({ success: false, message: "CÓDIGO EXPIRADO (Captura detectada)" });
         return;
       }
 
-      // Fetch student from Supabase
+      // Consulta a Supabase
       const { data: student, error } = await supabase
         .from('user')
         .select('*')
-        .eq('id', data.id)
+        .eq('id', studentId)
         .single();
       
-      if (error || !student) throw new Error("Estudiante no encontrado");
+      if (error || !student) throw new Error("Estudiante no registrado");
 
       if (student.status !== 'Active') {
-        setScanResult({ success: false, message: `Cuenta: ${student.status}` });
+        setScanResult({ success: false, message: `ACCESO DENEGADO: Cuenta ${student.status}` });
         setStudentData(student);
         return;
       }
 
-      setScanResult({ success: true, message: "Acceso Permitido" });
+      setScanResult({ success: true, message: "ACCESO PERMITIDO" });
       setStudentData(student);
 
-      // Log access in real-time
+      // Registro de Log (RF-05)
       await supabase.from('access_logs').insert({
-        user_id: student.id,
-        validator_id: user.id,
-        status: 'GRANTED'
+        user_id: studentId,
+        status: 'GRANTED',
+        location: 'ENTRADA PRINCIPAL'
       });
 
     } catch (err) {
-      console.error("Scan error:", err);
-      setScanResult({ success: false, message: err.message || "Error al procesar QR" });
+      setScanResult({ success: false, message: err.message });
     }
   };
 
@@ -97,59 +96,48 @@ const Validator = () => {
     await startScanner();
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
   return (
-    <div className="student-bg" style={{ display: 'flex', flexDirection: 'column' }}>
-      <header style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', color: 'white' }}>
-        <div className="logo-text">UniSalamanca<span>Validador</span></div>
-        <button onClick={handleLogout} className="btn-secondary" style={{ padding: '5px 10px', fontSize: '0.8rem' }}>
-          <LogOut size={14} />
-        </button>
+    <div className="login-page" style={{ flexDirection: 'column' }}>
+      <header style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', width: '100%', color: '#4f46e5' }}>
+        <h2 style={{ fontSize: '1rem' }}>UniSalamanca <span style={{ fontWeight: 300 }}>Validador</span></h2>
+        <button onClick={logout} className="btn-primary" style={{ padding: '5px 10px', fontSize: '0.7rem' }}>SALIR</button>
       </header>
 
-      <div className="scanner-view">
-        <div className="scanner-frame">
-          <div id="reader"></div>
-          {isScanning && <div className="qr-scanner-line"></div>}
+      <div className="scanner-view" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ width: '90%', maxWidth: '400px', background: 'white', borderRadius: '40px', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0' }}>
+           <div id="reader" style={{ width: '100%', height: '100%' }}></div>
         </div>
         
-        <div className="scanner-instructions">
-          <h3 style={{ color: 'white' }}>Preparado para Escanear</h3>
-          <p style={{ color: '#94a3b8' }}>Apunta al código QR del estudiante</p>
+        <div style={{ marginTop: '30px', textAlign: 'center' }}>
+          <h3>Escaner de Identidad</h3>
+          <p style={{ color: '#64748b' }}>Apunta al código QR del estudiante</p>
         </div>
       </div>
 
       {scanResult && (
-        <div className="result-panel">
-          <div className="result-card">
-            <div className={`status-badge ${scanResult.success ? 'granted' : 'denied'}`}>
-              {scanResult.success ? <CheckCircle size={40} /> : <XCircle size={40} />}
-            </div>
-            
-            {studentData && (
-              <div className="student-avatar-lg">
-                <img src={studentData.photo_url || '/images/default-avatar.png'} alt="Foto" />
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(255,255,255,0.98)', z-index: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+           <div className="login-card" style={{ maxWidth: '400px', padding: '40px', textAlign: 'center', flexDirection: 'column', border: '1px solid #e2e8f0' }}>
+              <div style={{ 
+                width: '80px', height: '80px', borderRadius: '25px', 
+                display: 'flex', justifyContent: 'center', alignItems: 'center', 
+                margin: '0 auto 20px',
+                background: scanResult.success ? '#ecfdf5' : '#fef2f2',
+                color: scanResult.success ? '#10b981' : '#ef4444'
+              }}>
+                 {scanResult.success ? <CheckCircle size={40} /> : <XCircle size={40} />}
               </div>
-            )}
-
-            <div className="result-info">
-              <h2 style={{ color: 'white' }}>{scanResult.message}</h2>
+              
               {studentData && (
-                <p style={{ color: '#94a3b8' }}>
-                  {studentData.name}<br />
-                  {studentData.program}
-                </p>
+                <div style={{ width: '100px', height: '100px', borderRadius: '30px', overflow: 'hidden', margin: '0 auto 20px', border: '3px solid #4f46e5' }}>
+                  <img src={studentData.photo_url || '/images/default-avatar.png'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
               )}
-            </div>
 
-            <button className="next-btn" onClick={resetScanner}>
-              LISTO PARA EL SIGUIENTE
-            </button>
-          </div>
+              <h2>{scanResult.message}</h2>
+              {studentData && <p style={{ color: '#64748b', marginBottom: '30px' }}>{studentData.name}<br/>{studentData.program}</p>}
+
+              <button className="btn-primary" style={{ width: '100%', padding: '18px' }} onClick={resetScanner}>SIGUIENTE</button>
+           </div>
         </div>
       )}
     </div>

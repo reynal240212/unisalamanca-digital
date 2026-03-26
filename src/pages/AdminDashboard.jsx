@@ -2,93 +2,77 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import { 
   Users, 
-  BarChart2, 
-  Settings, 
-  LogOut, 
-  Plus, 
-  Upload, 
+  UserPlus, 
+  FileUp, 
   Search, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  X
+  LogOut, 
+  TrendingUp, 
+  AlertCircle,
+  MoreVertical,
+  CheckCircle2,
+  XCircle,
+  ShieldCheck
 } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('students');
   const [students, setStudents] = useState([]);
-  const [filteredStudents, setFilteredStudents] = useState([]);
   const [stats, setStats] = useState({ total: 0, active: 0, suspended: 0 });
   const [searchTerm, setSearchTerm] = useState('');
-  const [modalityFilter, setModalityFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isZoomOpen, setIsZoomOpen] = useState(false);
-  const [zoomImg, setZoomImg] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
   
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user || user.role !== 'ADMIN') navigate('/');
     fetchStudents();
-  }, []);
-
-  useEffect(() => {
-    filterStudents();
-  }, [students, searchTerm, modalityFilter, statusFilter]);
+  }, [user]);
 
   const fetchStudents = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('user')
-        .select('*')
-        .eq('role', 'ESTUDIANTE')
-        .order('name');
-      
-      if (error) throw error;
-      
-      setStudents(data || []);
-      updateStats(data || []);
-    } catch (err) {
-      console.error('Error fetching students:', err);
-    } finally {
-      setIsLoading(false);
+    const { data, error } = await supabase
+      .from('user')
+      .select('*')
+      .neq('role', 'ADMIN')
+      .order('created_at', { ascending: false });
+
+    if (!error) {
+      setStudents(data);
+      const active = data.filter(s => s.status === 'Active').length;
+      const suspended = data.filter(s => s.status === 'Suspended').length;
+      setStats({ total: data.length, active, suspended });
     }
   };
 
-  const updateStats = (data) => {
-    setStats({
-      total: data.length,
-      active: data.filter(s => s.status === 'Active').length,
-      suspended: data.filter(s => s.status === 'Suspended').length
-    });
-  };
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    setIsUploading(true);
 
-  const filterStudents = () => {
-    let result = [...students];
-    
-    if (searchTerm) {
-      result = result.filter(s => 
-        s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        s.email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    if (modalityFilter !== 'all') {
-      result = result.filter(s => s.modality === modalityFilter);
-    }
-    
-    if (statusFilter !== 'all') {
-      result = result.filter(s => s.status === statusFilter);
-    }
-    
-    setFilteredStudents(result);
+    reader.onload = async (evt) => {
+      const bstr = evt.target.result;
+      const wb = XLSX.read(bstr, { type: 'binary' });
+      const wsname = wb.SheetNames[0];
+      const ws = wb.Sheets[wsname];
+      const data = XLSX.utils.sheet_to_json(ws);
+
+      for (let row of data) {
+        // En un caso real, haríamos un upsert masivo
+        await supabase.from('user').insert({
+          email: row.Email,
+          name: row.Nombre,
+          program: row.Programa,
+          status: 'Active',
+          role: 'ESTUDIANTE'
+        });
+      }
+      
+      setIsUploading(false);
+      fetchStudents();
+    };
+    reader.readAsBinaryString(file);
   };
 
   const handleLogout = () => {
@@ -96,218 +80,125 @@ const AdminDashboard = () => {
     navigate('/');
   };
 
-  const showPhotoModal = (url) => {
-    setZoomImg(url);
-    setIsZoomOpen(true);
-  };
-
   return (
     <div className="admin-container">
-      {/* Sidebar */}
       <aside className="sidebar">
-        <div className="sidebar-brand">
-          <div className="logo-icon">US</div>
-          <span>UniSalamanca</span>
+        <div style={{ padding: '30px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800 }}>UniSalamanca</h2>
+          <p style={{ fontSize: '0.7rem', color: '#94a3b8' }}>ADMIN PORTAL</p>
         </div>
-        
-        <nav>
-          <ul>
-            <li 
-              className={activeTab === 'students' ? 'active' : ''} 
-              onClick={() => setActiveTab('students')}
-            >
-              <Users size={20} className="icon" />
-              <span>Estudiantes</span>
+        <nav style={{ flex: 1, padding: '20px' }}>
+          <ul style={{ list-style: 'none' }}>
+            <li style={{ padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', marginBottom: '10px' }}>
+              <Users size={18} style={{ marginRight: '10px' }} /> Estudiantes
             </li>
-            <li 
-              className={activeTab === 'reports' ? 'active' : ''} 
-              onClick={() => setActiveTab('reports')}
-            >
-              <BarChart2 size={20} className="icon" />
-              <span>Reportes</span>
-            </li>
-            <li 
-              className={activeTab === 'settings' ? 'active' : ''} 
-              onClick={() => setActiveTab('settings')}
-            >
-              <Settings size={20} className="icon" />
-              <span>Ajustes</span>
+            <li style={{ padding: '12px', color: '#94a3b8' }}>
+              <TrendingUp size={18} style={{ marginRight: '10px' }} /> Reportes
             </li>
           </ul>
         </nav>
-
-        <div className="sidebar-user">
-          <div className="user-avatar">AD</div>
-          <div className="user-info">
-            <p className="user-name">{user?.name || 'Administrador'}</p>
-            <p className="user-role">Sede Central</p>
-          </div>
-          <button onClick={handleLogout} className="btn-icon-logout" title="Cerrar Sesión">
-            <LogOut size={18} />
+        <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          <button onClick={handleLogout} style={{ background: 'transparent', border: 'none', color: '#f87171', display: 'flex', alignItems: 'center' }}>
+            <LogOut size={18} style={{ marginRight: '10px' }} /> Cerrar Sesión
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="content">
-        {activeTab === 'students' && (
-          <section id="students-view">
-            <header className="content-header">
-              <div className="header-title">
-                <h1>Gestión de Estudiantes</h1>
-                <p className="subtitle">Administra los accesos y modalidades de estudio</p>
-              </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button className="btn-secondary">
-                  <Upload size={16} /> Subir Listado (Excel)
-                </button>
-                <button 
-                  onClick={() => setIsModalOpen(true)} 
-                  className="btn-primary"
-                >
-                  <Plus size={16} /> Nuevo Estudiante
-                </button>
-              </div>
-            </header>
-
-            <div className="toolbar">
-              <div className="search-box">
-                <Search size={18} className="search-icon" />
-                <input 
-                  type="text" 
-                  placeholder="Buscar por nombre o correo..." 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <select 
-                className="action-select"
-                value={modalityFilter}
-                onChange={(e) => setModalityFilter(e.target.value)}
-              >
-                <option value="all">Todas las Modalidades</option>
-                <option value="Presencial">Presencial</option>
-                <option value="PAT">PAT</option>
-              </select>
-              <select 
-                className="action-select"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="all">Todos los Estados</option>
-                <option value="Active">Activos</option>
-                <option value="Suspended">Suspendidos</option>
-                <option value="Revoked">Revocados</option>
-              </select>
-              <button 
-                className="btn-secondary" 
-                onClick={() => {
-                  setSearchTerm('');
-                  setModalityFilter('all');
-                  setStatusFilter('all');
-                }}
-              >
-                Limpiar
-              </button>
-            </div>
-
-            <section className="stats-grid">
-              <div className="stat-card">
-                <span className="stat-label">Total Estudiantes</span>
-                <span className="stat-value">{stats.total}</span>
-              </div>
-              <div className="stat-card success">
-                <span className="stat-label">Identidades Activas</span>
-                <span className="stat-value">{stats.active}</span>
-              </div>
-              <div className="stat-card danger">
-                <span className="stat-label">Suspendidos</span>
-                <span className="stat-value">{stats.suspended}</span>
-              </div>
-            </section>
-
-            <section className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Foto</th>
-                    <th>Estudiante</th>
-                    <th>Programa</th>
-                    <th>Modalidad</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>Cargando estudiantes...</td>
-                    </tr>
-                  ) : filteredStudents.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>No se encontraron estudiantes.</td>
-                    </tr>
-                  ) : (
-                    filteredStudents.map(student => (
-                      <tr key={student.id}>
-                        <td>
-                          <div 
-                            className="student-thumb" 
-                            onClick={() => showPhotoModal(student.photo_url || '/images/default-avatar.png')}
-                          >
-                            <img 
-                              src={student.photo_url || '/images/default-avatar.png'} 
-                              alt={student.name} 
-                              onError={(e) => e.target.src = '/images/default-avatar.png'}
-                            />
-                          </div>
-                        </td>
-                        <td>
-                          <div className="student-row-info">
-                            <span className="student-name">{student.name}</span>
-                            <span className="student-sub">{student.email}</span>
-                          </div>
-                        </td>
-                        <td>{student.program || 'N/A'}</td>
-                        <td>
-                          <span className={`badge ${student.modality === 'PAT' ? 'egresado' : 'active'}`}>
-                            {student.modality}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={`badge ${student.status.toLowerCase()}`}>
-                            {student.status}
-                          </span>
-                        </td>
-                        <td>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button className="btn-action" title="Editar"><Edit size={14} /></button>
-                            <button className="btn-action" title="Eliminar"><Trash2 size={14} /></button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </section>
-          </section>
-        )}
-
-        {/* Other tabs can be added here */}
-      </main>
-
-      {/* Photo Zoom Modal */}
-      {isZoomOpen && (
-        <div className="modal-overlay" onClick={() => setIsZoomOpen(false)}>
-          <div className="photo-zoom-container" onClick={e => e.stopPropagation()}>
-            <img src={zoomImg} alt="Zoom" />
-            <button className="btn-close-zoom" onClick={() => setIsZoomOpen(false)}>
-              <X size={20} />
-            </button>
+        <header style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
+          <div>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 800 }}>Gestión de Estudiantes</h1>
+            <p style={{ color: '#64748b' }}>Panel central de identidad digital</p>
           </div>
-        </div>
-      )}
+          <div style={{ display: 'flex', gap: '15px' }}>
+             <label className="btn-primary" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                <FileUp size={18} style={{ marginRight: '10px' }} /> Carga Masiva
+                <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} accept=".xlsx,.csv" />
+             </label>
+             <button className="btn-primary" onClick={() => alert('Próximamente')}>
+                <UserPlus size={18} style={{ marginRight: '10px' }} /> Nuevo Usuario
+             </button>
+          </div>
+        </header>
+
+        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px' }}>
+           <div style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+              <p style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 700 }}>TOTAL ESTUDIANTES</p>
+              <h3 style={{ fontSize: '2rem', margin: '5px 0' }}>{stats.total}</h3>
+              <div style={{ display: 'flex', alignItems: 'center', color: '#10b981', fontSize: '0.8rem' }}>
+                 <TrendingUp size={14} style={{ marginRight: '5px' }} /> +12% este mes
+              </div>
+           </div>
+           <div style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+              <p style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 700 }}>CUENTAS ACTIVAS</p>
+              <h3 style={{ fontSize: '2rem', margin: '5px 0', color: '#10b981' }}>{stats.active}</h3>
+              <div style={{ background: '#ecfdf5', color: '#10b981', padding: '4px 8px', borderRadius: '8px', fontSize: '0.7rem', width: 'fit-content' }}>OPERATIVO</div>
+           </div>
+           <div style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+              <p style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 700 }}>SUSPENDIDAS</p>
+              <h3 style={{ fontSize: '2rem', margin: '5px 0', color: '#ef4444' }}>{stats.suspended}</h3>
+              <div style={{ background: '#fef2f2', color: '#ef4444', padding: '4px 8px', borderRadius: '8px', fontSize: '0.7rem', width: 'fit-content' }}>REQUERIDAS DE ACCIÓN</div>
+           </div>
+        </section>
+
+        <section style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '24px', overflow: 'hidden' }}>
+           <div style={{ padding: '20px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ position: 'relative', width: '400px' }}>
+                 <Search style={{ position: 'absolute', left: '12px', top: '10px', color: '#94a3b8' }} size={18} />
+                 <input 
+                    type="text" 
+                    placeholder="Buscar por nombre o email..." 
+                    style={{ width: '100%', padding: '10px 10px 10px 40px', borderRadius: '12px', border: '1px solid #e2e8f0' }}
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                 />
+              </div>
+           </div>
+           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                 <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
+                    <th style={{ padding: '16px 24px', fontSize: '0.75rem', color: '#64748b' }}>ESTUDIANTE</th>
+                    <th style={{ padding: '16px 24px', fontSize: '0.75rem', color: '#64748b' }}>PROGRAMA</th>
+                    <th style={{ padding: '16px 24px', fontSize: '0.75rem', color: '#64748b' }}>ESTADO</th>
+                    <th style={{ padding: '16px 24px', fontSize: '0.75rem', color: '#64748b' }}>ACCIONES</th>
+                 </tr>
+              </thead>
+              <tbody>
+                 {students.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase())).map(s => (
+                    <tr key={s.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                       <td style={{ padding: '16px 24px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                             <div style={{ width: '32px', height: '32px', background: '#eef2ff', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5', fontWeight: 700 }}>
+                                {s.name.charAt(0)}
+                             </div>
+                             <div>
+                                <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{s.name}</p>
+                                <p style={{ fontSize: '0.75rem', color: '#64748b' }}>{s.email}</p>
+                             </div>
+                          </div>
+                       </td>
+                       <td style={{ padding: '16px 24px', fontSize: '0.85rem' }}>{s.program}</td>
+                       <td style={{ padding: '16px 24px' }}>
+                          <span style={{ 
+                             padding: '4px 10px', 
+                             borderRadius: '8px', 
+                             fontSize: '0.75rem', 
+                             fontWeight: 600,
+                             background: s.status === 'Active' ? '#ecfdf5' : '#fef2f2',
+                             color: s.status === 'Active' ? '#10b981' : '#ef4444'
+                          }}>
+                             {s.status}
+                          </span>
+                       </td>
+                       <td style={{ padding: '16px 24px' }}>
+                          <button style={{ background: 'transparent', border: 'none', color: '#94a3b8' }}><MoreVertical size={18} /></button>
+                       </td>
+                    </tr>
+                 ))}
+              </tbody>
+           </table>
+        </section>
+      </main>
     </div>
   );
 };

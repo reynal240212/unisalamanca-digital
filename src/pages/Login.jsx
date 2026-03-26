@@ -7,7 +7,6 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [captcha, setCaptcha] = useState({ q: '', a: 0 });
   const [captchaInput, setCaptchaInput] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
@@ -19,119 +18,63 @@ const Login = () => {
   }, []);
 
   const generateCaptcha = () => {
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    setCaptcha({
-      q: `${num1} + ${num2} = ?`,
-      a: num1 + num2
-    });
+    const n1 = Math.floor(Math.random() * 10) + 1;
+    const n2 = Math.floor(Math.random() * 10) + 1;
+    setCaptcha({ q: `${n1} + ${n2}=?`, a: n1+n2 });
   };
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
-    
     if (parseInt(captchaInput) !== captcha.a) {
-      setError('Captcha incorrecto. Inténtalo de nuevo.');
+      setError('Captcha incorrecto');
       generateCaptcha();
-      setCaptchaInput('');
       return;
     }
 
     setIsLoading(true);
     try {
-      const user = await login(email, password);
-      // Success redirection based on role
-      if (user.role === 'VALIDADOR') {
-        navigate('/validator');
-      } else if (user.role === 'ADMIN') {
-        navigate('/admin');
-      } else {
-        navigate('/student');
-      }
+      const u = await login(email, password);
+      // Success
+      if (u.role === 'ADMIN') navigate('/admin');
+      else if (u.role === 'VALIDADOR') navigate('/validator');
+      else navigate('/student');
     } catch (err) {
-      setError(err.message || 'Error en el inicio de sesión');
+      setError(err.message);
       generateCaptcha();
-      setCaptchaInput('');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="container">
-        <div className="info-side">
-          <div className="mascot-container">
-            <img src="/images/squirrel.png" alt="Mascota" />
-          </div>
-          <h2>NUESTRA COMUNIDAD</h2>
-          <p>El talento se está moviendo y merece ser visto. Muy pronto lo verás...</p>
+    <div className="login-page">
+      <div className="login-card">
+        <div className="login-info">
+          <img src="/images/squirrel.png" alt="Mascota" style={{ width: '80%', marginBottom: '20px' }} />
+          <h2>IDENTIDAD DIGITAL</h2>
+          <p>UniSalamanca - Innovación y Seguridad</p>
         </div>
-        
-        <div className="form-side">
-          <div className="logo-box">
-            <img src="/images/logo.png" alt="Logo" />
-            <p>Identidad Digital Estudiantil</p>
+        <div className="login-form-side">
+          <div style={{ marginBottom: '30px' }}>
+            <img src="/images/logo.png" alt="Logo" style={{ maxWidth: '200px' }} />
           </div>
-
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Correo Universitario</label>
-              <div className="input-wrapper">
-                <input 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  placeholder="usuario@unisalamanca.edu.co" 
-                  required 
-                />
-              </div>
+          <form onSubmit={handleLogin}>
+            <div className="input-group">
+              <label>Correo Institucional</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
-
-            <div className="form-group">
+            <div className="input-group">
               <label>Contraseña</label>
-              <div className="input-wrapper">
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  placeholder="Tu contraseña" 
-                  required 
-                />
-                <button 
-                  type="button" 
-                  className="toggle-btn" 
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? '👁️' : '🙈'}
-                </button>
-              </div>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
             </div>
-            
-            <div className="captcha-box">
-              <label className="captcha-header">Verificación de Seguridad</label>
-              <div className="captcha-content">
-                <div className="puzzle-text">{captcha.q}</div>
-                <input 
-                  type="number" 
-                  value={captchaInput} 
-                  onChange={(e) => setCaptchaInput(e.target.value)} 
-                  placeholder="?" 
-                  required 
-                />
-              </div>
+            <div className="input-group" style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px' }}>
+              <label>Verificación: {captcha.q}</label>
+              <input type="number" value={captchaInput} onChange={e => setCaptchaInput(e.target.value)} required />
             </div>
-            
-            <button type="submit" className="login-btn" disabled={isLoading}>
-              {isLoading ? (
-                <span className="loader"></span>
-              ) : (
-                "INGRESAR AHORA"
-              )}
+            {error && <p style={{ color: 'red', marginBottom: '15px' }}>{error}</p>}
+            <button className="btn-primary" style={{ width: '100%' }} disabled={isLoading}>
+              {isLoading ? 'Cargando...' : 'INGRESAR'}
             </button>
-            
-            {error && <div className="error-msg" style={{ display: 'block' }}>{error}</div>}
           </form>
         </div>
       </div>
