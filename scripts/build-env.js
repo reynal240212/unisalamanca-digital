@@ -6,8 +6,8 @@ const envContent = `window.ENV = {
   SUPABASE_ANON_KEY: "${process.env.SUPABASE_ANON_KEY || ''}"
 };`;
 
-const targetPath = path.join(__dirname, '..', 'frontend', 'env.js');
-const examplePath = path.join(__dirname, '..', 'frontend', 'env.example.js');
+const targetPath = path.join(__dirname, '..', 'public', 'src', 'env.js');
+const examplePath = path.join(__dirname, '..', 'public', 'src', 'env.example.js');
 
 // Write the real env.js
 fs.writeFileSync(targetPath, envContent);
@@ -21,4 +21,4 @@ if (!fs.existsSync(examplePath)) {
   fs.writeFileSync(examplePath, exampleContent);
 }
 
-console.log('✅ Environment configuration generated successfully in frontend/env.js');
+console.log('✅ Environment configuration generated successfully in public/src/env.js');
