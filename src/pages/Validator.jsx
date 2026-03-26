@@ -164,6 +164,8 @@ const Validator = () => {
            </div>
         </div>
       )}
-    </div>
-  );
-}; export default Validator;tor;
+      </div>
+    );
+};
+
+export default Validator;

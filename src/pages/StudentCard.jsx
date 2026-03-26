@@ -278,8 +278,11 @@ const PrintIDModal = ({ student, onClose }) => {
   );
 };
 
+
 /* ─ Estilos adicionales ─ */
 const styles = `
   .app-container { min-height: 100vh; display: flex; flex-direction: column; }
 `;
+
+export default StudentCard;
 
