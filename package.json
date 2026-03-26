@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/build-env.cjs && vite build",
+    "build": "node ./scripts/build-env.cjs && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
