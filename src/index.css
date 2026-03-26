@@ -359,9 +359,10 @@ body { background: var(--bg-light); color: var(--text-main); overflow-x: hidden;
 
 @media (max-width: 768px) {
   .login-card {
-    grid-template-columns: 1fr;
-    max-width: 450px;
-    margin: 0 auto;
+    grid-template-columns: 1fr !important;
+    max-width: 480px !important;
+    width: 95% !important;
+    margin: 0 auto !important;
   }
 }
 
