@@ -49,33 +49,44 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-card">
-        <div className="login-info">
+        <div className="login-info" style={{ background: 'var(--primary)' }}>
           <img src="/images/squirrel.png" alt="Mascota" style={{ width: '80%', marginBottom: '20px' }} />
-          <h2>IDENTIDAD DIGITAL</h2>
-          <p>UniSalamanca - Innovación y Seguridad</p>
+          <h2 style={{ color: 'white' }}>IDENTIDAD DIGITAL</h2>
+          <p style={{ color: 'rgba(255,255,255,0.7)' }}>UniSalamanca - Innovación y Seguridad</p>
+          <button 
+            onClick={() => navigate('/')} 
+            className="btn-outline-white" 
+            style={{ marginTop: '20px', padding: '10px 20px', fontSize: '0.8rem' }}
+          >
+            ← VOLVER AL INICIO
+          </button>
         </div>
         <div className="login-form-side">
-          <div style={{ marginBottom: '30px' }}>
-            <img src="/images/logo.png" alt="Logo" style={{ maxWidth: '200px' }} />
+          <div style={{ marginBottom: '30px', textAlign: 'center' }}>
+            <img src="/images/logo.png" alt="Logo" style={{ maxWidth: '180px' }} />
+            <h3 style={{ marginTop: '10px', fontSize: '0.9rem', color: 'var(--primary)', letterSpacing: '1px' }}>ACCESO INSTITUCIONAL</h3>
           </div>
           <form onSubmit={handleLogin}>
             <div className="input-group">
               <label>Correo Institucional</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+              <input type="email" value={email} placeholder="ejemplo@unisalamanca.edu.co" onChange={e => setEmail(e.target.value)} required />
             </div>
             <div className="input-group">
               <label>Contraseña</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+              <input type="password" value={password} placeholder="••••••••" onChange={e => setPassword(e.target.value)} required />
             </div>
-            <div className="input-group" style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px' }}>
-              <label>Verificación: {captcha.q}</label>
+            <div className="input-group" style={{ background: 'var(--bg-light)', padding: '15px', borderRadius: '12px' }}>
+              <label>Verificación de Seguridad: {captcha.q}</label>
               <input type="number" value={captchaInput} onChange={e => setCaptchaInput(e.target.value)} required />
             </div>
-            {error && <p style={{ color: 'red', marginBottom: '15px' }}>{error}</p>}
-            <button className="btn-primary" style={{ width: '100%' }} disabled={isLoading}>
-              {isLoading ? 'Cargando...' : 'INGRESAR'}
+            {error && <p style={{ color: 'var(--error)', marginBottom: '15px', fontSize: '0.85rem' }}>{error}</p>}
+            <button className="btn-primary" style={{ width: '100%', padding: '15px' }} disabled={isLoading}>
+              {isLoading ? 'VERIFICANDO...' : 'INICIAR SESIÓN'}
             </button>
           </form>
+          <p style={{ marginTop: '20px', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+            ¿Problemas para ingresar? <a href="#" style={{ color: 'var(--secondary)' }}>Contactar Soporte IT</a>
+          </p>
         </div>
       </div>
     </div>
