@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import bcrypt from 'bcryptjs';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +20,10 @@ const UserFormModal = ({ student, onClose, onSave }) => {
     program: student?.program || '',
     role: student?.role || 'ESTUDIANTE',
     status: student?.status || 'Active',
+    password: '',
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -97,6 +101,23 @@ const UserFormModal = ({ student, onClose, onSave }) => {
                 </optgroup>
               ))}
             </select>
+          </div>
+
+          <div style={{ marginBottom: '24px', position: 'relative' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '7px' }}>
+              {isEdit ? 'Nueva Contraseña (Opcional)' : 'Contraseña Inicial'}
+            </label>
+            <div style={{ position: 'relative' }}>
+               <input
+                 type={showPassword ? "text" : "password"} value={form.password} placeholder={isEdit ? "Dejar en blanco para no cambiar" : "Mínimo 6 caracteres"}
+                 required={!isEdit}
+                 onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
+                 style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontFamily: 'inherit', fontSize: '0.9rem', outline: 'none' }}
+               />
+               <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
+                 {showPassword ? <X size={16} /> : <Key size={16} />}
+               </button>
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
@@ -421,24 +442,36 @@ const AdminDashboard = () => {
   };
 
   const handleSaveUser = async (id, form) => {
-    if (id) {
-       // UPDATE
-       const { error } = await supabase.from('user').update(form).eq('id', id);
-       if (!error) {
-         setEditingStudent(null);
-         fetchStudents();
-       } else {
-         alert("Error al actualizar: " + error.message);
-       }
-    } else {
-       // CREATE
-       const { error } = await supabase.from('user').insert([form]);
-       if (!error) {
-         setShowCreateModal(false);
-         fetchStudents();
-       } else {
-         alert("Error al crear: " + error.message);
-       }
+    try {
+      const userData = { ...form };
+      delete userData.password;
+
+      if (form.password) {
+        const salt = await bcrypt.genSalt(10);
+        userData.password_hash = await bcrypt.hash(form.password, salt);
+      }
+
+      if (id) {
+         // UPDATE
+         const { error } = await supabase.from('user').update(userData).eq('id', id);
+         if (!error) {
+           setEditingStudent(null);
+           fetchStudents();
+         } else {
+           alert("Error al actualizar: " + error.message);
+         }
+      } else {
+         // CREATE
+         const { error } = await supabase.from('user').insert([userData]);
+         if (!error) {
+           setShowCreateModal(false);
+           fetchStudents();
+         } else {
+           alert("Error al crear: " + error.message);
+         }
+      }
+    } catch (err) {
+      alert("Error en el proceso de seguridad: " + err.message);
     }
   };
 
