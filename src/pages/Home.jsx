@@ -35,35 +35,41 @@ const Home = () => {
          </header>
 
          {/* Presentation Hero */}
-         <section className="id-hero" style={{ backgroundImage: 'url(https://newsite.unisalamanca.edu.co/api/uploads/imgs/hero/71bf71e3a8d2b8cd_DIPLOMADOS_Mesa-de-trabajo-1-copia-3.webp)', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+         <section className="id-hero" style={{ backgroundImage: 'url(https://newsite.unisalamanca.edu.co/api/uploads/imgs/hero/71bf71e3a8d2b8cd_DIPLOMADOS_Mesa-de-trabajo-1-copia-3.webp)', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.92)', zIndex: 0 }}></div>
+            
             <div className="hero-grid">
-               <div className="hero-text-side" style={{ position: 'relative', zIndex: 1 }}>
-                  <span className="id-badge">NUEVO LANZAMIENTO</span>
-                  <h1>Tu Identidad, <br />Ahora es <span className="text-cyan">Digital</span></h1>
+               <div className="hero-text-side" style={{ position: 'relative', zIndex: 1, animation: 'fadeInLeft 1s ease-out' }}>
+                  <span className="id-badge">IDENTIDAD 2026</span>
+                  <h1 style={{ fontWeight: 900 }}>Tu Identidad, <br />Ahora es <span className="text-cyan">Premium</span></h1>
                   <p className="hero-desc">
-                     Bienvenido a la evolución de UniSalamanca. Un sistema de identificación
-                     inteligente, seguro y siempre contigo.
+                     Vive la evolución digital de UniSalamanca. Acceso inteligente, 
+                     encriptación de grado militar y diseño institucional de vanguardia.
                   </p>
                   <div className="cta-group">
-                     <button onClick={() => navigate('/login')} className="btn-id-primary">
+                     <button onClick={() => navigate('/login')} className="btn-id-primary" style={{ boxShadow: '0 10px 25px rgba(22,182,214,0.4)' }}>
                         ACTIVAR MI CARNET <ChevronRight size={18} />
                      </button>
-                     <button className="btn-id-secondary">VER TUTORIAL</button>
+                     <button className="btn-id-secondary">EXPLORAR FUNCIONES</button>
                   </div>
                </div>
-               <div className="hero-image-side" style={{ position: 'relative', zIndex: 1 }}>
-                  <div className="phone-mockup">
-                     <div className="mockup-screen">
-                        <div className="card-preview" style={{ background: 'linear-gradient(135deg, #fff, #f0f7ff)' }}>
+               <div className="hero-image-side" style={{ position: 'relative', zIndex: 1, animation: 'fadeInRight 1.2s ease-out' }}>
+                  <div className="phone-mockup" style={{ transform: 'rotate(-5deg)' }}>
+                     <div className="mockup-screen" style={{ background: 'linear-gradient(135deg, #1e293b, #0f172a)' }}>
+                        <div className="card-preview" style={{ 
+                          background: 'rgba(255,255,255,0.15)', 
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          color: 'white'
+                        }}>
                            <div className="card-top">
-                              <span className="uni">Uni</span><span className="sal">Salamanca</span>
+                              <span style={{ color: 'var(--secondary)', fontWeight: 900 }}>Uni</span><span>Salamanca</span>
                            </div>
-                           <img src="/images/salmi.png" alt="Salmi" style={{ width: '80px', marginBottom: '10px' }} />
-                           <div className="card-qr">
-                              <QrCode size={120} color="#2A2266" />
+                           <img src="/images/salmi.png" alt="Salmi" style={{ width: '70px', marginBottom: '8px', filter: 'drop-shadow(0 0 10px rgba(22,182,214,0.5))' }} />
+                           <div className="card-qr" style={{ background: 'white', padding: '10px', borderRadius: '12px' }}>
+                              <QrCode size={100} color="#2A2266" />
                            </div>
-                           <p>ESTUDIANTE ACTIVO</p>
+                           <p style={{ fontSize: '0.6rem', letterSpacing: '2px', fontWeight: 800 }}>ESTUDIANTE DIGITAL</p>
                         </div>
                      </div>
                   </div>

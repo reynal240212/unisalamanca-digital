@@ -106,91 +106,139 @@ const StudentCard = () => {
     setShowOnboarding(false);
   };
 
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) - 0.5;
+    const y = ((e.clientY - rect.top) / rect.height) - 0.5;
+    setMousePos({ x: x * 20, y: y * -20 });
+  };
+
+  const handleMouseLeave = () => setMousePos({ x: 0, y: 0 });
+
   return (
-    <div className="login-page" style={{ padding: '20px' }}>
-      <div className="app-container" style={{ width: '100%', maxWidth: '400px' }}>
-        <header style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-           <h2 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--primary)' }}>
-             <span style={{ color: 'var(--secondary)' }}>Uni</span>Salamanca
-           </h2>
-           <button onClick={logout} className="btn-primary" style={{ padding: '8px 15px', fontSize: '0.75rem', background: 'var(--footer-bg)' }}>CERRAR SESIÓN</button>
+    <div className="login-page" style={{ 
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
+      perspective: '1000px'
+    }}>
+      <div className="app-container" style={{ width: '100%', maxWidth: '420px', zIndex: 10 }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img src="/images/escudo.png" alt="UniSalamanca" style={{ height: '32px', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.3))' }} />
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'white', margin: 0, letterSpacing: '-0.5px' }}>
+                ID <span style={{ color: 'var(--secondary)' }}>Digital</span>
+              </h2>
+           </div>
+           <button onClick={logout} style={{ 
+             background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)',
+             color: 'white', padding: '8px 16px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer',
+             transition: 'all 0.3s'
+           }}>SALIR</button>
         </header>
 
-         <div className="login-card" style={{ flexDirection: 'column', padding: '30px', alignItems: 'center', textAlign: 'center', background: 'white', borderRadius: '32px', boxShadow: '0 20px 40px rgba(0,0,0,0.06)' }}>
-           <div style={{ width: '120px', height: '120px', borderRadius: '50%', border: '4px solid var(--secondary)', overflow: 'hidden', marginBottom: '20px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
-              <img src={student?.photo_url || '/images/default-avatar.png'} alt="Foto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-           </div>
+         <div 
+           className="premium-card"
+           onMouseMove={handleMouseMove}
+           onMouseLeave={handleMouseLeave}
+           style={{ 
+             background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', borderRadius: '32px',
+             padding: '40px 30px', position: 'relative', overflow: 'hidden',
+             boxShadow: '0 30px 60px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.5)',
+             transform: `rotateY(${mousePos.x}deg) rotateX(${mousePos.y}deg)`,
+             transition: 'transform 0.1s ease-out',
+             transformStyle: 'preserve-3d'
+           }}
+         >
+           {/* Decorative elements */}
+           <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '150px', height: '150px', background: 'var(--secondary)', filter: 'blur(80px)', opacity: 0.15, zIndex: 0 }}></div>
            
-           <h2 style={{ margin: 0, fontWeight: 800, color: 'var(--primary)' }}>{student?.name || 'Cargando...'}</h2>
-           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px', fontWeight: 600 }}>{student?.program}</p>
+           <div style={{ transform: 'translateZ(50px)', zIndex: 1 }}>
+             <div style={{ width: '140px', height: '140px', borderRadius: '32px', border: '6px solid white', overflow: 'hidden', margin: '0 auto 24px', boxShadow: '0 15px 35px rgba(0,0,0,0.1)', background: '#f8fafc' }}>
+                <img src={student?.photo_url || '/images/default-avatar.png'} alt="Foto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+             </div>
+             
+             <h2 style={{ margin: 0, fontWeight: 900, color: '#1e293b', fontSize: '1.4rem' }}>{student?.name?.toUpperCase() || 'Cargando...'}</h2>
+             <p style={{ color: 'var(--secondary)', fontSize: '0.85rem', marginBottom: '25px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>{student?.program}</p>
 
-           <div style={{ background: 'white', padding: '15px', borderRadius: '20px', boxShadow: '0 10px 20px rgba(0,0,0,0.05)', marginBottom: '20px', border: '1px solid #f1f5f9' }}>
-              <QRCodeSVG value={qrValue} size={180} level="H" />
+             <div style={{ 
+               background: 'white', padding: '20px', borderRadius: '24px', 
+               boxShadow: '0 10px 30px rgba(0,0,0,0.04)', marginBottom: '25px', 
+               border: '1px solid #f1f5f9', display: 'inline-block'
+             }}>
+                <QRCodeSVG value={qrValue} size={190} level="H" includeMargin={false} />
+             </div>
+
+             <div style={{ width: '100%', maxWidth: '240px', margin: '0 auto' }}>
+                <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', marginBottom: '10px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                   <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--primary), var(--secondary))', width: `${progress}%`, transition: 'width 1s linear' }}></div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                   <span className="pulse-dot"></span>
+                   <p style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 800, letterSpacing: '0.5px' }}>TOKEN DE SEGURIDAD ACTIVO</p>
+                </div>
+             </div>
+
+             <button 
+                onClick={() => setShowPrintModal(true)}
+                style={{ 
+                  marginTop: '32px', background: '#f8fafc', border: '1.5px solid #e2e8f0', 
+                  color: '#475569', fontSize: '0.8rem', padding: '12px 24px', 
+                  borderRadius: '16px', cursor: 'pointer', fontWeight: 800,
+                  display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'center',
+                  transition: 'all 0.2s'
+                }}
+             >
+                <ShieldCheck size={18} /> GENERAR VERSIÓN FÍSICA
+             </button>
            </div>
-
-           <div style={{ width: '100%' }}>
-              <div style={{ height: '4px', background: '#f1f5f9', borderRadius: '2px', marginBottom: '8px', overflow: 'hidden' }}>
-                 <div style={{ height: '100%', background: 'var(--secondary)', width: `${progress}%`, transition: 'width 1s linear' }}></div>
-              </div>
-              <p style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 700 }}>ROTACIÓN DINÁMICA DE SEGURIDAD</p>
-           </div>
-
-           <button 
-              onClick={() => setShowPrintModal(true)}
-              style={{ 
-                marginTop: '25px', background: 'transparent', border: '1.5px solid #e2e8f0', 
-                color: 'var(--primary)', fontSize: '0.8rem', padding: '10px 20px', 
-                borderRadius: '12px', cursor: 'pointer', fontWeight: 700,
-                display: 'flex', alignItems: 'center', gap: '8px', width: '100%', justifyContent: 'center'
-              }}
-           >
-              📄 Generar Carnet Físico (Sin QR)
-           </button>
         </div>
 
-        <footer style={{ marginTop: '30px', textAlign: 'center' }}>
-           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-              <ShieldCheck size={20} color="var(--primary)" />
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Identidad Digital Verificada</p>
+        <footer style={{ marginTop: '40px', textAlign: 'center' }}>
+           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', opacity: 0.8 }}>
+              <img src="/images/salmi.png" alt="Salmi" style={{ height: '28px' }} />
+              <p style={{ fontSize: '0.75rem', color: 'white', fontWeight: 700, letterSpacing: '0.5px' }}>TECNOLOGÍA SALAMANCA DIGITAL</p>
            </div>
         </footer>
       </div>
 
       {showOnboarding && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(15,23,42,0.95)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-           <div className="login-card" style={{ maxWidth: '450px', padding: '40px', textAlign: 'center', flexDirection: 'column' }}>
-              <h3>¡Bienvenido Estudiante!</h3>
-              <p style={{ color: '#64748b', marginBottom: '20px' }}>Activa tu carnet digital capturando tu foto de perfil.</p>
+           <div className="login-card" style={{ maxWidth: '450px', padding: '40px', textAlign: 'center', flexDirection: 'column', background: 'white', borderRadius: '32px' }}>
+              <h3 style={{ fontWeight: 900, color: '#1e293b' }}>¡Bienvenido Estudiante!</h3>
+              <p style={{ color: '#64748b', marginBottom: '20px', fontSize: '0.9rem' }}>Activa tu carnet digital capturando tu foto de perfil.</p>
               
-              <div style={{ width: '200px', height: '200px', borderRadius: '50%', border: '2px dashed #4f46e5', margin: '0 auto 20px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '200px', height: '200px', borderRadius: '50%', border: '3px dashed var(--secondary)', margin: '0 auto 20px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
                  {capturedImg ? (
                    <img src={capturedImg} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                  ) : (
-                   isCapturing ? <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }}></video> : <Camera size={40} color="#4f46e5" />
+                   isCapturing ? <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }}></video> : <Camera size={40} color="var(--secondary)" />
                  )}
               </div>
 
               <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
 
-              <div style={{ marginBottom: '20px' }}>
-                 <label style={{ fontSize: '0.8rem', display: 'flex', gap: '10px', alignItems: 'center', textAlign: 'left' }}>
-                    <input type="checkbox" checked={privacyChecked} onChange={e => setPrivacyChecked(e.target.checked)} />
+              <div style={{ marginBottom: '24px' }}>
+                 <label style={{ fontSize: '0.75rem', display: 'flex', gap: '12px', alignItems: 'center', textAlign: 'left', color: '#475569', lineHeight: '1.4' }}>
+                    <input type="checkbox" checked={privacyChecked} onChange={e => setPrivacyChecked(e.target.checked)} style={{ width: '18px', height: '18px' }} />
                     Autorizo el tratamiento de mis datos personales según la Ley 1581 de 2012 para fines de identificación institucional.
                  </label>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
                  {!capturedImg ? (
-                    <button onClick={startCamera} className="btn-primary" disabled={isCapturing}>ENCENDER CÁMARA</button>
+                    <button onClick={startCamera} style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 800, cursor: 'pointer' }} disabled={isCapturing}>ENCENDER CÁMARA</button>
                  ) : (
-                    <button onClick={() => { setCapturedImg(null); startCamera(); }} className="btn-primary" style={{ background: '#64748b' }}>REPETIR</button>
+                    <button onClick={() => { setCapturedImg(null); startCamera(); }} style={{ background: '#64748b', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 800, cursor: 'pointer' }}>REPETIR</button>
                  )}
-                 {isCapturing && <button onClick={takePhoto} className="btn-primary">CAPTURAR</button>}
-                 {capturedImg && <button onClick={savePhoto} className="btn-primary">GUARDAR Y ACTIVAR</button>}
+                 {isCapturing && <button onClick={takePhoto} style={{ background: 'var(--secondary)', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 800, cursor: 'pointer' }}>CAPTURAR</button>}
+                 {capturedImg && <button onClick={savePhoto} style={{ background: '#22c55e', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 800, cursor: 'pointer' }}>ACTIVAR AHORA</button>}
               </div>
            </div>
         </div>
       )}
+      <style>{styles}</style>
     </div>
   );
 };
@@ -281,7 +329,18 @@ const PrintIDModal = ({ student, onClose }) => {
 
 /* ─ Estilos adicionales ─ */
 const styles = `
-  .app-container { min-height: 100vh; display: flex; flex-direction: column; }
+  .pulse-dot {
+    width: 6px; height: 6px; background: #22c55e; border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+  }
+  .premium-card:hover {
+    box-shadow: 0 45px 80px rgba(0,0,0,0.18);
+  }
 `;
 
 export default StudentCard;
