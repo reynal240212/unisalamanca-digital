@@ -35,8 +35,14 @@ const Home = () => {
          </header>
 
          {/* Presentation Hero */}
-         <section className="id-hero" style={{ backgroundImage: 'url(https://newsite.unisalamanca.edu.co/api/uploads/imgs/hero/71bf71e3a8d2b8cd_DIPLOMADOS_Mesa-de-trabajo-1-copia-3.webp)', backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.92)', zIndex: 0 }}></div>
+         <section className="id-hero" style={{ 
+            backgroundImage: 'url(https://newsite.unisalamanca.edu.co/api/uploads/imgs/hero/71bf71e3a8d2b8cd_DIPLOMADOS_Mesa-de-trabajo-1-copia-3.webp)', 
+            backgroundSize: 'cover', 
+            backgroundPosition: 'center', 
+            position: 'relative', 
+            overflow: 'hidden' 
+         }}>
+            <div className="hero-overlay"></div>
             
             <div className="hero-grid">
                <div className="hero-text-side" style={{ position: 'relative', zIndex: 1, animation: 'fadeInLeft 1s ease-out' }}>
@@ -47,7 +53,7 @@ const Home = () => {
                      encriptación de grado militar y diseño institucional de vanguardia.
                   </p>
                   <div className="cta-group">
-                     <button onClick={() => navigate('/login')} className="btn-id-primary" style={{ boxShadow: '0 10px 25px rgba(22,182,214,0.4)' }}>
+                     <button onClick={() => navigate('/login')} className="btn-id-primary">
                         ACTIVAR MI CARNET <ChevronRight size={18} />
                      </button>
                      <button className="btn-id-secondary">EXPLORAR FUNCIONES</button>
@@ -65,11 +71,16 @@ const Home = () => {
                            <div className="card-top">
                               <span style={{ color: 'var(--secondary)', fontWeight: 900 }}>Uni</span><span>Salamanca</span>
                            </div>
-                           <img src="/images/salmi.png" alt="Salmi" style={{ width: '70px', marginBottom: '8px', filter: 'drop-shadow(0 0 10px rgba(22,182,214,0.5))' }} />
-                           <div className="card-qr" style={{ background: 'white', padding: '10px', borderRadius: '12px' }}>
+                           <img 
+                              src="/images/salmi.png" 
+                              alt="Salmi" 
+                              className="floating-mascot"
+                              style={{ width: '100px', marginBottom: '8px', filter: 'drop-shadow(0 0 20px rgba(22,182,214,0.6))' }} 
+                           />
+                           <div className="card-qr" style={{ background: 'white', padding: '10px', borderRadius: '12px', marginTop: '10px' }}>
                               <QrCode size={100} color="#2A2266" />
                            </div>
-                           <p style={{ fontSize: '0.6rem', letterSpacing: '2px', fontWeight: 800 }}>ESTUDIANTE DIGITAL</p>
+                           <p style={{ fontSize: '0.6rem', letterSpacing: '2px', fontWeight: 800, marginTop: '15px' }}>ESTUDIANTE DIGITAL</p>
                         </div>
                      </div>
                   </div>
@@ -79,23 +90,23 @@ const Home = () => {
 
          {/* Features Presentation */}
          <section className="id-features">
-            <div className="features-intro">
+            <div className="features-intro" style={{ animation: 'reveal 1s ease-out' }}>
                <h2>Tecnología al Servicio de tu Seguridad</h2>
                <p>Descubre los beneficios de portar tu identidad digital institucional.</p>
             </div>
 
             <div className="features-official-grid">
-               <div className="off-feat-card">
+               <div className="off-feat-card" style={{ animation: 'reveal 1.2s ease-out' }}>
                   <div className="off-icon cyan"><QrCode size={30} /></div>
                   <h3>QR Dinámico</h3>
                   <p>Código encriptado que se renueva cada 30 segundos para evitar duplicados.</p>
                </div>
-               <div className="off-feat-card">
+               <div className="off-feat-card" style={{ animation: 'reveal 1.4s ease-out' }}>
                   <div className="off-icon navy"><ShieldCheck size={30} /></div>
                   <h3>Validación Instantánea</h3>
                   <p>Verificación rápida en portería para un acceso fluido al campus.</p>
                </div>
-               <div className="off-feat-card">
+               <div className="off-feat-card" style={{ animation: 'reveal 1.6s ease-out' }}>
                   <div className="off-icon green"><UserCheck size={30} /></div>
                   <h3>Ley 1581 (Habeas Data)</h3>
                   <p>Tus datos protegidos bajo los más altos estándares legales de Colombia.</p>
