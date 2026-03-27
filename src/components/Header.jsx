@@ -8,8 +8,11 @@ const Header = () => {
     return (
         <header className="official-header">
             <div className="header-container">
-                <div className="branding" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                    <img src="/images/logo-oficial.svg" alt="UniSalamanca" style={{ height: '50px' }} />
+                <div className="branding" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <img src="/images/escudo.png" alt="UniSalamanca" style={{ height: '40px' }} />
+                    <span style={{ fontWeight: 900, letterSpacing: '0.5px', fontSize: '1.2rem' }}>
+                        <span style={{ color: 'var(--secondary)' }}>Uni</span><span style={{ color: 'var(--primary)' }}>Salamanca</span>
+                    </span>
                 </div>
                 <div className="header-actions">
                     <div className="search-circle"><Search size={18} /></div>

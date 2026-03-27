@@ -14,7 +14,7 @@ const LoginBranding = () => {
 
       <div style={{ transform: 'translateY(-20px)' }}>
         <img 
-          src="/images/salmi.png"
+          src="/images/salmi-hoodie-final.png"
           alt="Salmi" 
           className="salmi-animation"
         />

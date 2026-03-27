@@ -54,10 +54,10 @@ const Home = () => {
                               <span style={{ color: 'var(--secondary)', fontWeight: 900 }}>Uni</span><span>Salamanca</span>
                            </div>
                            <img 
-                              src="/images/salmi.png" 
+                              src="/images/salmi-hoodie-final.png" 
                               alt="Salmi" 
                               className="floating-mascot"
-                              style={{ width: '100px', marginBottom: '8px', filter: 'drop-shadow(0 0 20px rgba(22,182,214,0.6))' }} 
+                              style={{ width: '150px', marginBottom: '8px' }} 
                            />
                            <div className="card-qr" style={{ background: 'white', padding: '10px', borderRadius: '12px', marginTop: '10px' }}>
                               <QrCode size={100} color="#2A2266" />

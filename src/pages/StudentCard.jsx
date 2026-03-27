@@ -134,7 +134,7 @@ const StudentCard = () => {
 
         <footer style={{ marginTop: '40px', textAlign: 'center' }}>
            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', opacity: 0.8 }}>
-              <img src="/images/salmi.png" alt="Salmi" style={{ height: '28px' }} />
+              <img src="/images/salmi-hoodie-final.png" alt="Salmi" style={{ height: '28px' }} />
               <p style={{ fontSize: '0.75rem', color: 'white', fontWeight: 700, letterSpacing: '0.5px' }}>TECNOLOGÍA SALAMANCA DIGITAL</p>
            </div>
         </footer>
