@@ -34,7 +34,11 @@ export const AuthProvider = ({ children }) => {
         id: data.id,
         email: data.email,
         name: data.name,
-        role: data.role
+        role: data.role,
+        program: data.program,
+        photo_url: data.photo_url,
+        semester: data.semester,
+        gpa: data.gpa
       };
 
       setUser(sessionUser);

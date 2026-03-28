@@ -14,9 +14,10 @@ const LoginBranding = () => {
 
       <div style={{ transform: 'translateY(-20px)' }}>
         <img 
-          src="/images/salmi-hoodie-final.png"
-          alt="Salmi" 
+          src="/images/salmi-premium.png" 
+          alt="Salmi Premium Mascot" 
           className="salmi-animation"
+          style={{ width: '240px', height: 'auto', marginBottom: '10px' }}
         />
         <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginTop: '20px', lineHeight: 1.2 }}>
           Tu Identidad Digital,<br/>Más Segura que Nunca

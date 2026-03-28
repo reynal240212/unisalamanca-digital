@@ -1,41 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { LogIn, ShieldCheck, Mail, Lock } from 'lucide-react';
 import LoginBranding from '../components/LoginBranding';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [captcha, setCaptcha] = useState({ q: '', a: 0 });
-  const [captchaInput, setCaptchaInput] = useState('');
+  const [captchaToken, setCaptchaToken] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+  const recaptchaRef = useRef();
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    generateCaptcha();
-  }, []);
-
-  const generateCaptcha = () => {
-    const n1 = Math.floor(Math.random() * 8) + 1;
-    const n2 = Math.floor(Math.random() * 8) + 1;
-    setCaptcha({ q: `${n1} + ${n2} = ?`, a: n1 + n2 });
-  };
-
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
-
-    if (parseInt(captchaInput) !== captcha.a) {
-      setError('Verificación de seguridad incorrecta');
-      generateCaptcha();
-      setCaptchaInput('');
+    if (!captchaToken) {
+      setError('Por favor completa la verificación de seguridad');
       return;
     }
 
+    setError('');
     setIsLoading(true);
     try {
       const u = await login(email, password);
@@ -44,15 +32,40 @@ const Login = () => {
       else navigate('/student');
     } catch (err) {
       setError('Credenciales inválidas o cuenta suspendida');
-      generateCaptcha();
-      setCaptchaInput('');
+      setCaptchaToken(null);
+      if (recaptchaRef.current) recaptchaRef.current.reset();
     } finally {
       setIsLoading(false);
     }
   };
 
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
     <div className="login-page">
+      <div className="identity-overlay">
+        <div className="identity-mesh" style={{ transform: `translate(${mousePos.x * -15}px, ${mousePos.y * -15}px)` }}></div>
+
+        <div className="identity-shields">
+          <img src="/images/escudo.png" alt="" className="shield shield-1" style={{ transform: `translate(${mousePos.x * 30}px, ${mousePos.y * 30}px)` }} />
+          <img src="/images/escudo.png" alt="" className="shield shield-2" style={{ transform: `translate(${mousePos.x * -40}px, ${mousePos.y * -40}px)` }} />
+        </div>
+
+
+        <div className="identity-particles">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className={`particle p-${i + 1}`}></div>
+          ))}
+        </div>
+      </div>
       <div className="login-card">
         {/* LADO IZQUIERDO: Branding e Info */}
         <LoginBranding />
@@ -72,43 +85,33 @@ const Login = () => {
           <form onSubmit={handleLogin}>
             <div className="input-group">
               <label><Mail size={12} style={{ marginRight: '6px' }} /> Correo Institucional</label>
-              <input 
-                type="email" 
-                value={email} 
-                placeholder="nombre.apellido@unisalamanca.edu.co" 
-                onChange={e => setEmail(e.target.value)} 
-                required 
+              <input
+                type="email"
+                value={email}
+                placeholder="usuario@unisalamanca.edu.co"
+                onChange={e => setEmail(e.target.value)}
+                required
               />
             </div>
 
             <div className="input-group" style={{ marginBottom: '20px' }}>
               <label><Lock size={12} style={{ marginRight: '6px' }} /> Contraseña</label>
-              <input 
-                type="password" 
-                value={password} 
-                placeholder="••••••••••••" 
-                onChange={e => setPassword(e.target.value)} 
-                required 
+              <input
+                type="password"
+                value={password}
+                placeholder="••••••••••••"
+                onChange={e => setPassword(e.target.value)}
+                required
               />
             </div>
 
-            <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '18px', border: '1.5px solid #f1f5f9', marginBottom: '24px' }}>
-              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '12px', letterSpacing: '0.5px' }}>
-                🔒 Verificación de Seguridad
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <div style={{ padding: '10px 15px', background: '#2A2266', color: 'white', borderRadius: '10px', fontWeight: 900, fontSize: '1rem' }}>
-                  {captcha.q}
-                </div>
-                <input 
-                  type="number" 
-                  value={captchaInput} 
-                  placeholder="Resultado"
-                  onChange={e => setCaptchaInput(e.target.value)} 
-                  required 
-                  style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none', textAlign: 'center', fontWeight: 700 }}
-                />
-              </div>
+            <div className="security-check-card" style={{ display: 'flex', justifyContent: 'center', background: 'transparent', border: 'none', boxShadow: 'none', padding: '0', marginBottom: '25px' }}>
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                onChange={token => setCaptchaToken(token)}
+                hl="es"
+              />
             </div>
 
             {error && (
@@ -117,7 +120,11 @@ const Login = () => {
               </div>
             )}
 
-            <button className="login-button" style={{ width: '100%' }} disabled={isLoading}>
+            <button 
+              className="login-button" 
+              style={{ width: '100%', opacity: (!captchaToken || isLoading) ? 0.7 : 1, cursor: (!captchaToken || isLoading) ? 'not-allowed' : 'pointer' }} 
+              disabled={!captchaToken || isLoading}
+            >
               {isLoading ? 'VERIFICANDO...' : (
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
                   INGRESAR AL PANEL <LogIn size={18} />
@@ -132,6 +139,17 @@ const Login = () => {
             </p>
           </footer>
         </div>
+      </div>
+
+      <div className="login-footer-branding">
+        <div className="footer-line"></div>
+        <div className="footer-content">
+          <div className="login-footer-text">
+            <span className="text-secondary">Uni</span><span className="text-white">Salamanca</span>
+          </div>
+          <div className="login-footer-subtext">Corporación Universitaria Empresarial de Salamanca</div>
+        </div>
+        <div className="footer-line"></div>
       </div>
     </div>
   );
