@@ -38,7 +38,12 @@ const Home = () => {
                      <button onClick={() => navigate('/login')} className="btn-id-primary">
                         ACTIVAR MI CARNET <ChevronRight size={18} />
                      </button>
-                     <button className="btn-id-secondary">EXPLORAR FUNCIONES</button>
+                     <button 
+                        className="btn-id-secondary"
+                        onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
+                     >
+                        EXPLORAR FUNCIONES
+                     </button>
                   </div>
                </div>
                <div className="hero-image-side" style={{ position: 'relative', zIndex: 1, animation: 'fadeInRight 1.2s ease-out' }}>
@@ -71,7 +76,7 @@ const Home = () => {
          </section>
 
          {/* Features Presentation */}
-         <section className="id-features">
+         <section id="features" className="id-features">
             <div className="features-intro" style={{ animation: 'reveal 1s ease-out' }}>
                <h2>Tecnología al Servicio de tu Seguridad</h2>
                <p>Descubre los beneficios de portar tu identidad digital institucional.</p>

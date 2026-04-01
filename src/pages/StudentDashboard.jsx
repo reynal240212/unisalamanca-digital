@@ -16,6 +16,32 @@ const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [profileCompleted, setProfileCompleted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Efecto para inicializar Elfsight cuando cambie la pestaña a noticias
+  useEffect(() => {
+    if (activeTab === 'noticias') {
+      const scriptId = 'elfsight-platform-sdk';
+      
+      // Función para inicializar el widget
+      const initElfsight = () => {
+        if (window.elfsightPlatform && typeof window.elfsightPlatform.init === 'function') {
+          window.elfsightPlatform.init();
+        }
+      };
+
+      // Si el script no existe, lo inyectamos
+      if (!document.getElementById(scriptId)) {
+        const script = document.createElement('script');
+        script.id = scriptId;
+        script.src = 'https://elfsightcdn.com/platform.js';
+        script.async = true;
+        script.onload = initElfsight;
+        document.head.appendChild(script);
+      } else {
+        // Si ya existe, solo re-inicializamos
+        setTimeout(initElfsight, 200);
+      }
+    }
+  }, [activeTab]);
   
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
@@ -151,15 +177,58 @@ const StudentDashboard = () => {
             }} />
           </div>
         );
-      case 'qr':
+      case 'noticias':
         return (
-          <div className="section-reveal" style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-             <StudentCardComponent 
-                student={studentData} 
-                qrValue={`USAL-${studentData.id}`} 
-                progress={profileCompleted ? 100 : 45} 
-                onPrintRequest={() => alert('Generando PDF Premium...')}
-              />
+          <div className="section-reveal" style={{ 
+              background: 'white', 
+              borderRadius: '30px', 
+              boxShadow: 'rgba(0, 0, 0, 0.04) 0px 10px 40px',
+              overflow: 'hidden',
+              minHeight: '800px',
+              animation: 'slideUp 0.6s ease-out'
+          }}>
+              <div style={{ 
+                padding: '30px 40px', 
+                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+                color: 'white'
+              }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ 
+                      width: '45px', height: '45px', background: 'rgba(255,255,255,0.1)', 
+                      backdropFilter: 'blur(10px)', borderRadius: '15px', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center' 
+                    }}>
+                      <Bell size={24} color="white" />
+                    </div>
+                    <div>
+                      <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800 }}>Muro UniSalamanca</h2>
+                      <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>Sigue el pulso oficial de nuestra comunidad</p>
+                    </div>
+                  </div>
+              </div>
+              
+              <div style={{ padding: '20px', minHeight: '400px' }}>
+                  <div 
+                    className="elfsight-app-c0513214-3c38-42ef-87e0-f4d7c9105a02" 
+                    data-elfsight-app-lazy="true"
+                  ></div>
+              </div>
+          </div>
+        );
+      case 'ajustes':
+        return (
+          <div className="section-reveal" style={{ textAlign: 'center', padding: '80px 20px' }}>
+            <div style={{ 
+              width: '100px', height: '100px', background: 'white', borderRadius: '50%', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+            }}>
+              <Settings size={48} color="var(--primary)" />
+            </div>
+            <h2 style={{ color: 'var(--primary-dark)', fontWeight: 900 }}>Ajustes de Perfil</h2>
+            <p style={{ color: '#64748b', maxWidth: '400px', margin: '10px auto' }}>
+              Pronto podrás personalizar tu carnet, cambiar tu foto y gestionar tus preferencias de seguridad.
+            </p>
           </div>
         );
       default: return null;

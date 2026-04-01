@@ -51,6 +51,15 @@ const StudentCardComponent = ({ student, qrValue, progress, timeLeft, onPrintReq
         margin: '0 auto'
       }}
     >
+      {/* Interactive Shine Effect (Hologram) */}
+      <div 
+        className="card-shine" 
+        style={{ 
+            position: 'absolute', inset: 0, opacity: 0.1, pointerEvents: 'none', zIndex: 5,
+            background: `radial-gradient(circle at ${50 + mousePos.x}% ${50 + mousePos.y}%, white, transparent 60%)` 
+        }}
+      ></div>
+
       {/* Dynamic Background Textures */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.03, pointerEvents: 'none', background: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
       <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '180px', height: '180px', background: 'var(--secondary)', filter: 'blur(100px)', opacity: 0.2, zIndex: 0 }}></div>
@@ -75,63 +84,61 @@ const StudentCardComponent = ({ student, qrValue, progress, timeLeft, onPrintReq
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', marginBottom: '40px', position: 'relative' }}>
-            <div className="qr-container-premium" style={{ margin: '0 auto', maxWidth: '230px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '24px', position: 'relative' }}>
+            <div className="qr-container-premium">
                 {isRefreshing && (
                     <div className="qr-refresh-overlay">
                         <div className="pulse-dot"></div>
                     </div>
                 )}
+                
                 <a 
                   href={`/validate/${student?.id}`} 
                   className="qr-scanner-container" 
-                  style={{ display: 'block', margin: '0 auto', textDecoration: 'none', transition: 'all 0.3s ease' }}
                   onClick={(e) => { e.preventDefault(); alert('Validando Credencial...'); }}
                 >
-                    <div className="scan-line" style={{ background: 'linear-gradient(to right, transparent, var(--secondary), transparent)', height: '4px', opacity: 0.8 }}></div>
-                    <div className="qr-frame" style={{ borderRadius: '20px', border: 'none', background: 'transparent', cursor: 'pointer' }}>
+                    <div className="scan-line"></div>
+                    <div className="qr-frame">
                         <QRCodeSVG 
                             value={qrValue} 
-                            size={180} 
+                            size={160} 
                             level="Q" 
                             includeMargin={false}
                             imageSettings={{
                                 src: "/images/escudo.png",
-                                height: 40,
-                                width: 40,
+                                height: 36,
+                                width: 36,
                                 excavate: true,
                             }}
                         />
                     </div>
                 </a>
                 
-                {/* Countdown Timer Bar */}
-                <div className="qr-countdown-bar">
-                    <div className="qr-countdown-inner" style={{ width: `${((timeLeft || 0) / 30) * 100}%` }}></div>
+                {/* Simplified Security Cycle Area */}
+                <div style={{ width: '100%', maxWidth: '210px', margin: '20px auto 0' }}>
+                    <div className="qr-countdown-bar">
+                        <div 
+                            className="qr-countdown-inner" 
+                            style={{ width: `${Math.max(0, Math.min(100, (timeLeft / 30) * 100))}%` }}
+                        ></div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '10px' }}>
+                        <span className="pulse-dot-small" style={{ width: '6px', height: '6px', background: 'var(--secondary)', borderRadius: '50%', boxShadow: '0 0 10px var(--secondary)' }}></span>
+                        <p style={{ fontSize: '0.65rem', fontWeight: 900, color: '#0f172a', letterSpacing: '1.5px', margin: 0 }}>
+                            SEGURIDAD ACTIVA: <span style={{ color: 'var(--secondary)' }}>{String(timeLeft || 0).padStart(2, '0')}s</span>
+                        </p>
+                    </div>
                 </div>
-                <p style={{ marginTop: '10px', fontSize: isMobile ? '0.55rem' : '0.65rem', fontWeight: 900, color: '#0f172a', letterSpacing: '1px' }}>
-                    REFRESCO EN: <span style={{ color: 'var(--secondary)' }}>{String(timeLeft || 0).padStart(2, '0')}s</span>
-                </p>
             </div>
-            <p style={{ marginTop: '15px', fontSize: '0.6rem', fontWeight: 800, color: '#94a3b8', letterSpacing: '2px' }}>ID: {student?.id?.substring(0, 8) || '00000000'}</p>
-        </div>
-
-        <div style={{ width: '100%', maxWidth: '260px', margin: '0 auto' }}>
-           <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '100px', marginBottom: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)' }}>
-              <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--primary), var(--secondary))', width: `${progress}%`, transition: 'width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)', borderRadius: '100px' }}></div>
-           </div>
-           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <span className="pulse-dot"></span>
-              <p style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 900, letterSpacing: '0.5px' }}>SISTEMA DE SEGURIDAD ACTIVO</p>
-           </div>
+            <p style={{ marginTop: '15px', fontSize: '0.6rem', fontWeight: 800, color: '#94a3b8', letterSpacing: '2px' }}>ID DE IDENTIDAD: {student?.id?.substring(0, 8) || '00000000'}</p>
         </div>
 
         <button 
            onClick={onPrintRequest}
            className="btn-primary-premium"
-           style={{ marginTop: '40px', width: '100%', background: 'white', color: 'var(--primary)', border: '1.5px solid #e2e8f0' }}
+           style={{ marginTop: '15px', width: '100%', background: 'white', color: 'var(--primary)', border: '1.5px solid #e2e8f0' }}
         >
-           <ShieldCheck size={18} /> DESCARGAR CARNET PDF
+           <ShieldCheck size={18} /> DESCARGAR CARNET DIGITAL
         </button>
       </div>
     </div>

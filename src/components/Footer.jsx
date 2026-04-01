@@ -17,7 +17,15 @@ const Footer = () => {
                         Institución de educación superior sujeta a inspección y vigilancia por el Ministerio de Educación Nacional.
                     </p>
                     <div className="social-links">
-                        <Facebook size={20} /> <Instagram size={20} /> <Linkedin size={20} />
+                        <a href="https://www.facebook.com/Unisalamancaa/" target="_blank" rel="noopener noreferrer" className="social-icon">
+                            <Facebook size={20} />
+                        </a>
+                        <a href="https://www.instagram.com/unisalamanca" target="_blank" rel="noopener noreferrer" className="social-icon">
+                            <Instagram size={20} />
+                        </a>
+                        <a href="https://linkedin.com/school/unisalamanca" target="_blank" rel="noopener noreferrer" className="social-icon">
+                            <Linkedin size={20} />
+                        </a>
                     </div>
                 </div>
                 <div className="footer-col-links">
@@ -31,10 +39,24 @@ const Footer = () => {
                 </div>
                 <div className="footer-col-contact">
                     <h4>SEDE BARRANQUILLA</h4>
-                    <p><MapPin size={16} /> Carrera 50 #79 - 155, Barranquilla</p>
-                    <p><Phone size={16} /> +57 (605) 360 6585</p>
-                    <p><Phone size={16} /> +57 320 834 5051 (Admisiones)</p>
-                    <p><Mail size={16} /> admisiones@unisalamanca.edu.co</p>
+                    <p>
+                        <MapPin size={16} /> 
+                        <a href="https://maps.apple.com/?address=Carrera%2050%20%2379-155,%20Barranquilla,%20Colombia" target="_blank" rel="noopener noreferrer" className="contact-link">
+                            Carrera 50 #79 - 155, Barranquilla
+                        </a>
+                    </p>
+                    <p>
+                        <Phone size={16} /> 
+                        <a href="tel:+576053606585" className="contact-link">+57 (605) 360 6585</a>
+                    </p>
+                    <p>
+                        <Phone size={16} /> 
+                        <a href="tel:+573208345051" className="contact-link">+57 320 834 5051 (Admisiones)</a>
+                    </p>
+                    <p>
+                        <Mail size={16} /> 
+                        <a href="mailto:admisiones@unisalamanca.edu.co" className="contact-link">admisiones@unisalamanca.edu.co</a>
+                    </p>
                 </div>
             </div>
             <div className="footer-bottom-official">
