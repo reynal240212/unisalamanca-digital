@@ -119,7 +119,11 @@ const StudentCardComponent = ({ student, qrValue, progress, timeLeft, onPrintReq
                     <div className="qr-countdown-bar">
                         <div 
                             className="qr-countdown-inner" 
-                            style={{ width: `${Math.max(0, Math.min(100, (timeLeft / 30) * 100))}%` }}
+                            style={{ 
+                                width: `${(timeLeft / 30) * 100}%`,
+                                transition: timeLeft === 30 ? 'none' : 'width 1s linear',
+                                background: timeLeft < 10 ? 'var(--accent)' : 'var(--secondary)'
+                            }}
                         ></div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '10px' }}>

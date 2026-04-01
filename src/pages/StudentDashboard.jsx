@@ -46,9 +46,9 @@ const StudentDashboard = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
   
-  // Dynamic QR Logic
+  // Lógica de QR Dinámico (TOTP-Style)
   const [timeLeft, setTimeLeft] = useState(30);
-  const [qrSeed, setQrSeed] = useState(Date.now());
+  const [qrValue, setQrValue] = useState("");
   const [studentData, setStudentData] = useState(user || {
     name: 'Cargando...',
     program: '...',
@@ -58,24 +58,47 @@ const StudentDashboard = () => {
   });
   const [characterizationData, setCharacterizationData] = useState(null);
 
+  // Función para generar un hash "pseudo-OTP" basado en tiempo y un secreto (ID del estudiante)
+  const generateDynamicQR = (id) => {
+    const window = Math.floor(Date.now() / 30000); // Ventanas de 30 segundos
+    const secret = "US-SECRET-2026-"; // Sal interna para mayor seguridad
+    const raw = `${secret}${id}-${window}`;
+    
+    // Un hashing simple pero efectivo para el MVP (similar a FNV-1a)
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < raw.length; i++) {
+        hash ^= raw.charCodeAt(i);
+        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    const token = (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    return `unisalamanca:token:${id}:${token}`;
+  };
+
   useEffect(() => {
     if (user) {
       setStudentData(user);
       checkCharacterization();
     }
     
-    // Timer for QR Rotation
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setQrSeed(Date.now()); // Rotate QR
-          return 30;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    // Timer sincronizado con el reloj del sistema (TOTP Sync)
+    const syncTimer = () => {
+      const now = new Date();
+      const seconds = now.getSeconds();
+      const currentWindowSecond = seconds % 30;
+      const remainingInWindow = 30 - currentWindowSecond;
+      
+      setTimeLeft(remainingInWindow);
+      if (user?.id) {
+        setQrValue(generateDynamicQR(user.id));
+      }
+    };
 
-    return () => clearInterval(timer);
+    // Ejecutar inmediatamente al montar
+    syncTimer();
+    
+    // Mantener sincronía cada segundo
+    const interval = setInterval(syncTimer, 1000);
+    return () => clearInterval(interval);
   }, [user]);
 
   const checkCharacterization = async () => {
@@ -157,7 +180,7 @@ const StudentDashboard = () => {
                 <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center' }}>
                   <StudentCardComponent 
                     student={studentData} 
-                    qrValue={`USAL-${studentData.id}-${qrSeed}`} 
+                    qrValue={qrValue} 
                     timeLeft={timeLeft}
                     progress={profileCompleted ? 100 : 45} 
                     onPrintRequest={() => alert('Generando PDF Premium...')}
