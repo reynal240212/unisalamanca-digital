@@ -6,6 +6,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import StudentCard from './pages/StudentCard';
 import Validator from './pages/Validator';
 import Home from './pages/Home';
+import Characterization from './pages/Characterization';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -26,6 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<ProtectedRoute allowedRoles={['ADMIN']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/student" element={<ProtectedRoute allowedRoles={['ESTUDIANTE']}><StudentDashboard /></ProtectedRoute>} />
+          <Route path="/characterization" element={<ProtectedRoute allowedRoles={['ESTUDIANTE']}><Characterization /></ProtectedRoute>} />
           <Route path="/validator" element={<ProtectedRoute allowedRoles={['VALIDADOR']}><Validator /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

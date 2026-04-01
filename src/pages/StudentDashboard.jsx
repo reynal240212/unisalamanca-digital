@@ -116,7 +116,7 @@ const StudentDashboard = () => {
                         <h3 style={{ margin: 0, fontWeight: 800 }}>Completa tu Caracterización</h3>
                         <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#64748b' }}>Es necesario este paso para activar todas las funcionalidades de tu carnet digital.</p>
                       </div>
-                      <button onClick={() => setActiveTab('caracterizacion')} className="btn-primary-premium">Empezar</button>
+                      <button onClick={() => navigate('/characterization')} className="btn-primary-premium">Empezar</button>
                     </div>
                   </div>
                 )}
@@ -135,16 +135,6 @@ const StudentDashboard = () => {
                 </div>
               </div>
             </div>
-          </div>
-        );
-      case 'caracterizacion':
-        return (
-          <div className="section-reveal">
-            <CharacterizationForm user={user} onComplete={() => {
-              setProfileCompleted(true);
-              setActiveTab('dashboard');
-              alert('¡Caracterización completada con éxito!');
-            }} />
           </div>
         );
       case 'noticias':
@@ -246,12 +236,22 @@ const StudentDashboard = () => {
             </button>
           ))}
 
-          <p className="sidebar-label-premium">Servicios</p>
           {[
             { id: 'caracterizacion', label: 'Caracterización', icon: <UserCircle size={18} /> },
             { id: 'noticias', label: 'Noticias US', icon: <Bell size={18} /> },
           ].map(item => (
-            <button key={item.id} onClick={() => setActiveTab(item.id)} className={`nav-item-premium ${activeTab === item.id ? 'active' : ''}`}>
+            <button 
+              key={item.id} 
+              onClick={() => {
+                if (item.id === 'caracterizacion') {
+                    navigate('/characterization');
+                } else {
+                    setActiveTab(item.id);
+                }
+                closeSidebar();
+              }} 
+              className={`nav-item-premium ${activeTab === item.id ? 'active' : ''}`}
+            >
               {item.icon} {item.label}
             </button>
           ))}
