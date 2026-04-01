@@ -139,38 +139,42 @@ const StudentDashboard = () => {
         );
       case 'noticias':
         return (
-          <div className="section-reveal" style={{ 
-              background: 'white', 
-              borderRadius: '30px', 
-              boxShadow: 'rgba(0, 0, 0, 0.04) 0px 10px 40px',
+          <div className="section-reveal-news" style={{ 
+              borderRadius: '24px', 
               overflow: 'hidden',
               minHeight: '800px',
-              animation: 'slideUp 0.6s ease-out'
+              animation: 'slideUp 0.6s ease-out',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
           }}>
               <div style={{ 
-                padding: '30px 40px', 
-                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
-                color: 'white'
+                padding: '40px', 
+                background: 'linear-gradient(135deg, rgba(42, 34, 102, 0.95) 0%, rgba(22, 182, 214, 0.95) 100%)',
+                color: 'white',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
               }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div style={{ 
-                      width: '45px', height: '45px', background: 'rgba(255,255,255,0.1)', 
-                      backdropFilter: 'blur(10px)', borderRadius: '15px', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center' 
+                      width: '56px', height: '56px', background: 'rgba(255,255,255,0.15)', 
+                      backdropFilter: 'blur(10px)', borderRadius: '18px', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
                     }}>
-                      <Bell size={24} color="white" />
+                      <Bell size={28} color="white" />
                     </div>
                     <div>
-                      <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800 }}>Muro UniSalamanca</h2>
-                      <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>Sigue el pulso oficial de nuestra comunidad</p>
+                      <h2 style={{ margin: 0, fontSize: '1.7rem', fontWeight: 900, letterSpacing: '-0.5px' }}>Muro UniSalamanca</h2>
+                      <p style={{ margin: '4px 0 0', fontSize: '0.95rem', opacity: 0.9, fontWeight: 500 }}>Sigue el pulso oficial de nuestra comunidad</p>
                     </div>
                   </div>
               </div>
               
-              <div style={{ padding: '20px', minHeight: '400px' }}>
+              <div style={{ padding: '0', minHeight: '600px', background: 'transparent' }}>
                   <div 
                     className="elfsight-app-c0513214-3c38-42ef-87e0-f4d7c9105a02" 
                     data-elfsight-app-lazy="true"
+                    style={{ width: '100%' }}
                   ></div>
               </div>
           </div>
