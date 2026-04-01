@@ -9,7 +9,7 @@ const SalmiAdviceComponent = ({ student, characterization }) => {
   const timerRef = useRef(null);
 
   const advicePool = [
-    `¡Hola ${student?.name?.split(' ')[0]}! Recuerda que tu promedio de ${student?.gpa || 'N/A'} es excelente. ¡Sigue así!`,
+    `¡Hola ${(student?.name || 'Estudiante').split(' ')[0]}! Recuerda que tu promedio de ${student?.gpa || 'N/A'} es excelente. ¡Sigue así!`,
     "¿Ya revisaste tus próximas clases? La organización es la clave del éxito en UniSalamanca.",
     "No olvides hidratarte y tomar descansos. Tu bienestar mental es tan importante como tus notas.",
     "Salmi dice: La persistencia supera al talento cuando el talento no se esfuerza.",

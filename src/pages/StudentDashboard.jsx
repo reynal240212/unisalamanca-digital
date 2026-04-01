@@ -83,7 +83,7 @@ const StudentDashboard = () => {
               <div>
                 <div className="glass-card" style={{ marginBottom: '30px', background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))' }}>
                   <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 900, color: 'var(--primary-dark)' }}>
-                    ¡Hola, {studentData?.name?.split(' ')[0] || 'Estudiante'}! 👋
+                    ¡Hola, {(studentData?.name || 'Estudiante').split(' ')[0]}! 👋
                   </h1>
                   <p style={{ color: '#64748b', marginTop: '8px', fontSize: '0.95rem' }}>
                     Bienvenido a tu ecosistema digital UniSalamanca. Aquí tienes todo bajo control.
@@ -191,6 +191,22 @@ const StudentDashboard = () => {
             </p>
           </div>
         );
+      case 'qr':
+        return (
+          <div className="section-reveal" style={{ textAlign: 'center', padding: '40px 20px' }}>
+             <h2 style={{ color: 'var(--primary-dark)', fontWeight: 900 }}>Mi Credencial Digital</h2>
+             <p style={{ color: '#64748b', marginBottom: '30px' }}>Usa este código para ingresar a las instalaciones.</p>
+             <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <StudentCardComponent 
+                  student={studentData} 
+                  qrValue={qrValue} 
+                  timeLeft={timeLeft}
+                  progress={profileCompleted ? 100 : 45} 
+                  onPrintRequest={() => alert('Generando PDF Premium...')}
+                />
+             </div>
+          </div>
+        );
       default: return null;
     }
   };
@@ -216,7 +232,7 @@ const StudentDashboard = () => {
                 <img src={studentData.photo_url || '/images/default-avatar.png'} alt="P" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
              </div>
              <div style={{ overflow: 'hidden' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 900, whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{studentData?.name?.split(' ')[0] || 'Estudiante'}</p>
+                <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 900, whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{(studentData?.name || 'Estudiante').split(' ')[0]}</p>
                 <p style={{ margin: 0, fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>{studentData.program?.substring(0, 15)}...</p>
              </div>
           </div>
@@ -236,6 +252,7 @@ const StudentDashboard = () => {
             </button>
           ))}
 
+          <p className="sidebar-label-premium">Servicios</p>
           {[
             { id: 'caracterizacion', label: 'Caracterización', icon: <UserCircle size={18} /> },
             { id: 'noticias', label: 'Noticias US', icon: <Bell size={18} /> },
