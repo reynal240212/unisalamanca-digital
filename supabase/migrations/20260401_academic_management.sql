@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS subjects (
 );
 
 -- 3. HORARIOS DE MATERIAS
--- Siguiendo los bloques: 6:00 AM - 7:45 PM y 7:45 PM - 9:00 PM
+-- Siguiendo los bloques: 6:00 PM - 7:45 PM y 7:45 PM - 9:00 PM
 CREATE TABLE IF NOT EXISTS subject_schedules (
   id UUID PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
   subject_id UUID REFERENCES subjects(id) ON DELETE CASCADE,
