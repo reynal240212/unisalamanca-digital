@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { 
   LayoutDashboard, UserCircle, QrCode, LogOut, 
-  Bell, Settings, BookOpen, ShieldCheck, Star
+  Bell, Settings, BookOpen, ShieldCheck, Star, Calendar
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -10,6 +10,7 @@ import CharacterizationForm from '../components/CharacterizationForm';
 import StudentCardComponent from '../components/StudentCardComponent';
 import SalmiAdviceComponent from '../components/SalmiAdviceComponent';
 import SalmiChatbot from '../components/SalmiChatbot';
+import StudentSchedule from '../components/StudentSchedule';
 
 import { useQR } from '../hooks/useQR';
 import { useCharacterization } from '../hooks/useCharacterization';
@@ -211,6 +212,12 @@ const StudentDashboard = () => {
              </div>
           </div>
         );
+      case 'horario':
+        return (
+          <div className="section-reveal" style={{ padding: '20px' }}>
+            <StudentSchedule />
+          </div>
+        );
       default: return null;
     }
   };
@@ -246,6 +253,7 @@ const StudentDashboard = () => {
           {[
             { id: 'dashboard', label: 'Inicio', icon: <LayoutDashboard size={18} /> },
             { id: 'qr', label: 'Mi Carnet QR', icon: <QrCode size={18} /> },
+            { id: 'horario', label: 'Mi Horario', icon: <Calendar size={18} /> },
           ].map(item => (
             <button 
               key={item.id} 
