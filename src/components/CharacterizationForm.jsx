@@ -225,18 +225,97 @@ const CharacterizationForm = ({ user, onComplete }) => {
   };
 
   if (showSuccess) {
+    const SummarySection = ({ icon, title, fields, stepTarget }) => (
+      <div className="glass-card section-reveal" style={{ padding: '25px', marginBottom: '20px', border: '1px solid rgba(22, 182, 214, 0.1)', background: 'rgba(255,255,255,0.5)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ padding: '8px', background: 'var(--primary)', borderRadius: '10px', color: 'white' }}>{icon}</div>
+            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--primary-dark)' }}>{title}</h3>
+          </div>
+          <button 
+            onClick={() => { setStep(stepTarget); setShowSuccess(false); }}
+            style={{ padding: '6px 12px', background: 'white', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', color: '#64748b' }}
+          >
+             Editar <User size={14} />
+          </button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px' }}>
+          {fields.map((f, i) => (
+            <div key={i}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>{f.label}</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#334155' }}>{f.value || 'No reportado'}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
     return (
-      <div className="glass-card section-reveal" style={{ maxWidth: '600px', margin: '40px auto', textAlign: 'center', padding: '60px 40px' }}>
-        <div className="success-lottie-container" style={{ width: '120px', height: '120px', margin: '0 auto 30px', background: '#f0fdf4', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <CheckCircle2 size={64} color="var(--success)" className="animate-bounce" />
+      <div className="section-reveal" style={{ maxWidth: '850px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <CheckCircle2 size={40} color="var(--success)" />
+            </div>
+            <h2 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary-dark)', margin: 0 }}>¡Todo listo, {user?.name?.split(' ')[0]}!</h2>
+            <p style={{ color: '#64748b', marginTop: '10px' }}>Revisa que toda tu información sea correcta antes de activar tu carnet.</p>
         </div>
-        <h2 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary-dark)', marginBottom: '15px' }}>¡Caracterización Exitosa!</h2>
-        <p style={{ color: '#64748b', fontSize: '1.1rem', lineHeight: '1.6' }}>
-            Gracias {user?.name?.split(' ')[0]}, tus datos han sido sincronizados. Ahora tienes acceso total a tu Identidad Digital.
-        </p>
-        <div style={{ marginTop: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-            <SalmiHint text="¡Felicidades! Has completado tu proceso de caracterización. ¡Bienvenido a la comunidad UniSalamanca!" />
+
+        <SummarySection 
+           icon={<User size={18} />} 
+           title="IDENTIDAD Y CONTACTO" 
+           stepTarget={1}
+           fields={[
+             { label: 'Nacimiento', value: formData.birthDate },
+             { label: 'RH', value: formData.bloodType },
+             { label: 'Dirección', value: formData.address },
+             { label: 'Celular', value: formData.phone }
+           ]}
+        />
+        
+        <SummarySection 
+           icon={<Users size={18} />} 
+           title="ENTORNO FAMILIAR" 
+           stepTarget={2}
+           fields={[
+             { label: 'Vive con', value: formData.livesWith },
+             { label: 'Contacto Emergencia', value: formData.emergencyContact },
+             { label: 'Teléfono Emergencia', value: formData.emergencyPhone },
+             { label: 'Educación Padres', value: formData.parentEducation }
+           ]}
+        />
+
+        <SummarySection 
+           icon={<Heart size={18} />} 
+           title="BIENESTAR Y SOCIOECONOMÍA" 
+           stepTarget={3}
+           fields={[
+             { label: 'Estrato', value: formData.estrato },
+             { label: 'Ingresos', value: formData.incomeSource },
+             { label: 'Labora', value: formData.isWorking }
+           ]}
+        />
+
+        <SummarySection 
+           icon={<GraduationCap size={18} />} 
+           title="ACADEMIA E INTERESES" 
+           stepTarget={4}
+           fields={[
+             { label: 'Procedencia', value: formData.previousSchool },
+             { label: 'Habilidades', value: formData.digitalSkills }
+           ]}
+        />
+
+        <div style={{ marginTop: '30px' }}>
+            <SalmiHint text="¡Excelente trabajo! Has completado tu caracterización. Si crees que todo está en orden, presiona el botón inferior para finalizar el proceso." />
         </div>
+
+        <button 
+           onClick={() => onComplete()}
+           className="btn-primary-premium"
+           style={{ width: '100%', padding: '20px', background: 'var(--primary)', marginTop: '20px', boxShadow: '0 20px 40px rgba(42, 34, 102, 0.2)' }}
+        >
+           CONFIRMAR Y ACTIVAR MI CARNET <ArrowRight size={20} />
+        </button>
       </div>
     );
   }

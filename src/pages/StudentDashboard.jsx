@@ -11,10 +11,15 @@ import StudentCardComponent from '../components/StudentCardComponent';
 import SalmiAdviceComponent from '../components/SalmiAdviceComponent';
 import SalmiChatbot from '../components/SalmiChatbot';
 
+import { useQR } from '../hooks/useQR';
+import { useCharacterization } from '../hooks/useCharacterization';
+
 const StudentDashboard = () => {
   const { user, logout } = useAuth();
+  const { qrValue, timeLeft } = useQR(user?.id);
+  const { profileCompleted, characterizationData, checkCharacterization, setProfileCompleted } = useCharacterization(user?.id);
+  
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [profileCompleted, setProfileCompleted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   // Efecto para inicializar Elfsight cuando cambie la pestaña a noticias
   useEffect(() => {
@@ -46,9 +51,6 @@ const StudentDashboard = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
   
-  // Lógica de QR Dinámico (TOTP-Style)
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [qrValue, setQrValue] = useState("");
   const [studentData, setStudentData] = useState(user || {
     name: 'Cargando...',
     program: '...',
@@ -56,68 +58,13 @@ const StudentDashboard = () => {
     photo_url: null,
     id: '00000000'
   });
-  const [characterizationData, setCharacterizationData] = useState(null);
-
-  // Función para generar un hash "pseudo-OTP" basado en tiempo y un secreto (ID del estudiante)
-  const generateDynamicQR = (id) => {
-    const window = Math.floor(Date.now() / 30000); // Ventanas de 30 segundos
-    const secret = "US-SECRET-2026-"; // Sal interna para mayor seguridad
-    const raw = `${secret}${id}-${window}`;
-    
-    // Un hashing simple pero efectivo para el MVP (similar a FNV-1a)
-    let hash = 0x811c9dc5;
-    for (let i = 0; i < raw.length; i++) {
-        hash ^= raw.charCodeAt(i);
-        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
-    }
-    const token = (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
-    return `unisalamanca:token:${id}:${token}`;
-  };
 
   useEffect(() => {
     if (user) {
       setStudentData(user);
       checkCharacterization();
     }
-    
-    // Timer sincronizado con el reloj del sistema (TOTP Sync)
-    const syncTimer = () => {
-      const now = new Date();
-      const seconds = now.getSeconds();
-      const currentWindowSecond = seconds % 30;
-      const remainingInWindow = 30 - currentWindowSecond;
-      
-      setTimeLeft(remainingInWindow);
-      if (user?.id) {
-        setQrValue(generateDynamicQR(user.id));
-      }
-    };
-
-    // Ejecutar inmediatamente al montar
-    syncTimer();
-    
-    // Mantener sincronía cada segundo
-    const interval = setInterval(syncTimer, 1000);
-    return () => clearInterval(interval);
-  }, [user]);
-
-  const checkCharacterization = async () => {
-    if (!user?.id) return;
-    try {
-      const { data, error } = await supabase
-        .from('characterization')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      
-      if (data) {
-        setProfileCompleted(true);
-        setCharacterizationData(data);
-      }
-    } catch (err) {
-      console.error('Error checking characterization:', err);
-    }
-  };
+  }, [user, checkCharacterization]);
 
   const navigate = useNavigate();
 
