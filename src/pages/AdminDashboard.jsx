@@ -6,9 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import {
   Users, UserPlus, FileUp, Search, LogOut, TrendingUp,
-  CheckCircle2, XCircle, ShieldCheck, BarChart2, Settings,
-  Upload, Edit2, X, Save, AlertTriangle, Lock, Bell, Shield,
-  Activity, Database, Key, Menu
+  Activity, Database, Key, Menu, GraduationCap, Wallet, ClipboardList
 } from 'lucide-react';
 
 /* ─── MODAL USUARIO (CREAR/EDITAR) ─────────────────────────────────── */
@@ -560,7 +558,8 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <nav style={{ flex: 1, padding: '24px 0' }}>
+        <nav style={{ flex: 1, padding: '24px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <p style={{ margin: '0 24px 10px', fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '1px' }}>Sistema Core</p>
           {navItems.map(item => (
             <button key={item.id} onClick={() => { setActiveNav(item.id); setIsSidebarOpen(false); }} 
               className={`admin-nav-item ${activeNav === item.id ? 'active' : ''}`}>
@@ -568,6 +567,20 @@ const AdminDashboard = () => {
               <span>{item.label}</span>
             </button>
           ))}
+
+          <p style={{ margin: '24px 24px 10px', fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '1px' }}>Módulos de Gestión</p>
+          <button onClick={() => navigate('/registro')} className="admin-nav-item" style={{ borderLeft: '3px solid transparent' }}>
+            <GraduationCap size={18} />
+            <span>Registro Académico</span>
+          </button>
+          <button onClick={() => navigate('/cartera')} className="admin-nav-item" style={{ borderLeft: '3px solid transparent' }}>
+            <Wallet size={18} />
+            <span>Cartera Financiera</span>
+          </button>
+          <button onClick={() => navigate('/admisiones')} className="admin-nav-item" style={{ borderLeft: '3px solid transparent' }}>
+            <ClipboardList size={18} />
+            <span>Admisiones</span>
+          </button>
         </nav>
 
         <div style={{ padding: '24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>

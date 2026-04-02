@@ -61,21 +61,21 @@ function App() {
 
           {/* SECRETARÍA ACADÉMICA */}
           <Route path="/registro" element={
-            <ProtectedRoute allowedRoles={['SECRETARIA_ACADEMICA']}>
+            <ProtectedRoute allowedRoles={['SECRETARIA_ACADEMICA', 'ADMIN']}>
               <RegistroDashboard />
             </ProtectedRoute>
           } />
 
           {/* CARTERA */}
           <Route path="/cartera" element={
-            <ProtectedRoute allowedRoles={['CARTERA']}>
+            <ProtectedRoute allowedRoles={['CARTERA', 'ADMIN']}>
               <CarteraDashboard />
             </ProtectedRoute>
           } />
 
           {/* ADMISIONES */}
           <Route path="/admisiones" element={
-            <ProtectedRoute allowedRoles={['ADMISIONES']}>
+            <ProtectedRoute allowedRoles={['ADMISIONES', 'ADMIN']}>
               <AdmisionesDashboard />
             </ProtectedRoute>
           } />
