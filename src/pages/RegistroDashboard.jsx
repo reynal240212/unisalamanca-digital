@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { Users, FileText, Search, LogOut, Menu, Download, Eye, BookOpen } from 'lucide-react';
+import { Users, FileText, Search, LogOut, Menu, Download, Eye, BookOpen, ArrowLeft } from 'lucide-react';
 
 const RegistroDashboard = () => {
   const { user, logout } = useAuth();
@@ -15,7 +15,7 @@ const RegistroDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (!user || user.role !== 'SECRETARIA_ACADEMICA') { navigate('/login'); return; }
+    if (!user || (user.role !== 'SECRETARIA_ACADEMICA' && user.role !== 'ADMIN')) { navigate('/login'); return; }
     fetchStudents();
   }, [user]);
 
@@ -66,6 +66,11 @@ const RegistroDashboard = () => {
           </div>
         </div>
         <nav style={{ flex: 1, padding: '20px 0' }}>
+          {user?.role === 'ADMIN' && (
+            <button onClick={() => navigate('/admin')} className="admin-nav-item" style={{ marginBottom: '12px', borderLeft: '3px solid var(--secondary)', background: 'rgba(255,255,255,0.05)' }}>
+              <ArrowLeft size={18} /> <span style={{ fontWeight: 800 }}>Volver a Panel Admin</span>
+            </button>
+          )}
           {[
             { id: 'estudiantes', icon: <Users size={18} />, label: 'Estudiantes' },
             { id: 'documentos', icon: <FileText size={18} />, label: 'Fichas de Caracterización' },

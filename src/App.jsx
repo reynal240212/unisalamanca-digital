@@ -13,7 +13,7 @@ import Validator from './pages/Validator';
 import Home from './pages/Home';
 import Characterization from './pages/Characterization';
 
-const ACADEMIC_ROLES = ['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA'];
+const ACADEMIC_ROLES = ['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA', 'ADMIN'];
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();

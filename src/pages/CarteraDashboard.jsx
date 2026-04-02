@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Search, Plus, CheckCircle, XCircle, AlertTriangle, LogOut, Menu, Trash2 } from 'lucide-react';
+import { CreditCard, Search, Plus, CheckCircle, XCircle, AlertTriangle, LogOut, Menu, Trash2, ArrowLeft } from 'lucide-react';
 
 const STATUS_CONFIG = {
   paid:     { label: 'Pagado',    color: '#16a34a', bg: '#f0fdf4', icon: <CheckCircle size={14} /> },
@@ -26,7 +26,7 @@ const CarteraDashboard = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!user || user.role !== 'CARTERA') { navigate('/login'); return; }
+    if (!user || (user.role !== 'CARTERA' && user.role !== 'ADMIN')) { navigate('/login'); return; }
     fetchStudents();
   }, [user]);
 
@@ -99,6 +99,11 @@ const CarteraDashboard = () => {
           </div>
         </div>
         <nav style={{ flex: 1, padding: '20px 12px' }}>
+          {user?.role === 'ADMIN' && (
+            <button onClick={() => navigate('/admin')} className="admin-nav-item" style={{ marginBottom: '12px', borderLeft: '3px solid var(--secondary)', background: 'rgba(255,255,255,0.05)' }}>
+              <ArrowLeft size={18} /> <span style={{ fontWeight: 800 }}>Volver a Panel Admin</span>
+            </button>
+          )}
           <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', padding: '0 8px', marginBottom: '10px' }}>
             {filtered.length} Estudiantes
           </p>

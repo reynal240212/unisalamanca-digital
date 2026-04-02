@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { UserPlus, Search, Filter, LogOut, Menu, ChevronRight, CheckCircle, Clock, XCircle, AlertCircle, Plus, X } from 'lucide-react';
+import { UserPlus, Search, Filter, LogOut, Menu, ChevronRight, CheckCircle, Clock, XCircle, AlertCircle, Plus, X, ArrowLeft } from 'lucide-react';
 
 const STATUS_CONFIG = {
   pending:   { label: 'Inscrito',  color: '#ca8a04', bg: '#fef9c3', icon: <Clock size={12} /> },
@@ -96,7 +96,7 @@ const AdmisionesDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (!user || user.role !== 'ADMISIONES') { navigate('/login'); return; }
+    if (!user || (user.role !== 'ADMISIONES' && user.role !== 'ADMIN')) { navigate('/login'); return; }
     fetchApplicants();
   }, [user]);
 
@@ -165,6 +165,11 @@ const AdmisionesDashboard = () => {
           </div>
         </div>
         <nav style={{ flex: 1, padding: '20px 12px' }}>
+          {user?.role === 'ADMIN' && (
+            <button onClick={() => navigate('/admin')} className="admin-nav-item" style={{ marginBottom: '12px', borderLeft: '3px solid var(--secondary)', background: 'rgba(255,255,255,0.05)' }}>
+              <ArrowLeft size={18} /> <span style={{ fontWeight: 800 }}>Volver a Panel Admin</span>
+            </button>
+          )}
           {[{ status: 'all', label: `Todos (${applicants.length})` }, ...Object.entries(STATUS_CONFIG).map(([k, v]) => ({ status: k, label: `${v.label} (${counts[k] || 0})` }))].map(item => (
             <button key={item.status} onClick={() => { setFilterStatus(item.status); setIsSidebarOpen(false); }}
               className={`admin-nav-item ${filterStatus === item.status ? 'active' : ''}`} style={{ fontSize: '0.82rem' }}>

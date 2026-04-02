@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Calendar, BarChart2, LogOut, Search,
-  Plus, Trash2, X, Save, Clock, MapPin, BookOpen, Menu
+  Plus, Trash2, X, Save, Clock, MapPin, BookOpen, Menu, ArrowLeft
 } from 'lucide-react';
 
 /* ─── MODAL HORARIO ────────────────────────────────────────────── */
@@ -318,7 +318,7 @@ const AcademicDashboard = () => {
   const myPrograms = user?.directorship_programs || [];
 
   useEffect(() => {
-    if (!user || !['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA'].includes(user.role)) {
+    if (!user || (!['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA', 'ADMIN'].includes(user.role))) {
       navigate('/login');
       return;
     }
@@ -404,6 +404,11 @@ const AcademicDashboard = () => {
         </div>
 
         <nav style={{ flex: 1, padding: '20px 0' }}>
+          {user?.role === 'ADMIN' && (
+            <button onClick={() => navigate('/admin')} className="admin-nav-item" style={{ marginBottom: '12px', borderLeft: '3px solid var(--secondary)', background: 'rgba(255,255,255,0.05)' }}>
+              <ArrowLeft size={18} /> <span style={{ fontWeight: 800 }}>Volver a Panel Admin</span>
+            </button>
+          )}
           {navItems.map(item => (
             <button key={item.id}
               onClick={() => { setActiveNav(item.id); setIsSidebarOpen(false); }}
