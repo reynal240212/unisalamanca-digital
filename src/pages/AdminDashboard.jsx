@@ -125,10 +125,10 @@ const UserFormModal = ({ student, onClose, onSave }) => {
               </div>
             </div>
 
-            {/* FECHA DE INGRESO → determina el semestre automáticamente */}
+            {/* FECHA DE INGRESO → determina el semestre automáticamente SOLO para estudiantes */}
             <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '16px', border: '1px solid #e2e8f0' }}>
               <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>
-                📅 Fecha de Ingreso Institucional
+                {form.role === 'ESTUDIANTE' ? '📅 Fecha de Ingreso Institucional' : '📅 Fecha de Vinculación'}
               </label>
               <input
                 className="input-premium"
@@ -137,7 +137,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
                 onChange={e => setForm(p => ({ ...p, entry_date: e.target.value }))}
                 style={{ width: '100%' }}
               />
-              {form.entry_date && (() => {
+              {form.role === 'ESTUDIANTE' && form.entry_date && (() => {
                 const entry = new Date(form.entry_date);
                 const now = new Date();
                 const semActual = now.getMonth() >= 6 ? 2 : 1;
