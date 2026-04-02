@@ -34,6 +34,30 @@ const CharacterizationForm = ({ user, onComplete }) => {
     previousSchool: '', digitalSkills: '', interests: ''
   });
 
+  // NUEVO: Cargar datos existentes al iniciar
+  React.useEffect(() => {
+    if (user?.characterization) {
+      const d = user.characterization;
+      setFormData({
+        birthDate: d.birth_date || '',
+        address: d.address || '',
+        phone: d.phone || '',
+        bloodType: d.blood_type || '',
+        healthNotes: d.health_notes || '',
+        livesWith: d.lives_with || '',
+        emergencyContact: d.emergency_contact || '',
+        emergencyPhone: d.emergency_phone || '',
+        parentEducation: d.parent_education || '',
+        estrato: d.estrato?.toString() || '',
+        incomeSource: d.income_source || '',
+        isWorking: d.is_working || 'No',
+        previousSchool: d.previous_school || '',
+        digitalSkills: d.digital_skills || '',
+        interests: d.interests || ''
+      });
+    }
+  }, [user]);
+
   const nextStep = () => setStep(s => Math.min(s + 1, 4));
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 

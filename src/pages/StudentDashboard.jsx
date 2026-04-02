@@ -199,6 +199,18 @@ const StudentDashboard = () => {
              </div>
           </div>
         );
+      case 'caracterizacion':
+        return (
+          <div className="section-reveal" style={{ padding: '20px' }}>
+            <CharacterizationForm 
+              user={{...studentData, characterization: characterizationData}} 
+              onComplete={() => {
+                checkCharacterization();
+                setActiveTab('dashboard');
+              }} 
+            />
+          </div>
+        );
       case 'horario':
         return (
           <div className="section-reveal" style={{ padding: '20px' }}>
@@ -241,6 +253,7 @@ const StudentDashboard = () => {
             { id: 'dashboard', label: 'Inicio', icon: <LayoutDashboard size={18} /> },
             { id: 'qr', label: 'Mi Carnet QR', icon: <QrCode size={18} /> },
             { id: 'horario', label: 'Mi Horario', icon: <Calendar size={18} /> },
+            { id: 'caracterizacion', label: 'Mi Perfil', icon: <UserCircle size={18} /> },
           ].map(item => (
             <button 
               key={item.id} 
@@ -251,9 +264,7 @@ const StudentDashboard = () => {
             </button>
           ))}
 
-          <p className="sidebar-label-premium">Servicios</p>
           {[
-            { id: 'caracterizacion', label: 'Caracterización', icon: <UserCircle size={18} /> },
             { id: 'noticias', label: 'Noticias US', icon: <Bell size={18} /> },
           ].map(item => (
             <button 
