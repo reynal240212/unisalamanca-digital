@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { Users, FileText, Search, LogOut, Menu, Download, Eye, BookOpen, ArrowLeft } from 'lucide-react';
+import { Users, FileText, Search, LogOut, Menu, Download, Eye, BookOpen, ArrowLeft, Printer, Heart, GraduationCap, ShieldCheck } from 'lucide-react';
+import CharacterizationReport from '../components/CharacterizationReport';
 
 const RegistroDashboard = () => {
   const { user, logout } = useAuth();
@@ -13,6 +14,7 @@ const RegistroDashboard = () => {
   const [charData, setCharData] = useState(null);
   const [activeNav, setActiveNav] = useState('estudiantes');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('institucional');
 
   useEffect(() => {
     if (!user || (user.role !== 'SECRETARIA_ACADEMICA' && user.role !== 'ADMIN')) { navigate('/login'); return; }
@@ -153,40 +155,52 @@ const RegistroDashboard = () => {
                     <h3 style={{ margin: 0, fontWeight: 900, color: '#1e293b' }}>{selected.name}</h3>
                     <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#64748b' }}>{selected.program} · {selected.semester}</p>
                   </div>
-                  <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '4px' }}>✕</button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button 
+                      onClick={() => window.print()} 
+                      style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px 12px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <Printer size={15} /> Imprimir Ficha
+                    </button>
+                    <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '4px' }}>✕</button>
+                  </div>
+                </div>
+
+                {/* TABS PREMIUM */}
+                <div style={{ display: 'flex', gap: '2px', background: '#f8fafc', padding: '10px 24px 0', borderBottom: '1px solid #f1f5f9' }}>
+                  {[
+                    { id: 'institucional', label: 'Institucional', icon: <ShieldCheck size={14} /> },
+                    { id: 'caracterizacion', label: 'Personal/Familia', icon: <Users size={14} /> },
+                    { id: 'bienestar', label: 'Bienestar/Acad.', icon: <GraduationCap size={14} /> },
+                  ].map(t => (
+                    <button 
+                      key={t.id} 
+                      onClick={() => setActiveTab(t.id)}
+                      style={{ 
+                        padding: '10px 16px', border: 'none', background: 'none', cursor: 'pointer',
+                        fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px',
+                        color: activeTab === t.id ? 'var(--primary)' : '#64748b',
+                        borderBottom: activeTab === t.id ? '3px solid var(--primary)' : '3px solid transparent',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      {t.icon} {t.label}
+                    </button>
+                  ))}
                 </div>
 
                 <div style={{ padding: '24px' }}>
-                  {/* INFO BÁSICA */}
-                  <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>Información Institucional</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-                    {[
-                      { label: 'Correo', value: selected.email },
-                      { label: 'Estado', value: selected.status === 'Active' ? '✅ Activo' : '❌ Suspendido' },
-                      { label: 'Modalidad', value: selected.study_modality || 'Presencial' },
-                      { label: 'Ingreso', value: selected.entry_date || 'No registrado' },
-                    ].map(({ label, value }) => (
-                      <div key={label}>
-                        <span style={labelStyle}>{label}</span>
-                        <span style={valueStyle}>{value || '—'}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* FICHA CARACTERIZACIÓN */}
-                  {charData ? (
-                    <>
-                      <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>Ficha de Caracterización</h4>
+                  {activeTab === 'institucional' && (
+                    <div className="section-reveal">
+                      <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>Información Institucional</h4>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         {[
-                          { label: 'Fecha Nac.', value: charData.birth_date },
-                          { label: 'Tipo Sangre', value: charData.blood_type },
-                          { label: 'Dirección', value: charData.address },
-                          { label: 'Teléfono', value: charData.phone },
-                          { label: 'Estrato', value: charData.estrato },
-                          { label: 'Contacto Emergencia', value: charData.emergency_contact },
-                          { label: 'Tel. Emergencia', value: charData.emergency_phone },
-                          { label: 'Colegio Anterior', value: charData.previous_school },
+                          { label: 'Nombre', value: selected.name },
+                          { label: 'Identificación', value: selected.document_id || 'No reportada' },
+                          { label: 'Correo', value: selected.email },
+                          { label: 'Estado', value: selected.status === 'Active' ? '✅ Activo' : '❌ Suspendido' },
+                          { label: 'Modalidad', value: selected.study_modality || 'Presencial' },
+                          { label: 'Ingreso', value: selected.entry_date || 'No registrado' },
                         ].map(({ label, value }) => (
                           <div key={label}>
                             <span style={labelStyle}>{label}</span>
@@ -194,12 +208,81 @@ const RegistroDashboard = () => {
                           </div>
                         ))}
                       </div>
-                    </>
-                  ) : (
-                    <div style={{ textAlign: 'center', padding: '32px', background: '#f8fafc', borderRadius: '16px', color: '#94a3b8' }}>
-                      <BookOpen size={32} style={{ opacity: 0.4, marginBottom: '8px' }} />
-                      <p style={{ margin: 0, fontWeight: 600 }}>Sin ficha de caracterización</p>
-                      <p style={{ margin: '4px 0 0', fontSize: '0.8rem' }}>El estudiante no ha completado su ficha</p>
+                    </div>
+                  )}
+
+                  {activeTab === 'caracterizacion' && (
+                    <div className="section-reveal">
+                      {charData ? (
+                        <>
+                          <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>Datos Personales y Familia</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            {[
+                              { label: 'Fecha Nac.', value: charData.birth_date },
+                              { label: 'Tipo Sangre', value: charData.blood_type },
+                              { label: 'Teléfono', value: charData.phone },
+                              { label: 'Estrato', value: charData.estrato },
+                              { label: 'Vive con', value: charData.lives_with },
+                              { label: 'Educación Padres', value: charData.parent_education },
+                              { label: 'Contacto Emergencia', value: charData.emergency_contact },
+                              { label: 'Tel. Emergencia', value: charData.emergency_phone },
+                            ].map(({ label, value }) => (
+                              <div key={label}>
+                                <span style={labelStyle}>{label}</span>
+                                <span style={valueStyle}>{value || '—'}</span>
+                              </div>
+                            ))}
+                            <div style={{ gridColumn: 'span 2' }}>
+                              <span style={labelStyle}>Dirección de Residencia</span>
+                              <span style={valueStyle}>{charData.address || '—'}</span>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ textAlign: 'center', padding: '32px', background: '#f8fafc', borderRadius: '16px', color: '#94a3b8' }}>
+                          <BookOpen size={32} style={{ opacity: 0.4, marginBottom: '8px' }} />
+                          <p style={{ margin: 0, fontWeight: 600 }}>Sin ficha de caracterización</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {activeTab === 'bienestar' && (
+                    <div className="section-reveal">
+                      {charData ? (
+                        <>
+                          <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>Bienestar y Perfil Académico</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            {[
+                              { label: 'Colegio Anterior', value: charData.previous_school },
+                              { label: 'Fuente Ingresos', value: charData.income_source },
+                              { label: '¿Trabaja?', value: charData.is_working },
+                            ].map(({ label, value }) => (
+                              <div key={label}>
+                                <span style={labelStyle}>{label}</span>
+                                <span style={valueStyle}>{value || '—'}</span>
+                              </div>
+                            ))}
+                            <div style={{ gridColumn: 'span 2' }}>
+                              <span style={labelStyle}>Habilidades Digitales</span>
+                              <span style={valueStyle}>{charData.digital_skills || '—'}</span>
+                            </div>
+                            <div style={{ gridColumn: 'span 2' }}>
+                              <span style={labelStyle}>Intereses / Otros</span>
+                              <span style={valueStyle}>{charData.interests || '—'}</span>
+                            </div>
+                            <div style={{ gridColumn: 'span 2' }}>
+                              <span style={labelStyle}>Notas de Salud / Alergias</span>
+                              <span style={{ ...valueStyle, color: '#ef4444' }}>{charData.health_notes || 'Ninguna'}</span>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ textAlign: 'center', padding: '32px', background: '#f8fafc', borderRadius: '16px', color: '#94a3b8' }}>
+                          <BookOpen size={32} style={{ opacity: 0.4, marginBottom: '8px' }} />
+                          <p style={{ margin: 0, fontWeight: 600 }}>Sin ficha de caracterización</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -207,6 +290,9 @@ const RegistroDashboard = () => {
             )}
           </div>
         </div>
+
+        {/* COMPONENTE OCULTO DE IMPRESIÓN */}
+        <CharacterizationReport student={selected} charData={charData} />
       </main>
     </div>
   );

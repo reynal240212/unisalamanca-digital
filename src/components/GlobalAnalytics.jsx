@@ -25,7 +25,10 @@ const GlobalAnalytics = () => {
       programDistribution: [],
       admissionPipeline: [],
       financialStatus: [],
-      accessActivity: []
+      accessActivity: [],
+      estratoDistribution: [],
+      employmentStatus: [],
+      parentEducation: []
     }
   });
   const [loading, setLoading] = useState(true);
@@ -48,6 +51,10 @@ const GlobalAnalytics = () => {
       // 3. Fetch Financials
       const { data: financialsRaw } = await supabase.from('financial_obligations').select('*');
       const financials = financialsRaw || [];
+      
+      // 4. Fetch Characterization
+      const { data: charRaw } = await supabase.from('characterization').select('*');
+      const characterization = charRaw || [];
 
       // 4. Process Statistics
       const totalStudents = users.filter(u => u.role === 'ESTUDIANTE' || u.role === 'EGRESADO').length;
@@ -89,10 +96,33 @@ const GlobalAnalytics = () => {
       });
       const financialStatus = Object.entries(finMap).map(([name, value]) => ({ name, value }));
 
+      // Socioeconomic Charts processing
+      const estMap = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0 };
+      const workMap = { 'Trabaja': 0, 'No Trabaja': 0 };
+      const eduMap = {};
+      
+      characterization.forEach(c => {
+        if (c.estrato) estMap[c.estrato]++;
+        if (c.is_working === 'Si') workMap['Trabaja']++;
+        else workMap['No Trabaja']++;
+        if (c.parent_education) eduMap[c.parent_education] = (eduMap[c.parent_education] || 0) + 1;
+      });
+      
+      const estratoDistribution = Object.entries(estMap).map(([name, value]) => ({ name: `Estrato ${name}`, value }));
+      const employmentStatus = Object.entries(workMap).map(([name, value]) => ({ name, value }));
+      const parentEducation = Object.entries(eduMap).map(([name, value]) => ({ name, value }));
+
       setData({
-        users, applicants, financials,
+        users, applicants, financials, characterization,
         stats: { totalStudents, activeStudents, pendingApplicants, totalRevenue, pendingDebt },
-        charts: { programDistribution, admissionPipeline, financialStatus }
+        charts: { 
+          programDistribution, 
+          admissionPipeline, 
+          financialStatus,
+          estratoDistribution,
+          employmentStatus,
+          parentEducation
+        }
       });
     } catch (error) {
       console.error("Error fetching analytics:", error);
@@ -237,6 +267,65 @@ const GlobalAnalytics = () => {
           </div>
         </div>
 
+      </div>
+
+      {/* SECCIÓN SOCIOECONÓMICA PREMIUM */}
+      <div style={{ marginTop: '50px', paddingTop: '50px', borderTop: '2px dashed #e2e8f0' }}>
+        <div style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Users size={28} /> Perfil Socioeconómico y Bienestar
+          </h2>
+          <p style={{ color: '#64748b' }}>Análisis profundo de la población estudiantil basado en fichas de caracterización ({((characterization?.length / (data.stats.totalStudents || 1)) * 100).toFixed(1)}% completado).</p>
+        </div>
+
+        <div className="responsive-grid-3" style={{ gap: '24px' }}>
+          {/* DISTRIBUCIÓN POR ESTRATO */}
+          <div style={{ background: 'white', padding: '25px', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
+            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '20px' }}>Distribución por Estrato</h4>
+            <div style={{ height: '250px' }}>
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie data={data.charts.estratoDistribution} innerRadius={50} outerRadius={80} paddingAngle={5} dataKey="value">
+                    {data.charts.estratoDistribution.map((entry, index) => (
+                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* ESTADO LABORAL */}
+          <div style={{ background: 'white', padding: '25px', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
+            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '20px' }}>Estudiantes que Laboran</h4>
+            <div style={{ height: '250px' }}>
+              <ResponsiveContainer>
+                <BarChart data={data.charts.employmentStatus}>
+                  <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
+                  <Tooltip cursor={{ fill: '#f8fafc' }} />
+                  <Bar dataKey="value" fill="var(--secondary)" radius={[4, 4, 0, 0]} barSize={50} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* EDUCACIÓN PARENTAL */}
+          <div style={{ background: 'white', padding: '25px', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
+            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '20px' }}>Educación Red de Apoyo</h4>
+            <div style={{ height: '250px' }}>
+              <ResponsiveContainer>
+                <BarChart layout="vertical" data={data.charts.parentEducation}>
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" fontSize={10} width={80} axisLine={false} tickLine={false} />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
