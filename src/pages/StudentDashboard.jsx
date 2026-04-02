@@ -215,7 +215,7 @@ const StudentDashboard = () => {
       case 'horario':
         return (
           <div className="section-reveal" style={{ padding: '20px' }}>
-            <StudentSchedule />
+            <StudentSchedule student={studentData} />
           </div>
         );
       default: return null;

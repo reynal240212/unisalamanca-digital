@@ -1,133 +1,203 @@
 import React from 'react';
-import { Calendar, Clock, MapPin, BookOpen, AlertCircle, FileText } from 'lucide-react';
+import { Calendar, Clock, MapPin, BookOpen, AlertCircle, FileText, User } from 'lucide-react';
 import { useSchedule } from '../hooks/useSchedule';
 
 const StudentSchedule = ({ student }) => {
-  const { schedule, loading, error } = useSchedule();
+  const { schedule, loading, error } = useSchedule(student?.id);
 
   const getPdfPath = (programName) => {
     const maps = {
-      'Ingeniería de Sistemas': '/curriculums/ingenieria_sistemas.pdf',
+      'Ingeniería de Sistemas de Información': '/curriculums/ingenieria_sistemas.pdf',
       'Desarrollo de Software': '/curriculums/desarrollo_software.pdf',
       'Administración de Empresas': '/curriculums/administracion_empresas.pdf',
       'Contaduría Pública': '/curriculums/contaduria_publica.pdf',
       'Finanzas y Comercio Internacional': '/curriculums/finanzas_comercio.pdf',
-      'Tecnología en Desarrollo de Software': '/curriculums/desarrollo_software.pdf'
     };
-    return maps[programName] || '/curriculums/ingenieria_sistemas.pdf';
+    return maps[programName] || null;
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px', gap: '16px' }}>
+        <div style={{
+          width: '40px', height: '40px', borderRadius: '50%',
+          border: '3px solid var(--primary)', borderTopColor: 'transparent',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <p style={{ color: '#64748b', fontWeight: 600 }}>Cargando horario...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl flex items-center gap-3">
+      <div style={{
+        background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '16px',
+        padding: '20px', display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444'
+      }}>
         <AlertCircle size={20} />
-        <p>{error}</p>
+        <p style={{ fontWeight: 600 }}>{error}</p>
       </div>
     );
   }
 
   const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const period = schedule[0]?.period || '2026-1';
+  const pdfPath = getPdfPath(student?.program);
+
+  const dayColors = {
+    'Lunes':      { bg: '#eef2ff', accent: '#4f46e5', light: '#c7d2fe' },
+    'Martes':     { bg: '#f0fdf4', accent: '#16a34a', light: '#bbf7d0' },
+    'Miércoles':  { bg: '#fff7ed', accent: '#ea580c', light: '#fed7aa' },
+    'Jueves':     { bg: '#fdf4ff', accent: '#a21caf', light: '#e879f9' },
+    'Viernes':    { bg: '#ecfeff', accent: '#0891b2', light: '#a5f3fc' },
+    'Sábado':     { bg: '#fef9c3', accent: '#ca8a04', light: '#fde68a' },
+  };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-br from-blue-600 to-blue-400 rounded-2xl shadow-lg shadow-blue-500/20">
-            <Calendar className="text-white" size={24} />
+    <div style={{ animation: 'slideUp 0.5s ease-out' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{
+            width: '52px', height: '52px', borderRadius: '16px',
+            background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 8px 20px rgba(42, 34, 102, 0.2)'
+          }}>
+            <Calendar color="white" size={26} />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Mi Horario Académico</h2>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
-              Periodo: {schedule[0]?.period || 'Cargando...'} | Jornada Nocturna
+            <h2 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 900, color: 'var(--primary-dark)' }}>Mi Horario Académico</h2>
+            <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '0.85rem' }}>
+              Período: {period} · {student?.program || 'Programa no registrado'}
             </p>
           </div>
         </div>
 
-        <a 
-          href={getPdfPath(student?.program)} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm hover:shadow-md"
-        >
-          <FileText size={18} className="text-red-500" />
-          Descargar Pénsum
-        </a>
+        {pdfPath && (
+          <a href={pdfPath} target="_blank" rel="noopener noreferrer"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '10px 20px', background: 'white', borderRadius: '12px',
+              border: '1px solid #e2e8f0', color: '#374151', fontWeight: 700,
+              fontSize: '0.85rem', textDecoration: 'none',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <FileText size={16} color="#ef4444" />
+            Descargar Pénsum
+          </a>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {days.map((day) => {
-          const daySubjects = schedule.filter(s => 
-            s.blocks?.some(b => b.day_of_week === day)
-          );
+      {/* Sin materias */}
+      {schedule.length === 0 ? (
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          minHeight: '300px', background: 'white', borderRadius: '24px',
+          border: '2px dashed #e2e8f0', gap: '16px', textAlign: 'center', padding: '40px'
+        }}>
+          <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Calendar size={36} color="#94a3b8" />
+          </div>
+          <h3 style={{ margin: 0, color: '#475569', fontWeight: 800 }}>Sin horario asignado</h3>
+          <p style={{ color: '#94a3b8', maxWidth: '320px', fontSize: '0.9rem' }}>
+            Tu administrador aún no ha cargado tu horario. Consulta con secretaría para más información.
+          </p>
+        </div>
+      ) : (
+        /* Grid por días */
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+          {days.map((day) => {
+            const daySubjects = schedule.filter(s =>
+              s.blocks?.some(b => b.day_of_week === day)
+            );
+            const colors = dayColors[day];
 
-          return (
-            <div key={day} className="group relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-1000 group-hover:duration-200"></div>
-              <div className="relative bg-white/70 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl p-6 h-full shadow-sm hover:shadow-xl transition-all duration-300">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
-                    <span className="w-2 h-8 bg-blue-500 rounded-full"></span>
+            return (
+              <div key={day} style={{
+                background: 'white', borderRadius: '20px', border: `1px solid ${colors.light}`,
+                overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
+                transition: 'transform 0.2s, box-shadow 0.2s'
+              }}>
+                {/* Day header */}
+                <div style={{
+                  background: colors.bg, padding: '14px 20px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  borderBottom: `2px solid ${colors.light}`
+                }}>
+                  <h3 style={{ margin: 0, fontWeight: 900, color: colors.accent, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ width: '3px', height: '18px', background: colors.accent, borderRadius: '4px', display: 'inline-block' }} />
                     {day}
                   </h3>
-                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
-                    {daySubjects.length} Clases
+                  <span style={{
+                    background: colors.accent, color: 'white',
+                    padding: '2px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 800
+                  }}>
+                    {daySubjects.length} clases
                   </span>
                 </div>
 
-                <div className="space-y-4">
-                  {daySubjects.length > 0 ? (
-                    daySubjects.map((item, idx) => (
-                      <div key={idx} className="p-4 rounded-2xl bg-white/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors group/card">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <BookOpen size={14} className="text-blue-500" />
-                            <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-tight uppercase tracking-tight">
-                              {item.subject}
-                            </h4>
-                          </div>
-                          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-700/50 px-2 py-0.5 rounded-lg">
-                            {item.credits} CR
+                {/* Subjects */}
+                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '100px' }}>
+                  {daySubjects.length > 0 ? daySubjects.map((item, idx) => (
+                    <div key={idx} style={{
+                      background: colors.bg, borderRadius: '14px',
+                      padding: '14px', border: `1px solid ${colors.light}`
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <BookOpen size={14} color={colors.accent} />
+                          <span style={{ fontWeight: 800, fontSize: '0.85rem', color: '#1e293b' }}>
+                            {item.subject}
                           </span>
                         </div>
+                        <span style={{
+                          background: 'white', border: `1px solid ${colors.light}`,
+                          padding: '2px 8px', borderRadius: '8px', fontSize: '0.65rem',
+                          fontWeight: 800, color: colors.accent, whiteSpace: 'nowrap'
+                        }}>
+                          {item.credits} cr
+                        </span>
+                      </div>
 
-                        {item.blocks.filter(b => b.day_of_week === day).map((block, bIdx) => (
-                          <div key={bIdx} className="space-y-2 mt-2">
-                            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                              <Clock size={12} className="text-blue-400" />
-                              <span className="font-medium">
-                                {block.start_time.slice(0, 5)} - {block.end_time.slice(0, 5)}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                              <MapPin size={12} className="text-cyan-400" />
-                              <span>Salón: {block.classroom || 'Por definir'}</span>
-                            </div>
+                      {item.teacher && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                          <User size={11} color="#94a3b8" />
+                          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{item.teacher}</span>
+                        </div>
+                      )}
+
+                      {item.blocks.filter(b => b.day_of_week === day).map((block, bIdx) => (
+                        <div key={bIdx} style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Clock size={11} color="#94a3b8" />
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569' }}>
+                              {block.start_time?.slice(0, 5)} – {block.end_time?.slice(0, 5)}
+                            </span>
                           </div>
-                        ))}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-8 opacity-40">
-                      <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-2">
-                        <Clock size={20} />
-                      </div>
-                      <p className="text-xs font-medium">Sin clases programadas</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <MapPin size={11} color="#94a3b8" />
+                            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                              Salón: {block.classroom || 'Por definir'}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )) : (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, opacity: 0.35, paddingBottom: '8px' }}>
+                      <p style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>Sin clases</p>
                     </div>
                   )}
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

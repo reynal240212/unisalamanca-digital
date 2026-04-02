@@ -20,6 +20,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
     program: student?.program || '',
     role: student?.role || 'ESTUDIANTE',
     status: student?.status || 'Active',
+    entry_date: student?.entry_date || '',
     password: isEdit ? '' : 'Unisalamanca2026*',
   });
 
@@ -98,10 +99,38 @@ const UserFormModal = ({ student, onClose, onSave }) => {
               </div>
             </div>
 
+            {/* FECHA DE INGRESO → determina el semestre automáticamente */}
+            <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '16px', border: '1px solid #e2e8f0' }}>
+              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>
+                📅 Fecha de Ingreso Institucional
+              </label>
+              <input
+                className="input-premium"
+                type="date"
+                value={form.entry_date}
+                onChange={e => setForm(p => ({ ...p, entry_date: e.target.value }))}
+                style={{ width: '100%' }}
+              />
+              {form.entry_date && (() => {
+                const entry = new Date(form.entry_date);
+                const now = new Date();
+                const semActual = now.getMonth() >= 6 ? 2 : 1;
+                const semIngreso = entry.getMonth() >= 6 ? 2 : 1;
+                const num = Math.max(1, (now.getFullYear() - entry.getFullYear()) * 2 + semActual - semIngreso + 1);
+                const label = `${num}${num === 1 || num === 3 ? 'er' : 'o'} Semestre`;
+                return (
+                  <p style={{ marginTop: '8px', fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 700 }}>
+                    → Semestre calculado: <strong>{label}</strong>
+                  </p>
+                );
+              })()}
+            </div>
+
             <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
               <button type="button" onClick={onClose} className="btn-secondary-premium" style={{ flex: 1 }}>Cancelar</button>
               <button type="submit" className="btn-primary-premium" style={{ flex: 2 }}>{isEdit ? 'Actualizar' : 'Crear Usuario'}</button>
             </div>
+
           </div>
         </form>
       </div>
