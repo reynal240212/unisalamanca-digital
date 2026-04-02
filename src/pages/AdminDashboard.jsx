@@ -87,7 +87,21 @@ const UserFormModal = ({ student, onClose, onSave }) => {
               <div>
                 <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>Rol</label>
                 <select className="input-premium" value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))} style={{ width: '100%', background: 'white' }}>
-                  {['ESTUDIANTE', 'EGRESADO', 'VALIDADOR', 'ADMIN'].map(r => <option key={r} value={r}>{r}</option>)}
+                  <optgroup label="Estudiantes">
+                    <option value="ESTUDIANTE">Estudiante</option>
+                    <option value="EGRESADO">Egresado / Alumni</option>
+                  </optgroup>
+                  <optgroup label="Docentes">
+                    <option value="PROFESOR">Profesor</option>
+                  </optgroup>
+                  <optgroup label="Gestión Académica">
+                    <option value="COORD_ACADEMICO">Coordinador Académico</option>
+                    <option value="DIRECTOR_PROGRAMA">Director de Programa</option>
+                  </optgroup>
+                  <optgroup label="Seguridad y Admin">
+                    <option value="VALIDADOR">Validador / Guardia</option>
+                    <option value="ADMIN">Administrador del Sistema</option>
+                  </optgroup>
                 </select>
               </div>
               <div>

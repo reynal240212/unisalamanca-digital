@@ -28,6 +28,8 @@ const Login = () => {
     try {
       const u = await login(email, password);
       if (u.role === 'ADMIN') navigate('/admin');
+      else if (u.role === 'COORD_ACADEMICO' || u.role === 'DIRECTOR_PROGRAMA') navigate('/academic');
+      else if (u.role === 'PROFESOR') navigate('/teacher');
       else if (u.role === 'VALIDADOR') navigate('/validator');
       else navigate('/student');
     } catch (err) {
