@@ -480,7 +480,7 @@ const AdminDashboard = () => {
               borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
               backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)'
             }}>
-              <img src="/images/escudo.png" alt="Logo" style={{ width: '24px', filter: 'brightness(0) invert(1)' }} />
+              <img src="/images/escudo.png" alt="Logo" style={{ width: '24px' }} />
             </div>
             <div>
               <div style={{ fontWeight: 900, fontSize: '1.2rem', letterSpacing: '-0.5px' }}>

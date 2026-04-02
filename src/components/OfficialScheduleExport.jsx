@@ -16,7 +16,7 @@ const OfficialScheduleExport = ({ student, schedule }) => {
       <div className="print-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <img src="/images/escudo.png" alt="UniSalamanca" style={{ height: '70px', objectFit: 'contain' }} />
+            <img src="/images/escudo.png" alt="UniSalamanca" style={{ height: '85px', objectFit: 'contain' }} />
             <div style={{ borderLeft: '2px solid #1e3a8a', paddingLeft: '20px' }}>
               <h1 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 900, color: '#1e3a8a', letterSpacing: '-0.5px' }}>
                 CORPORACIÓN UNIVERSITARIA EMPRESARIAL DE SALAMANCA

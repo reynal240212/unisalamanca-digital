@@ -226,7 +226,7 @@ const StudentDashboard = () => {
     <div style={{ background: '#f8fafc', minHeight: '100vh', position: 'relative' }}>
       {/* MOBILE TOP BAR */}
       <div className="mobile-top-bar">
-         <img src="/images/logo.png" alt="US" style={{ height: '24px' }} />
+         <img src="/images/escudo.png" alt="US" style={{ height: '28px' }} />
          <button onClick={toggleSidebar} className="menu-circle">
             <Menu size={20} />
          </button>
