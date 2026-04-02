@@ -26,7 +26,7 @@ const SalmiChatbot = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  // Función de Voz (TTS) con efecto de ardilla
+  // Función de Voz (TTS) con efecto de mascota inteligente
   const speakAsSquirrel = (text) => {
     if (isMuted || !text) return;
     
@@ -34,9 +34,15 @@ const SalmiChatbot = () => {
     synth.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Intentar encontrar una voz en español de mejor calidad
+    const voices = synth.getVoices();
+    const spanishVoice = voices.find(v => v.lang.includes('es')) || voices[0];
+    if (spanishVoice) utterance.voice = spanishVoice;
+
     utterance.lang = 'es-ES';
-    utterance.pitch = 2.0; // Tono muy agudo (Ardilla)
-    utterance.rate = 1.15; // Un poco más rápido
+    utterance.pitch = 1.3; // Más inteligente, menos "chirriante" que antes
+    utterance.rate = 1.05; // Velocidad natural pero proactiva
     utterance.volume = 1.0;
     
     synth.speak(utterance);

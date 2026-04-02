@@ -21,24 +21,35 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // 1. Obtener IDENTIDAD del usuario (Seguridad)
-    const authHeader = req.headers.get('Authorization')!;
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user } } = await supabase.auth.getUser(token);
+    const authHeader = req.headers.get('Authorization');
+    console.log("Salmi AI: Recibiendo mensaje...");
 
     let userContext = "";
-    if (user) {
-      // Obtener perfil detallado del usuario actual
-      const { data: profile } = await supabase
-        .from('user')
-        .select('name, role, program, semester')
-        .eq('id', user.id)
-        .single();
-      
-      if (profile) {
-        userContext = `ESTÁS HABLANDO CON: ${profile.name} (${profile.role}). 
-        Su programa actual es: ${profile.program || 'N/A'}. 
-        Semestre: ${profile.semester || 'N/A'}.`;
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+        if (user && !authError) {
+          // Obtener perfil detallado del usuario actual
+          const { data: profile } = await supabase
+            .from('user')
+            .select('name, role, program, semester')
+            .eq('id', user.id)
+            .single();
+          
+          if (profile) {
+            console.log(`Salmi AI: Usuario identificado como ${profile.name}`);
+            userContext = `ESTÁS HABLANDO CON: ${profile.name} (${profile.role}). 
+            Su programa actual es: ${profile.program || 'N/A'}. 
+            Semestre: ${profile.semester || 'N/A'}.`;
+          }
+        }
+      } catch (e) {
+        console.error("Salmi AI: Error decodificando auth", e);
       }
+    } else {
+      console.log("Salmi AI: Petición sin cabecera de autorización");
     }
 
     // 2. Obtener información institucional y académica (RAGContext)
