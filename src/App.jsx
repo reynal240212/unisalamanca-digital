@@ -4,6 +4,9 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import AcademicDashboard from './pages/AcademicDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
+import RegistroDashboard from './pages/RegistroDashboard';
+import CarteraDashboard from './pages/CarteraDashboard';
+import AdmisionesDashboard from './pages/AdmisionesDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import StudentCard from './pages/StudentCard';
 import Validator from './pages/Validator';
@@ -53,6 +56,27 @@ function App() {
           <Route path="/teacher" element={
             <ProtectedRoute allowedRoles={['PROFESOR']}>
               <TeacherDashboard />
+            </ProtectedRoute>
+          } />
+
+          {/* SECRETARÍA ACADÉMICA */}
+          <Route path="/registro" element={
+            <ProtectedRoute allowedRoles={['SECRETARIA_ACADEMICA']}>
+              <RegistroDashboard />
+            </ProtectedRoute>
+          } />
+
+          {/* CARTERA */}
+          <Route path="/cartera" element={
+            <ProtectedRoute allowedRoles={['CARTERA']}>
+              <CarteraDashboard />
+            </ProtectedRoute>
+          } />
+
+          {/* ADMISIONES */}
+          <Route path="/admisiones" element={
+            <ProtectedRoute allowedRoles={['ADMISIONES']}>
+              <AdmisionesDashboard />
             </ProtectedRoute>
           } />
 

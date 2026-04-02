@@ -97,6 +97,11 @@ const UserFormModal = ({ student, onClose, onSave }) => {
                   <optgroup label="Gestión Académica">
                     <option value="COORD_ACADEMICO">Coordinador Académico</option>
                     <option value="DIRECTOR_PROGRAMA">Director de Programa</option>
+                    <option value="SECRETARIA_ACADEMICA">Secretaría Académica</option>
+                    <option value="ADMISIONES">Admisiones</option>
+                  </optgroup>
+                  <optgroup label="Gestión Financiera">
+                    <option value="CARTERA">Cartera / Cobros</option>
                   </optgroup>
                   <optgroup label="Seguridad y Admin">
                     <option value="VALIDADOR">Validador / Guardia</option>

@@ -30,6 +30,9 @@ const Login = () => {
       if (u.role === 'ADMIN') navigate('/admin');
       else if (u.role === 'COORD_ACADEMICO' || u.role === 'DIRECTOR_PROGRAMA') navigate('/academic');
       else if (u.role === 'PROFESOR') navigate('/teacher');
+      else if (u.role === 'SECRETARIA_ACADEMICA') navigate('/registro');
+      else if (u.role === 'CARTERA') navigate('/cartera');
+      else if (u.role === 'ADMISIONES') navigate('/admisiones');
       else if (u.role === 'VALIDADOR') navigate('/validator');
       else navigate('/student');
     } catch (err) {
