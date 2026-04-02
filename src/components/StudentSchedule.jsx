@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calendar, Clock, MapPin, BookOpen, AlertCircle, FileText, User } from 'lucide-react';
 import { useSchedule } from '../hooks/useSchedule';
+import OfficialScheduleExport from './OfficialScheduleExport';
 
 const StudentSchedule = ({ student }) => {
   const { schedule, loading, error } = useSchedule(student?.id);
@@ -14,6 +15,10 @@ const StudentSchedule = ({ student }) => {
       'Finanzas y Comercio Internacional': '/curriculums/finanzas_comercio.pdf',
     };
     return maps[programName] || null;
+  };
+
+  const handlePrint = () => {
+    window.print();
   };
 
   if (loading) {
@@ -56,6 +61,9 @@ const StudentSchedule = ({ student }) => {
 
   return (
     <div style={{ animation: 'slideUp 0.5s ease-out' }}>
+      {/* COMPONENTE OCULTO PARA IMPRESIÓN */}
+      <OfficialScheduleExport student={student} schedule={schedule} />
+
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -75,21 +83,39 @@ const StudentSchedule = ({ student }) => {
           </div>
         </div>
 
-        {pdfPath && (
-          <a href={pdfPath} target="_blank" rel="noopener noreferrer"
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {pdfPath && (
+            <a href={pdfPath} target="_blank" rel="noopener noreferrer"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '10px 20px', background: 'white', borderRadius: '12px',
+                border: '1px solid #e2e8f0', color: '#374151', fontWeight: 700,
+                fontSize: '0.85rem', textDecoration: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                transition: 'all 0.2s'
+              }}
+            >
+              <FileText size={16} color="#ef4444" />
+              Descargar Pénsum
+            </a>
+          )}
+
+          <button onClick={handlePrint}
             style={{
               display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '10px 20px', background: 'white', borderRadius: '12px',
-              border: '1px solid #e2e8f0', color: '#374151', fontWeight: 700,
-              fontSize: '0.85rem', textDecoration: 'none',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              padding: '10px 20px', background: 'var(--primary)', borderRadius: '12px',
+              border: 'none', color: 'white', fontWeight: 700,
+              fontSize: '0.85rem', cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(42, 34, 102, 0.2)',
               transition: 'all 0.2s'
             }}
+            onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+            onMouseOut={e => e.currentTarget.style.transform = 'none'}
           >
-            <FileText size={16} color="#ef4444" />
-            Descargar Pénsum
-          </a>
-        )}
+            <FileText size={16} />
+            Descargar Horario Oficial
+          </button>
+        </div>
       </div>
 
       {/* Sin materias */}

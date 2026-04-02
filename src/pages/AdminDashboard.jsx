@@ -21,6 +21,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
     role: student?.role || 'ESTUDIANTE',
     status: student?.status || 'Active',
     entry_date: student?.entry_date || '',
+    document_id: student?.document_id || '',
     password: isEdit ? '' : 'Unisalamanca2026*',
   });
 
@@ -64,6 +65,11 @@ const UserFormModal = ({ student, onClose, onSave }) => {
             <div>
               <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>Nombre Completo</label>
               <input className="input-premium" type="text" value={form.name} required onChange={e => setForm(p => ({ ...p, name: e.target.value }))} style={{ width: '100%' }} />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>Cédula / Documento de Identidad</label>
+              <input className="input-premium" type="text" value={form.document_id} required onChange={e => setForm(p => ({ ...p, document_id: e.target.value }))} style={{ width: '100%' }} placeholder="Ej: 1143221..." />
             </div>
 
             <div>

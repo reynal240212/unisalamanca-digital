@@ -2511,3 +2511,95 @@ body {
     z-index: 3000;
   }
 }
+/* ============================================================
+   OFFICIAL SCHEDULE PRINT STYLES
+   Optimized for PDF and Paper Printing
+   ============================================================ */
+@media print {
+  /* Hide all UI elements */
+  nav, aside, footer, .salmi-chatbot-wrapper, .mobile-top-bar, button, a, 
+  .admin-sidebar-premium, .admin-nav-item, .admin-main-container > div:not(.print-container),
+  .section-reveal > div:not(.printable-schedule) {
+    display: none !important;
+  }
+
+  body, html {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .printable-schedule {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    color: black !important;
+    font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif !important;
+  }
+
+  @page {
+    size: letter;
+    margin: 1.5cm;
+  }
+
+  /* Table styling for print */
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed;
+  }
+
+  .print-table th, .print-table td {
+    border: 1px solid #cbd5e1;
+    padding: 8px;
+    vertical-align: top;
+    font-size: 0.75rem;
+    word-wrap: break-word;
+  }
+
+  .print-table th {
+    background-color: #f8fafc !important;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .print-subject-name {
+    font-weight: 800;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+    color: #1e3a8a;
+  }
+
+  .print-detail-item {
+    font-size: 0.65rem;
+    color: #475569;
+    margin: 2px 0;
+  }
+
+  .print-header {
+    border-bottom: 3px solid #1e3a8a;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+  }
+
+  .print-logo-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .print-student-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 15px;
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+  }
+}
