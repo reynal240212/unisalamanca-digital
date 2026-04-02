@@ -442,7 +442,7 @@ const AdminDashboard = () => {
   const uniquePrograms = [...new Set(students.map(s => s.program).filter(Boolean))].sort();
 
   const navItems = [
-    { id: 'estudiantes', icon: <Users size={18} />, label: 'Estudiantes' },
+    { id: 'estudiantes', icon: <Users size={18} />, label: 'Inicio / Directorio' },
     { id: 'reportes', icon: <BarChart2 size={18} />, label: 'Reportes' },
     { id: 'seguridad', icon: <ShieldCheck size={18} />, label: 'Seguridad' },
     { id: 'config', icon: <Settings size={18} />, label: 'Configuración' },
