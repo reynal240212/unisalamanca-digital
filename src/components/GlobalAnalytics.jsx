@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { 
   Users, UserCheck, TrendingUp, DollarSign, 
-  Target, GraduationCap, Clock, AlertCircle 
+  Target, GraduationCap, Clock, AlertCircle, CheckCircle2, Wallet 
 } from 'lucide-react';
 
 const GlobalAnalytics = () => {
@@ -38,13 +38,16 @@ const GlobalAnalytics = () => {
     setLoading(true);
     try {
       // 1. Fetch Users
-      const { data: users } = await supabase.from('user').select('*');
+      const { data: usersRaw } = await supabase.from('user').select('*');
+      const users = usersRaw || [];
       
       // 2. Fetch Applicants
-      const { data: applicants } = await supabase.from('applicants').select('*');
+      const { data: applicantsRaw } = await supabase.from('applicants').select('*');
+      const applicants = applicantsRaw || [];
       
       // 3. Fetch Financials
-      const { data: financials } = await supabase.from('financial_obligations').select('*');
+      const { data: financialsRaw } = await supabase.from('financial_obligations').select('*');
+      const financials = financialsRaw || [];
 
       // 4. Process Statistics
       const totalStudents = users.filter(u => u.role === 'ESTUDIANTE' || u.role === 'EGRESADO').length;
@@ -225,9 +228,9 @@ const GlobalAnalytics = () => {
             <h3 style={{ fontWeight: 900, margin: 0, fontSize: '1.2rem' }}>Insights de Salmi AI</h3>
           </div>
           <p style={{ fontSize: '1.05rem', lineHeight: 1.6, opacity: 0.9, fontWeight: 500 }}>
-            "Hola Admin. He analizado los datos: Tienes una retención del **{((data.stats.activeStudents / data.stats.totalStudents) * 100).toFixed(1)}%**. 
+            "Hola Admin. He analizado los datos: Tienes una retención del **{data.stats.totalStudents > 0 ? ((data.stats.activeStudents / data.stats.totalStudents) * 100).toFixed(1) : 0}%**. 
             La carrera líder es **{data.charts.programDistribution[0]?.name || 'N/A'}**. 
-            Hay una oportunidad de recaudo de **${data.stats.pendingDebt.toLocaleString()} COP** pendiente por gestionar."
+            Hay una oportunidad de recaudo de **${(data.stats.pendingDebt || 0).toLocaleString()} COP** pendiente por gestionar."
           </p>
           <div style={{ marginTop: '25px', padding: '12px 20px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 700, display: 'inline-block' }}>
             ESTADO INSTITUCIONAL: ÓPTIMO ✓
