@@ -104,6 +104,17 @@ Deno.serve(async (req: Request) => {
     });
 
     const groqData = await response.json();
+    
+    if (!response.ok) {
+      console.error("Groq API Error:", groqData);
+      throw new Error(`Groq API Error: ${response.status} - ${groqData.error?.message || 'Unknown'}`);
+    }
+
+    if (!groqData.choices || groqData.choices.length === 0) {
+      console.error("Groq returned no choices:", groqData);
+      throw new Error("No se pudo obtener una respuesta de la IA.");
+    }
+
     const aiResponse = groqData.choices[0].message.content;
 
     return new Response(JSON.stringify({ response: aiResponse }), {
@@ -111,8 +122,8 @@ Deno.serve(async (req: Request) => {
     });
 
   } catch (error: any) {
-    console.error("AI Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+    console.error("Salmi AI Final Error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Error desconocido en el motor de IA";
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

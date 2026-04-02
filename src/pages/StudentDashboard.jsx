@@ -80,7 +80,7 @@ const StudentDashboard = () => {
         return (
           <div className="section-reveal">
             <SalmiAdviceComponent student={studentData} characterization={characterizationData} />
-            <div className="responsive-grid-2">
+            <div className="section-reveal-single">
               <div>
                 <div className="glass-card" style={{ marginBottom: '30px', background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))' }}>
                   <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 900, color: 'var(--primary-dark)' }}>
@@ -121,19 +121,6 @@ const StudentDashboard = () => {
                     </div>
                   </div>
                 )}
-              </div>
-
-              <div>
-                <h3 className="sidebar-label-premium" style={{ padding: '0 0 15px', color: '#94a3b8' }}>Identidad Digital</h3>
-                <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center' }}>
-                  <StudentCardComponent 
-                    student={studentData} 
-                    qrValue={qrValue} 
-                    timeLeft={timeLeft}
-                    progress={profileCompleted ? 100 : 45} 
-                    onPrintRequest={() => alert('Generando PDF Premium...')}
-                  />
-                </div>
               </div>
             </div>
           </div>
