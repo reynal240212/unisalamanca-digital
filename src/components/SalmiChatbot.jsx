@@ -14,7 +14,9 @@ const SalmiChatbot = () => {
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isMuted, setIsMuted] = useState(false); // NUEVO: Control de voz
   const messagesEndRef = useRef(null);
+  const synth = window.speechSynthesis;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -23,6 +25,22 @@ const SalmiChatbot = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  // Función de Voz (TTS) con efecto de ardilla
+  const speakAsSquirrel = (text) => {
+    if (isMuted || !text) return;
+    
+    // Detener cualquier voz previa
+    synth.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'es-ES';
+    utterance.pitch = 2.0; // Tono muy agudo (Ardilla)
+    utterance.rate = 1.15; // Un poco más rápido
+    utterance.volume = 1.0;
+    
+    synth.speak(utterance);
+  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -66,15 +84,20 @@ const SalmiChatbot = () => {
       }]);
       setIsTyping(false);
 
+      // ¡Hablar!
+      speakAsSquirrel(responseText);
+
     } catch (error) {
       console.error("Salmi Chat Error:", error);
       setIsTyping(false);
+      const errorMsg = "Lo siento, tuve un pequeño tropiezo digital. ¿Me lo puedes volver a preguntar?";
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
-        text: "Lo siento, tuve un pequeño tropiezo digital. ¿Me lo puedes volver a preguntar?",
+        text: errorMsg,
         sender: 'salmi',
         timestamp: new Date()
       }]);
+      speakAsSquirrel(errorMsg);
     }
   };
 
@@ -107,7 +130,14 @@ const SalmiChatbot = () => {
                 <span>Mentoría Digital 24/7</span>
               </div>
             </div>
-            <div className="salmi-header-actions">
+            <div className="salmi-header-actions" style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                onClick={() => setIsMuted(!isMuted)} 
+                title={isMuted ? "Activar Voz" : "Silenciar Voz"}
+                style={{ background: isMuted ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.3)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                {isMuted ? <Sparkles size={16} opacity={0.5} /> : <Sparkles size={16} color="#fff" />}
+              </button>
               <button onClick={() => setIsOpen(false)} title="Minimizar">
                 <Minimize2 size={18} />
               </button>
