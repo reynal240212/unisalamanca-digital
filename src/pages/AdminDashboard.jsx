@@ -335,9 +335,10 @@ const AdminDashboard = () => {
       setStats({
         total: data.length,
         active: data.filter(s => s.status === 'Active').length,
-        suspended: data.filter(s => s.status === 'Suspended').length,
-        validators: data.filter(s => s.role === 'VALIDADOR').length,
+        staff: data.filter(s => ['SECRETARIA_ACADEMICA', 'ADMISIONES', 'CARTERA'].includes(s.role)).length,
+        academia: data.filter(s => ['PROFESOR', 'COORD_ACADEMICO', 'DIRECTOR_PROGRAMA'].includes(s.role)).length,
         egresados: data.filter(s => s.role === 'EGRESADO').length,
+        validators: data.filter(s => s.role === 'VALIDADOR').length,
       });
     }
   };
@@ -372,17 +373,21 @@ const AdminDashboard = () => {
 
   const handleExport = () => {
     const exportData = filtered.map(s => ({
+      ID: s.id,
       Nombre: s.name,
       Email: s.email,
-      Programa: s.program,
+      Documento: s.document_id || 'N/A',
       Rol: s.role,
+      Programa: s.program || 'N/A',
       Estado: s.status,
+      Semestre: s.semester || 'N/A',
+      Ingreso: s.entry_date || 'N/A',
       Fecha_Creacion: new Date(s.created_at).toLocaleDateString()
     }));
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Usuarios_Filtrados");
-    XLSX.writeFile(wb, `UniSalamanca_Directorio_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, "Identidades_Completas");
+    XLSX.writeFile(wb, `UniSalamanca_Directorio_Premium_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   const handleSaveUser = async (id, form) => {
@@ -571,11 +576,25 @@ const AdminDashboard = () => {
                     style={{ padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '0.9rem', width: '100%', background: '#f8fafc' }} />
                </div>
                
-               <select className="input-premium" value={filterRole} onChange={e => setFilterRole(e.target.value)} style={{ width: 'auto', minWidth: '160px' }}>
+               <select className="input-premium" value={filterRole} onChange={e => setFilterRole(e.target.value)} style={{ width: 'auto', minWidth: '180px' }}>
                   <option value="ALL">Todos los Roles</option>
-                  <option value="ESTUDIANTE">Estudiantes</option>
-                  <option value="EGRESADO">Egresados</option>
-                  <option value="VALIDADOR">Validadores</option>
+                  <optgroup label="Estudiantes">
+                    <option value="ESTUDIANTE">Estudiantes</option>
+                    <option value="EGRESADO">Egresados</option>
+                  </optgroup>
+                  <optgroup label="Academia">
+                    <option value="PROFESOR">Profesores</option>
+                    <option value="COORD_ACADEMICO">Coordinadores</option>
+                    <option value="DIRECTOR_PROGRAMA">Directores</option>
+                  </optgroup>
+                  <optgroup label="Administración">
+                    <option value="SECRETARIA_ACADEMICA">Secretaría</option>
+                    <option value="ADMISIONES">Admisiones</option>
+                    <option value="CARTERA">Cartera</option>
+                  </optgroup>
+                  <optgroup label="Seguridad">
+                    <option value="VALIDADOR">Validadores</option>
+                  </optgroup>
                </select>
 
                <select className="input-premium" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 'auto' }}>
@@ -592,8 +611,10 @@ const AdminDashboard = () => {
               {[
                 { label: 'Total Identidades', value: stats.total, color: 'var(--primary)', bg: '#eef2ff', icon: <Users size={22} /> },
                 { label: 'Accesos Habilitados', value: stats.active, color: '#16A34A', bg: '#f0fdf4', icon: <Shield size={22} /> },
+                { label: 'Personal Administrativo', value: stats.staff, color: '#0891b2', bg: '#ecfeff', icon: <Wallet size={22} /> },
+                { label: 'Cuerpo Académico', value: stats.academia, color: '#8b5cf6', bg: '#f5f3ff', icon: <GraduationCap size={22} /> },
                 { label: 'Egresados / Alumni', value: stats.egresados, color: '#f59e0b', bg: '#fef9c3', icon: <TrendingUp size={22} /> },
-                { label: 'Agentes Seguridad', value: stats.validators, color: 'var(--secondary)', bg: '#ecfeff', icon: <ShieldCheck size={22} /> },
+                { label: 'Agentes Seguridad', value: stats.validators, color: '#ef4444', bg: '#fef2f2', icon: <ShieldCheck size={22} /> },
               ].map((s, i) => (
                 <div key={i} className="kpi-card">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
