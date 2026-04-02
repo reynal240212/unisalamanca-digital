@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { 
   LayoutDashboard, UserCircle, QrCode, LogOut, 
-  Bell, Settings, BookOpen, ShieldCheck, Star, Calendar
+  Bell, Settings, BookOpen, ShieldCheck, Star, Calendar, Menu
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -80,7 +80,7 @@ const StudentDashboard = () => {
         return (
           <div className="section-reveal">
             <SalmiAdviceComponent student={studentData} characterization={characterizationData} />
-            <div className="student-dashboard-grid">
+            <div className="responsive-grid-2">
               <div>
                 <div className="glass-card" style={{ marginBottom: '30px', background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))' }}>
                   <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 900, color: 'var(--primary-dark)' }}>
@@ -90,7 +90,7 @@ const StudentDashboard = () => {
                     Bienvenido a tu ecosistema digital UniSalamanca. Aquí tienes todo bajo control.
                   </p>
                   
-                  <div className="kpi-grid-premium" style={{ marginTop: '32px' }}>
+                  <div className="responsive-grid-3" style={{ marginTop: '32px' }}>
                     {[
                       { icon: <BookOpen className="text-primary" />, label: 'Mi Semestre', value: studentData.semester || '...' },
                       { icon: <Star className="text-secondary" />, label: 'Mi Promedio', value: studentData.gpa || '0.0' },
@@ -227,8 +227,8 @@ const StudentDashboard = () => {
       {/* MOBILE TOP BAR */}
       <div className="mobile-top-bar">
          <img src="/images/logo.png" alt="US" style={{ height: '24px' }} />
-         <button onClick={toggleSidebar} style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '8px', borderRadius: '10px', display: 'flex' }}>
-            <QrCode size={20} />
+         <button onClick={toggleSidebar} className="menu-circle">
+            <Menu size={20} />
          </button>
       </div>
 

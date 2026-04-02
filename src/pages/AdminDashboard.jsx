@@ -8,7 +8,7 @@ import {
   Users, UserPlus, FileUp, Search, LogOut, TrendingUp,
   CheckCircle2, XCircle, ShieldCheck, BarChart2, Settings,
   Upload, Edit2, X, Save, AlertTriangle, Lock, Bell, Shield,
-  Activity, Database, Key
+  Activity, Database, Key, Menu
 } from 'lucide-react';
 
 /* ─── MODAL USUARIO (CREAR/EDITAR) ─────────────────────────────────── */
@@ -130,7 +130,7 @@ const ReportesSection = ({ students, logs = [] }) => {
         <p style={{ color: '#64748b' }}>Métricas avanzadas de identidad y acceso digital</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '28px', marginBottom: '28px' }}>
+      <div className="responsive-grid-2" style={{ marginBottom: '28px' }}>
         <div className="kpi-card">
           <h3 style={{ fontWeight: 800, marginBottom: '24px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Database size={18} color="var(--primary)" /> Población por Facultad
@@ -173,7 +173,7 @@ const ReportesSection = ({ students, logs = [] }) => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+      <div className="responsive-grid-3">
         {[
           { label: 'RETENCIÓN', val: '98.2%', col: '#16a34a', sub: 'Usuarios activos' },
           { label: 'CONSULTAS / DÍA', val: '1.2k', col: 'var(--primary)', sub: 'Promedio semanal' },
@@ -202,7 +202,7 @@ const SeguridadSection = ({ students, logs = [] }) => {
         <p style={{ color: '#64748b' }}>Monitoreo en tiempo real de accesos y validaciones</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>
+      <div className="responsive-grid-3" style={{ marginBottom: '32px' }}>
         {[
           { icon: <Shield size={22} />, label: 'Agentes Activos', value: validators.length, color: 'var(--primary)', bg: '#eef2ff' },
           { icon: <Activity size={22} />, label: 'Validaciones / Hoy', value: todayLogs.length, color: '#16A34A', bg: '#f0fdf4' },
@@ -216,7 +216,7 @@ const SeguridadSection = ({ students, logs = [] }) => {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '28px' }}>
+      <div className="responsive-grid-2">
         <div className="premium-table-container">
           <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ fontWeight: 800, color: '#1e293b' }}>Registro de Actividad</h3>
@@ -287,7 +287,7 @@ const ConfigSection = () => (
     <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#1e293b', marginBottom: '6px' }}>Configuración del Sistema</h1>
     <p style={{ color: '#64748b', marginBottom: '32px' }}>Parámetros globales de la plataforma de identidad digital</p>
 
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+    <div className="responsive-grid-2">
       {[
         { icon: <Key size={22} />, title: 'Seguridad QR', desc: 'Ventana de tiempo para tokens QR dinámicos.', field: 'Expiración del QR', value: '30 segundos', color: '#2A2266', bg: '#eef2ff' },
         { icon: <Bell size={22} />, title: 'Notificaciones', desc: 'Configurar alertas automáticas del sistema.', field: 'Email de alertas', value: 'admin@unisalamanca.edu.co', color: '#16B6D6', bg: '#ecfeff' },
@@ -325,6 +325,7 @@ const AdminDashboard = () => {
   const [activeNav, setActiveNav] = useState('estudiantes');
   const [editingStudent, setEditingStudent] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -472,8 +473,21 @@ const AdminDashboard = () => {
         <UserFormModal onClose={() => setShowCreateModal(false)} onSave={handleSaveUser} />
       )}
 
+      {/* MOBILE TOP BAR */}
+      <div className="mobile-top-bar">
+         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/images/escudo.png" alt="US" style={{ height: '32px' }} />
+            <span style={{ fontWeight: 900, color: 'var(--primary)' }}>Admin</span>
+         </div>
+         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="menu-circle">
+            <Menu size={20} />
+         </button>
+      </div>
+
+      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
       {/* SIDEBAR PREMIUM */}
-      <aside className="admin-sidebar-premium">
+      <aside className={`admin-sidebar-premium ${isSidebarOpen ? 'open' : ''}`}>
         <div style={{ padding: '32px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{ 
@@ -494,7 +508,7 @@ const AdminDashboard = () => {
 
         <nav style={{ flex: 1, padding: '24px 0' }}>
           {navItems.map(item => (
-            <button key={item.id} onClick={() => setActiveNav(item.id)} 
+            <button key={item.id} onClick={() => { setActiveNav(item.id); setIsSidebarOpen(false); }} 
               className={`admin-nav-item ${activeNav === item.id ? 'active' : ''}`}>
               {item.icon}
               <span>{item.label}</span>
@@ -533,11 +547,11 @@ const AdminDashboard = () => {
 
         {activeNav === 'estudiantes' && (
           <div className="section-reveal">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px' }}>
-              <div>
-                <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#1e293b', letterSpacing: '-1px' }}>Gestión de Identidad</h1>
-                <p style={{ color: '#64748b', fontSize: '1rem' }}>Administración central de credenciales digitales</p>
-              </div>
+              <div className="responsive-stack-mobile" style={{ marginBottom: '40px' }}>
+                <div>
+                  <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#1e293b', letterSpacing: '-1px' }}>Gestión de Identidad</h1>
+                  <p style={{ color: '#64748b', fontSize: '1rem' }}>Administración central de credenciales digitales</p>
+                </div>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button onClick={() => setShowCreateModal(true)} className="btn-primary-premium">
                   <UserPlus size={18} /> Nuevo Registro
@@ -555,7 +569,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* FILTROS AVANZADOS */}
-            <div className="kpi-card" style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '32px', padding: '16px' }}>
+            <div className="kpi-card" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', marginBottom: '32px', padding: '16px' }}>
                <div style={{ flex: 1, position: 'relative' }}>
                   <Search style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
                   <input type="text" placeholder="Buscar por nombre, email o ID..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
@@ -579,7 +593,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* KPIs */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '32px' }}>
+            <div className="responsive-grid-3" style={{ marginBottom: '32px' }}>
               {[
                 { label: 'Total Identidades', value: stats.total, color: 'var(--primary)', bg: '#eef2ff', icon: <Users size={22} /> },
                 { label: 'Accesos Habilitados', value: stats.active, color: '#16A34A', bg: '#f0fdf4', icon: <Shield size={22} /> },

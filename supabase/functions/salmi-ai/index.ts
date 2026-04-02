@@ -15,10 +15,10 @@ Deno.serve(async (req: Request) => {
   // Convertir a texto legible por la IA
   const contextText = `
   CONOCIMIENTO INSTITUCIONAL UNISALAMANCA:
-  ${info?.map(i => `- ${i.category.toUpperCase()} (${i.title}): ${i.content}`).join('\n')}
+  ${info?.map((i: any) => `- ${i.category.toUpperCase()} (${i.title}): ${i.content}`).join('\n')}
 
   PROGRAMAS ACADÉMICOS:
-  ${programs?.map(p => `- ${p.name} (${p.program_type}): ${p.description}. Duración: ${p.duration}. Perfil de Egresado: ${p.career_profile}`).join('\n')}
+  ${programs?.map((p: any) => `- ${p.name} (${p.program_type}): ${p.description}. Duración: ${p.duration}. Perfil de Egresado: ${p.career_profile}`).join('\n')}
   `;
 
   // 2. Llamar a Groq (Llama-3) mediante variable de entorno SEGURA
