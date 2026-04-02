@@ -4,6 +4,7 @@ import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
+import GlobalAnalytics from '../components/GlobalAnalytics';
 import {
   Users, UserPlus, FileUp, Search, LogOut, TrendingUp,
   Activity, Database, Key, Menu, GraduationCap, Wallet, ClipboardList
@@ -162,84 +163,9 @@ const UserFormModal = ({ student, onClose, onSave }) => {
 };
 
 /* ─── SECCIÓN REPORTES ──────────────────────────────────────────── */
-const ReportesSection = ({ students, logs = [] }) => {
-  const programs = {};
-  students.forEach(s => { if (s.program) programs[s.program] = (programs[s.program] || 0) + 1; });
-  const topPrograms = Object.entries(programs).sort((a,b) => b[1] - a[1]).slice(0, 6);
-  const maxProg = topPrograms[0]?.[1] || 1;
-
-  const hourlyData = new Array(24).fill(0);
-  logs.forEach(l => {
-    const hour = new Date(l.created_at).getHours();
-    hourlyData[hour]++;
-  });
-  const maxHour = Math.max(...hourlyData) || 1;
-
-  return (
-    <div className="section-reveal">
-      <div style={{ marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b' }}>Análisis Institucional</h1>
-        <p style={{ color: '#64748b' }}>Métricas avanzadas de identidad y acceso digital</p>
-      </div>
-
-      <div className="responsive-grid-2" style={{ marginBottom: '28px' }}>
-        <div className="kpi-card">
-          <h3 style={{ fontWeight: 800, marginBottom: '24px', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Database size={18} color="var(--primary)" /> Población por Facultad
-          </h3>
-          {topPrograms.map(([prog, count]) => (
-            <div key={prog} style={{ marginBottom: '18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569' }}>{prog}</span>
-                <span style={{ fontSize: '0.85rem', fontWeight: 900, color: 'var(--primary)' }}>{count}</span>
-              </div>
-              <div style={{ background: '#f1f5f9', borderRadius: '10px', height: '12px', overflow: 'hidden' }}>
-                <div style={{ background: 'linear-gradient(90deg, var(--primary), var(--secondary))', height: '100%', borderRadius: '10px', width: `${(count/maxProg)*100}%`, transition: 'width 1.5s ease' }} />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="kpi-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3 style={{ fontWeight: 800, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <TrendingUp size={18} color="var(--secondary)" /> Picos de Acceso
-            </h3>
-            <span className="status-badge" style={{ background: '#ecfeff', color: '#0891b2' }}>HOY</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '160px', gap: '6px' }}>
-            {hourlyData.slice(6, 22).map((count, i) => (
-              <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <div style={{ 
-                  width: '100%', height: `${(count/maxHour)*100}%`, minHeight: '4px',
-                  background: count === maxHour ? 'var(--secondary)' : 'var(--primary)',
-                  borderRadius: '6px 6px 0 0', opacity: count > 0 ? 1 : 0.1,
-                  transition: 'height 1s ease'
-                }} />
-              </div>
-            ))}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px', color: '#94a3b8', fontSize: '0.65rem', fontWeight: 700 }}>
-            <span>06am</span><span>12pm</span><span>06pm</span><span>10pm</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="responsive-grid-3">
-        {[
-          { label: 'RETENCIÓN', val: '98.2%', col: '#16a34a', sub: 'Usuarios activos' },
-          { label: 'CONSULTAS / DÍA', val: '1.2k', col: 'var(--primary)', sub: 'Promedio semanal' },
-          { label: 'INCIDENCIAS', val: logs.filter(l=>l.status==='DENIED').length, col: '#ef4444', sub: 'Accesos denegados' }
-        ].map(k => (
-          <div key={k.label} className="kpi-card" style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>{k.label}</p>
-            <h4 style={{ fontSize: '2rem', fontWeight: 900, color: k.col }}>{k.val}</h4>
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>{k.sub}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+/* ─── SECCIÓN REPORTES (ANALYTICS) ──────────────────────────────── */
+const ReportesSection = () => {
+  return <GlobalAnalytics />;
 };
 
 /* ─── SECCIÓN SEGURIDAD ─────────────────────────────────────────── */
