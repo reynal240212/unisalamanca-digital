@@ -7,6 +7,8 @@ import * as XLSX from 'xlsx';
 import GlobalAnalytics from '../components/GlobalAnalytics';
 import {
   Users, UserPlus, FileUp, Search, LogOut, TrendingUp,
+  CheckCircle2, XCircle, ShieldCheck, BarChart2, Settings,
+  Upload, Edit2, X, Save, AlertTriangle, Lock, Bell, Shield,
   Activity, Database, Key, Menu, GraduationCap, Wallet, ClipboardList
 } from 'lucide-react';
 
