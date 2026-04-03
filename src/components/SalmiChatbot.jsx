@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Send, X, Minimize2, Sparkles, BookOpen, GraduationCap, Info } from 'lucide-react';
 import { supabase } from '../services/supabase';
+import ReactMarkdown from 'react-markdown';
 
 const SalmiChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -117,7 +118,13 @@ const SalmiChatbot = () => {
                   </div>
                 )}
                 <div className={`message-bubble ${msg.sender}`}>
-                  <p>{msg.text}</p>
+                  {msg.sender === 'salmi' ? (
+                    <div className="markdown-content">
+                      <ReactMarkdown>{msg.text}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p>{msg.text}</p>
+                  )}
                   <span className="msg-time">
                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
