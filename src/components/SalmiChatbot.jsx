@@ -7,46 +7,14 @@ const SalmiChatbot = () => {
   const [messages, setMessages] = useState([
     { 
       id: 1, 
-      text: "¡Hola! Soy Salmi, tu asistente de UniSalamanca. ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre la misión, bienestar o cualquier carrera (Software, Administración, etc.)", 
+      text: "Bienvenido al canal de atención de UniSalamanca. ¿En qué podemos ayudarle hoy? Puede consultar sobre programas académicos, bienestar institucional o procesos de admisión.", 
       sender: 'salmi',
       timestamp: new Date()
     }
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [isMuted, setIsMuted] = useState(false); // NUEVO: Control de voz
   const messagesEndRef = useRef(null);
-  const synth = window.speechSynthesis;
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
-
-  // Función de Voz (TTS) con efecto de mascota inteligente
-  const speakAsSquirrel = (text) => {
-    if (isMuted || !text) return;
-    
-    // Detener cualquier voz previa
-    synth.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Intentar encontrar una voz en español de mejor calidad
-    const voices = synth.getVoices();
-    const spanishVoice = voices.find(v => v.lang.includes('es')) || voices[0];
-    if (spanishVoice) utterance.voice = spanishVoice;
-
-    utterance.lang = 'es-ES';
-    utterance.pitch = 1.3; // Más inteligente, menos "chirriante" que antes
-    utterance.rate = 1.05; // Velocidad natural pero proactiva
-    utterance.volume = 1.0;
-    
-    synth.speak(utterance);
-  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -90,20 +58,16 @@ const SalmiChatbot = () => {
       }]);
       setIsTyping(false);
 
-      // ¡Hablar!
-      speakAsSquirrel(responseText);
-
     } catch (error) {
       console.error("Salmi Chat Error:", error);
       setIsTyping(false);
-      const errorMsg = "Lo siento, tuve un pequeño tropiezo digital. ¿Me lo puedes volver a preguntar?";
+      const errorMsg = "Lo siento, hubo un error procesando la solicitud. Por favor, reintente en unos momentos.";
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         text: errorMsg,
         sender: 'salmi',
         timestamp: new Date()
       }]);
-      speakAsSquirrel(errorMsg);
     }
   };
 
@@ -137,13 +101,6 @@ const SalmiChatbot = () => {
               </div>
             </div>
             <div className="salmi-header-actions" style={{ display: 'flex', gap: '8px' }}>
-              <button 
-                onClick={() => setIsMuted(!isMuted)} 
-                title={isMuted ? "Activar Voz" : "Silenciar Voz"}
-                style={{ background: isMuted ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.3)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                {isMuted ? <Sparkles size={16} opacity={0.5} /> : <Sparkles size={16} color="#fff" />}
-              </button>
               <button onClick={() => setIsOpen(false)} title="Minimizar">
                 <Minimize2 size={18} />
               </button>

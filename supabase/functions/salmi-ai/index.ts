@@ -28,9 +28,10 @@ Deno.serve(async (req: Request) => {
     if (authHeader) {
       try {
         const token = authHeader.replace('Bearer ', '');
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        const { data, error: authError } = await supabase.auth.getUser(token);
 
-        if (user && !authError) {
+        if (data?.user && !authError) {
+          const user = data.user;
           // Obtener perfil detallado del usuario actual
           const { data: profile } = await supabase
             .from('user')
@@ -40,13 +41,14 @@ Deno.serve(async (req: Request) => {
           
           if (profile) {
             console.log(`Salmi AI: Usuario identificado como ${profile.name}`);
-            userContext = `ESTÁS HABLANDO CON: ${profile.name} (${profile.role}). 
-            Su programa actual es: ${profile.program || 'N/A'}. 
-            Semestre: ${profile.semester || 'N/A'}.`;
+            userContext = `ESTÁS HABLANDO CON: ${profile.name} (Rol: ${profile.role}). 
+            Programa actual: ${profile.program || 'No definido aún'}. 
+            Semestre: ${profile.semester || 'No definido'}.`;
           }
         }
       } catch (e) {
         console.error("Salmi AI: Error decodificando auth", e);
+        // Continuamos sin contexto de usuario en lugar de fallar
       }
     } else {
       console.log("Salmi AI: Petición sin cabecera de autorización");
@@ -70,6 +72,15 @@ Deno.serve(async (req: Request) => {
     // 3. Llamar a Groq (Llama-3.3)
     const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
 
+    if (!GROQ_API_KEY) {
+      console.error("Salmi AI: ERROR - GROQ_API_KEY no configurada en las variables de entorno.");
+      return new Response(JSON.stringify({ 
+        response: "¡Bellota! Parece que me falta mi combustible (API Key). Por favor, dile al administrador que verifique la configuración de Groq." 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -81,18 +92,14 @@ Deno.serve(async (req: Request) => {
         messages: [
           {
             role: "system",
-            content: `Eres Salmi, la mascota ardilla oficial de UniSalamanca. 
+            content: `Eres el Asistente Digital Oficial de UniSalamanca. 
             
-            PERSONALIDAD:
-            - Eres una ardilla de negocios inteligente, amable y muy rápida.
-            - Usa frases como "¡Bellota!" o algo relacionado con ardillas ocasionalmente (10%).
-            - Tono: Profesional pero cercano y motivador.
-            
-            PRIVACIDAD Y REGLAS:
-            1. Solo conoces datos del USUARIO ACTUAL que se te provee. No inventes datos de otros alumnos.
-            2. Tienes PROHIBIDO revelar información personal de un estudiante a otro. 
-            3. Si un alumno pregunta por "otro alumno", responde que por políticas de privacidad solo tratas sus propios datos.
-            4. Usa el contexto institucional para responder sobre carreras y bienestar.
+            REGLAS DE RESPUESTA:
+            1. TONO: Profesional, directo y ejecutivo. No uses lenguaje informal ni referencias a animales (ardillas, bellotas).
+            2. ESTRUCTURA: Usa viñetas o listas numeradas para información múltiple. Evita párrafos largos.
+            3. BREVEDAD: Responde de forma concisa. Si la respuesta es larga, resume los puntos clave.
+            4. PRIVACIDAD: Solo conoces datos del USUARIO ACTUAL que se te provee. No reveles información personal de un estudiante a otro. 
+            5. CONTEXTO: Usa estrictamente la información institucional para responder.
             
             CONTEXTO:\n${contextText}`
           },
@@ -107,12 +114,16 @@ Deno.serve(async (req: Request) => {
     
     if (!response.ok) {
       console.error("Groq API Error:", groqData);
-      throw new Error(`Groq API Error: ${response.status} - ${groqData.error?.message || 'Unknown'}`);
+      return new Response(JSON.stringify({ 
+        response: "¡Bellota! Mis circuitos están un poco lentos ahora mismo. ¿Podrías intentar preguntarme de nuevo en un momento?" 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
-    if (!groqData.choices || groqData.choices.length === 0) {
-      console.error("Groq returned no choices:", groqData);
-      throw new Error("No se pudo obtener una respuesta de la IA.");
+    if (!groqData?.choices?.[0]?.message?.content) {
+      console.error("Groq returned unexpected structure:", groqData);
+      throw new Error("Estructura de respuesta de IA inválida.");
     }
 
     const aiResponse = groqData.choices[0].message.content;
