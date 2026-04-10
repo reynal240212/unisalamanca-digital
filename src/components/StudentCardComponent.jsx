@@ -23,13 +23,6 @@ const StudentCardComponent = ({ student, qrValue, progress, timeLeft, onPrintReq
 
   const handleMouseLeave = () => setMousePos({ x: 0, y: 0 });
   
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 640);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   return (
     <div 
@@ -37,18 +30,10 @@ const StudentCardComponent = ({ student, qrValue, progress, timeLeft, onPrintReq
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ 
-        background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(30px)', borderRadius: '40px',
-        padding: isMobile ? '30px 20px' : '50px 35px', position: 'relative', overflow: 'hidden',
         boxShadow: `0 30px 60px rgba(0,0,0,0.12), 
                     inset 0 0 0 1px rgba(255,255,255,0.6),
                     ${mousePos.x * 2}px ${mousePos.y * 2}px 40px rgba(22, 182, 214, 0.15)`,
         transform: `rotateY(${mousePos.x}deg) rotateX(${mousePos.y}deg)`,
-        transition: 'transform 0.15s ease-out, box-shadow 0.3s ease',
-        transformStyle: 'preserve-3d',
-        border: '1px solid rgba(255,255,255,0.4)',
-        width: '100%',
-        maxWidth: '350px',
-        margin: '0 auto'
       }}
     >
       {/* Interactive Shine Effect (Hologram) */}

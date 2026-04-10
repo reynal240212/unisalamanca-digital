@@ -33,6 +33,7 @@ const Login = () => {
       else if (u.role === 'SECRETARIA_ACADEMICA') navigate('/registro');
       else if (u.role === 'CARTERA') navigate('/cartera');
       else if (u.role === 'ADMISIONES') navigate('/admisiones');
+      else if (u.role === 'BIENESTAR') navigate('/bienestar');
       else if (u.role === 'VALIDADOR') navigate('/validator');
       else navigate('/student');
     } catch (err) {
@@ -77,14 +78,14 @@ const Login = () => {
 
         {/* LADO DERECHO: Formulario */}
         <div className="login-form-side">
-          <div style={{ marginBottom: '40px' }}>
+          <div className="form-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
               <div style={{ width: '40px', height: '40px', background: 'rgba(42, 34, 102, 0.05)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ShieldCheck size={24} color="var(--primary)" />
               </div>
-              <h1 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#1e293b', margin: 0 }}>Iniciar Sesión</h1>
+              <h1 className="form-title">Iniciar Sesión</h1>
             </div>
-            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Ingresa tus credenciales institucionales para continuar.</p>
+            <p className="form-subtitle">Ingresa tus credenciales institucionales para continuar.</p>
           </div>
 
           <form onSubmit={handleLogin}>

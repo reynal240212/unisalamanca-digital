@@ -26,12 +26,15 @@ const CharacterizationForm = ({ user, onComplete }) => {
   const [formData, setFormData] = useState({
     // Personales
     birthDate: '', address: '', phone: '', bloodType: '', healthNotes: '',
+    documentType: '', gender: '', ethnicity: '', disability: '',
     // Familiares
-    livesWith: '', emergencyContact: '', emergencyPhone: '', parentEducation: '',
+    livesWith: '', emergencyContact: '', emergencyPhone: '', parentEducation: '', 
+    maritalStatus: '', hasChildren: 'No', emergencyRelationship: '',
     // Socioeconómicos
     estrato: '', incomeSource: '', isWorking: 'No',
     // Académicos
-    previousSchool: '', digitalSkills: '', interests: ''
+    previousSchool: '', digitalSkills: '', interests: '',
+    workCompany: '', workRole: ''
   });
 
   // NUEVO: Cargar datos existentes al iniciar
@@ -44,16 +47,25 @@ const CharacterizationForm = ({ user, onComplete }) => {
         phone: d.phone || '',
         bloodType: d.blood_type || '',
         healthNotes: d.health_notes || '',
+        documentType: d.document_type || '',
+        gender: d.gender || '',
+        ethnicity: d.ethnicity || '',
+        disability: d.disability || '',
         livesWith: d.lives_with || '',
         emergencyContact: d.emergency_contact || '',
         emergencyPhone: d.emergency_phone || '',
         parentEducation: d.parent_education || '',
+        maritalStatus: d.marital_status || '',
+        hasChildren: d.has_children || 'No',
+        emergencyRelationship: d.emergency_relationship || '',
         estrato: d.estrato?.toString() || '',
         incomeSource: d.income_source || '',
         isWorking: d.is_working || 'No',
         previousSchool: d.previous_school || '',
         digitalSkills: d.digital_skills || '',
-        interests: d.interests || ''
+        interests: d.interests || '',
+        workCompany: d.work_company || '',
+        workRole: d.work_role || ''
       });
     }
   }, [user]);
@@ -83,13 +95,22 @@ const CharacterizationForm = ({ user, onComplete }) => {
           address: formData.address,
           phone: formData.phone,
           health_notes: formData.healthNotes,
+          document_type: formData.documentType,
+          gender: formData.gender,
+          ethnicity: formData.ethnicity,
+          disability: formData.disability,
           lives_with: formData.livesWith,
           emergency_contact: formData.emergencyContact,
           emergency_phone: formData.emergencyPhone,
+          emergency_relationship: formData.emergencyRelationship,
           parent_education: formData.parentEducation,
+          marital_status: formData.maritalStatus,
+          has_children: formData.hasChildren,
           estrato: parseInt(formData.estrato) || null,
           income_source: formData.incomeSource,
           is_working: formData.isWorking,
+          work_company: formData.workCompany,
+          work_role: formData.workRole,
           previous_school: formData.previousSchool,
           digital_skills: formData.digitalSkills,
           interests: formData.interests,
@@ -120,6 +141,13 @@ const CharacterizationForm = ({ user, onComplete }) => {
             <SalmiHint text="¡Hola! Empecemos con lo básico. Necesitamos conocerte un poco mejor para personalizar tu experiencia institucional." />
             <div className="form-grid-premium">
               <div className="form-field-premium">
+                <label className="label-premium">Tipo de Documento</label>
+                <select className="input-premium" value={formData.documentType} onChange={e => setFormData({...formData, documentType: e.target.value})}>
+                  <option value="">Seleccionar...</option>
+                  {['C.C.', 'T.I.', 'C.E.', 'Pasaporte', 'PEP'].map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div className="form-field-premium">
                 <label className="label-premium">Fecha de Nacimiento</label>
                 <input type="date" className="input-premium" value={formData.birthDate} onChange={e => setFormData({...formData, birthDate: e.target.value})} />
               </div>
@@ -129,6 +157,27 @@ const CharacterizationForm = ({ user, onComplete }) => {
                   <option value="">Seleccionar...</option>
                   {['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'].map(rh => <option key={rh} value={rh}>{rh}</option>)}
                 </select>
+              </div>
+              <div className="form-field-premium">
+                <label className="label-premium">Identidad de Género</label>
+                <select className="input-premium" value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})}>
+                   <option value="">Seleccionar...</option>
+                   {['Masculino', 'Femenino', 'No Binario', 'Otro', 'Prefiero no decirlo'].map(g => <option key={g} value={g}>{g}</option>)}
+                </select>
+              </div>
+              <div className="form-field-premium">
+                <label className="label-premium">Pertenencia Étnica</label>
+                <select className="input-premium" value={formData.ethnicity} onChange={e => setFormData({...formData, ethnicity: e.target.value})}>
+                   <option value="">Seleccionar...</option>
+                   {['Ninguna', 'Afrocolombiano', 'Indígena', 'Raizal', 'Palenquero', 'Rrom'].map(e => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+              <div className="form-field-premium">
+                 <label className="label-premium">Discapacidad (si aplica)</label>
+                 <select className="input-premium" value={formData.disability} onChange={e => setFormData({...formData, disability: e.target.value})}>
+                    <option value="Ninguna">Ninguna</option>
+                    {['Física', 'Visual', 'Auditiva', 'Cognitiva', 'Múltiple'].map(d => <option key={d} value={d}>{d}</option>)}
+                 </select>
               </div>
               <div className="form-field-premium" style={{ gridColumn: 'span 2' }}>
                 <label className="label-premium">Dirección de Residencia Actual</label>
@@ -172,8 +221,26 @@ const CharacterizationForm = ({ user, onComplete }) => {
                 </select>
               </div>
               <div className="form-field-premium">
+                <label className="label-premium">Estado Civil</label>
+                <select className="input-premium" value={formData.maritalStatus} onChange={e => setFormData({...formData, maritalStatus: e.target.value})}>
+                   <option value="">Seleccionar...</option>
+                   {['Soltero', 'Casado', 'Unión Libre', 'Divorciado', 'Viudo'].map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+              <div className="form-field-premium">
+                <label className="label-premium">¿Tiene Hijos?</label>
+                <select className="input-premium" value={formData.hasChildren} onChange={e => setFormData({...formData, hasChildren: e.target.value})}>
+                   <option value="No">No</option>
+                   <option value="Si">Sí</option>
+                </select>
+              </div>
+              <div className="form-field-premium">
                 <label className="label-premium">Contacto de Emergencia</label>
                 <input type="text" className="input-premium" placeholder="Nombre completo" value={formData.emergencyContact} onChange={e => setFormData({...formData, emergencyContact: e.target.value})} />
+              </div>
+              <div className="form-field-premium">
+                <label className="label-premium">Parentesco</label>
+                <input type="text" className="input-premium" placeholder="Ej: Madre, Padre, Esposo..." value={formData.emergencyRelationship} onChange={e => setFormData({...formData, emergencyRelationship: e.target.value})} />
               </div>
               <div className="form-field-premium">
                 <label className="label-premium">Teléfono del Contacto</label>
@@ -221,6 +288,18 @@ const CharacterizationForm = ({ user, onComplete }) => {
                   ))}
                 </div>
               </div>
+              {formData.isWorking === 'Si' && (
+                <>
+                  <div className="form-field-premium">
+                    <label className="label-premium">Empresa / Lugar de Trabajo</label>
+                    <input type="text" className="input-premium" placeholder="Nombre de la empresa" value={formData.workCompany} onChange={e => setFormData({...formData, workCompany: e.target.value})} />
+                  </div>
+                  <div className="form-field-premium">
+                    <label className="label-premium">Cargo u Ocupación</label>
+                    <input type="text" className="input-premium" placeholder="Ej: Asistente, Vendedor..." value={formData.workRole} onChange={e => setFormData({...formData, workRole: e.target.value})} />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         );
@@ -289,8 +368,12 @@ const CharacterizationForm = ({ user, onComplete }) => {
            title="IDENTIDAD Y CONTACTO" 
            stepTarget={1}
            fields={[
+             { label: 'Tipo Doc', value: formData.documentType },
              { label: 'Nacimiento', value: formData.birthDate },
              { label: 'RH', value: formData.bloodType },
+             { label: 'Género', value: formData.gender },
+             { label: 'Etnia', value: formData.ethnicity },
+             { label: 'Discapacidad', value: formData.disability },
              { label: 'Dirección', value: formData.address },
              { label: 'Celular', value: formData.phone }
            ]}
@@ -302,7 +385,10 @@ const CharacterizationForm = ({ user, onComplete }) => {
            stepTarget={2}
            fields={[
              { label: 'Vive con', value: formData.livesWith },
+             { label: 'Estado Civil', value: formData.maritalStatus },
+             { label: 'Hijos', value: formData.hasChildren },
              { label: 'Contacto Emergencia', value: formData.emergencyContact },
+             { label: 'Parentesco', value: formData.emergencyRelationship },
              { label: 'Teléfono Emergencia', value: formData.emergencyPhone },
              { label: 'Educación Padres', value: formData.parentEducation }
            ]}
@@ -315,7 +401,9 @@ const CharacterizationForm = ({ user, onComplete }) => {
            fields={[
              { label: 'Estrato', value: formData.estrato },
              { label: 'Ingresos', value: formData.incomeSource },
-             { label: 'Labora', value: formData.isWorking }
+             { label: 'Labora', value: formData.isWorking },
+             { label: 'Empresa', value: formData.workCompany },
+             { label: 'Cargo', value: formData.workRole }
            ]}
         />
 

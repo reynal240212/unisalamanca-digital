@@ -2,8 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { Users, FileText, Search, LogOut, Menu, Download, Eye, BookOpen, ArrowLeft, Printer, Heart, GraduationCap, ShieldCheck } from 'lucide-react';
+import { 
+  Users, FileText, Search, LogOut, Menu, Download, Eye, 
+  BookOpen, ArrowLeft, Printer, Heart, GraduationCap, 
+  ShieldCheck, Image as ImageIcon 
+} from 'lucide-react';
 import CharacterizationReport from '../components/CharacterizationReport';
+import PhotoValidationModule from '../components/PhotoValidationModule';
 
 const RegistroDashboard = () => {
   const { user, logout } = useAuth();
@@ -76,6 +81,7 @@ const RegistroDashboard = () => {
           {[
             { id: 'estudiantes', icon: <Users size={18} />, label: 'Estudiantes' },
             { id: 'documentos', icon: <FileText size={18} />, label: 'Fichas de Caracterización' },
+            { id: 'validacion', icon: <ImageIcon size={18} />, label: 'Validación de Fotos' },
           ].map(item => (
             <button key={item.id} onClick={() => { setActiveNav(item.id); setSelected(null); setIsSidebarOpen(false); }}
               className={`admin-nav-item ${activeNav === item.id ? 'active' : ''}`}>
@@ -108,7 +114,10 @@ const RegistroDashboard = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1.6fr' : '1fr', gap: '24px' }}>
+          {activeNav === 'validacion' ? (
+            <PhotoValidationModule />
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1.6fr' : '1fr', gap: '24px' }}>
             {/* STUDENT LIST */}
             <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
               <div style={{ overflowX: 'auto' }}>
@@ -289,7 +298,8 @@ const RegistroDashboard = () => {
               </div>
             )}
           </div>
-        </div>
+        )}
+      </div>
 
         {/* COMPONENTE OCULTO DE IMPRESIÓN */}
         <CharacterizationReport student={selected} charData={charData} />

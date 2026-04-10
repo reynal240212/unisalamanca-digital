@@ -11,6 +11,7 @@ import StudentCardComponent from '../components/StudentCardComponent';
 import SalmiAdviceComponent from '../components/SalmiAdviceComponent';
 import SalmiChatbot from '../components/SalmiChatbot';
 import StudentSchedule from '../components/StudentSchedule';
+import ProfileView from '../components/ProfileView';
 
 import { useQR } from '../hooks/useQR';
 import { useCharacterization } from '../hooks/useCharacterization';
@@ -78,50 +79,50 @@ const StudentDashboard = () => {
     switch(activeTab) {
       case 'dashboard':
         return (
-          <div className="section-reveal">
+          <div className="section-reveal dashboard-main-content">
             <SalmiAdviceComponent student={studentData} characterization={characterizationData} />
             <div className="section-reveal-single">
-              <div>
-                <div className="glass-card" style={{ marginBottom: '30px', background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))' }}>
-                  <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 900, color: 'var(--primary-dark)' }}>
-                    ¡Hola, {(studentData?.name || 'Estudiante').split(' ')[0]}! 👋
-                  </h1>
-                  <p style={{ color: '#64748b', marginTop: '8px', fontSize: '0.95rem' }}>
-                    Bienvenido a tu ecosistema digital UniSalamanca. Aquí tienes todo bajo control.
-                  </p>
-                  
-                  <div className="responsive-grid-3" style={{ marginTop: '32px' }}>
-                    {[
-                      { icon: <BookOpen className="text-primary" />, label: 'Mi Semestre', value: studentData.semester || '...' },
-                      { icon: <Star className="text-secondary" />, label: 'Mi Promedio', value: studentData.gpa || '0.0' },
-                      { icon: <Bell className="text-accent" />, label: 'Notificaciones', value: '3' }
-                    ].map((stat, i) => (
-                      <div key={i} className="kpi-card-premium" style={{ padding: '20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-                           {stat.icon}
-                           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>{stat.label}</span>
-                        </div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--primary-dark)' }}>{stat.value}</div>
+              <div className="glass-card welcome-header">
+                <h1 className="welcome-title">
+                  ¡Hola, {(studentData?.name || 'Estudiante').split(' ')[0]}! 👋
+                </h1>
+                <p className="welcome-subtitle">
+                  Bienvenido a tu ecosistema digital UniSalamanca. Aquí tienes todo bajo control.
+                </p>
+                
+                <div className="stats-grid-responsive">
+                  {[
+                    { icon: <BookOpen className="text-primary" />, label: 'Mi Semestre', value: studentData.semester || '...' },
+                    { icon: <Star className="text-secondary" />, label: 'Mi Promedio', value: studentData.gpa || '0.0' },
+                    { icon: <Bell className="text-accent" />, label: 'Notificaciones', value: '3' }
+                  ].map((stat, i) => (
+                    <div key={i} className="kpi-card-premium">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                         {stat.icon}
+                         <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>{stat.label}</span>
                       </div>
-                    ))}
-                  </div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--primary-dark)' }}>{stat.value}</div>
+                    </div>
+                  ))}
                 </div>
+              </div>
 
                 {!profileCompleted && (
                   <div className="glass-card" style={{ border: '2px dashed var(--secondary)', background: 'rgba(22, 182, 214, 0.05)', marginTop: '20px' }}>
-                    <div className="banner-caracterizacion-premium">
-                      <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', flexShrink: 0 }}>
-                        <UserCircle size={32} color="var(--secondary)" />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ margin: 0, fontWeight: 800 }}>Completa tu Caracterización</h3>
-                        <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#64748b' }}>Es necesario este paso para activar todas las funcionalidades de tu carnet digital.</p>
+                    <div className="flex-center-between">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', textAlign: 'left' }}>
+                        <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', flexShrink: 0 }}>
+                          <UserCircle size={32} color="var(--secondary)" />
+                        </div>
+                        <div>
+                          <h3 style={{ margin: 0, fontWeight: 800 }}>Completa tu Caracterización</h3>
+                          <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#64748b' }}>Es necesario este paso para activar tu carnet digital.</p>
+                        </div>
                       </div>
                       <button onClick={() => navigate('/characterization')} className="btn-primary-premium">Empezar</button>
                     </div>
                   </div>
                 )}
-              </div>
             </div>
           </div>
         );
@@ -217,12 +218,22 @@ const StudentDashboard = () => {
             <StudentSchedule student={studentData} />
           </div>
         );
+      case 'perfil':
+        return (
+          <div className="section-reveal" style={{ padding: '20px' }}>
+            <ProfileView 
+              user={studentData} 
+              characterization={characterizationData} 
+              onEditRequest={() => setActiveTab('caracterizacion')} 
+            />
+          </div>
+        );
       default: return null;
     }
   };
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', position: 'relative' }}>
+    <div className="student-dashboard-wrapper">
       {/* MOBILE TOP BAR */}
       <div className="mobile-top-bar">
          <img src="/images/escudo.png" alt="US" style={{ height: '28px' }} />
@@ -253,7 +264,8 @@ const StudentDashboard = () => {
             { id: 'dashboard', label: 'Inicio', icon: <LayoutDashboard size={18} /> },
             { id: 'qr', label: 'Mi Carnet QR', icon: <QrCode size={18} /> },
             { id: 'horario', label: 'Mi Horario', icon: <Calendar size={18} /> },
-            { id: 'caracterizacion', label: 'Mi Perfil', icon: <UserCircle size={18} /> },
+            { id: 'perfil', label: 'Mi Perfil', icon: <UserCircle size={18} /> },
+            { id: 'caracterizacion', label: 'Actualizar Datos', icon: <Settings size={18} /> },
           ].map(item => (
             <button 
               key={item.id} 

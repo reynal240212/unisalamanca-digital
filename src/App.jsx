@@ -7,6 +7,7 @@ import TeacherDashboard from './pages/TeacherDashboard';
 import RegistroDashboard from './pages/RegistroDashboard';
 import CarteraDashboard from './pages/CarteraDashboard';
 import AdmisionesDashboard from './pages/AdmisionesDashboard';
+import BienestarDashboard from './pages/BienestarDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import StudentCard from './pages/StudentCard';
 import Validator from './pages/Validator';
@@ -77,6 +78,13 @@ function App() {
           <Route path="/admisiones" element={
             <ProtectedRoute allowedRoles={['ADMISIONES', 'ADMIN']}>
               <AdmisionesDashboard />
+            </ProtectedRoute>
+          } />
+
+          {/* BIENESTAR UNIVERSITARIO */}
+          <Route path="/bienestar" element={
+            <ProtectedRoute allowedRoles={['BIENESTAR', 'ADMIN']}>
+              <BienestarDashboard />
             </ProtectedRoute>
           } />
 

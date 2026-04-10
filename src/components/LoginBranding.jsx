@@ -7,35 +7,28 @@ const LoginBranding = () => {
 
   return (
     <div className="login-info">
-      <div style={{ position: 'absolute', top: '30px', left: '30px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <img src="/images/escudo.png" alt="Logo" style={{ width: '32px', filter: 'brightness(0) invert(1)' }} />
-        <span style={{ fontWeight: 800, fontSize: '0.9rem', letterSpacing: '1px' }}>UNISALAMANCA</span>
+      <div className="login-info-header">
+        <img src="/images/escudo.png" alt="Logo" className="login-info-logo" />
+        <span className="login-info-title">UNISALAMANCA</span>
       </div>
 
-      <div style={{ transform: 'translateY(-20px)' }}>
+      <div className="login-info-content">
         <img 
           src="/images/salmi-premium.png" 
           alt="Salmi Premium Mascot" 
-          className="salmi-animation"
-          style={{ width: '240px', height: 'auto', marginBottom: '10px' }}
+          className="salmi-animation login-mascot"
         />
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginTop: '20px', lineHeight: 1.2 }}>
+        <h2 className="login-branding-h2">
           Tu Identidad Digital,<br/>Más Segura que Nunca
         </h2>
-        <p style={{ color: 'rgba(255,255,255,0.8)', marginTop: '12px', fontSize: '0.9rem', maxWidth: '300px', margin: '12px auto' }}>
+        <p className="login-branding-p">
           Accede a tu carnet institucional y servicios universitarios en un solo lugar.
         </p>
       </div>
 
       <button 
         onClick={() => navigate('/')} 
-        style={{ 
-          position: 'absolute', bottom: '40px', background: 'transparent', border: '1.5px solid rgba(255,255,255,0.3)',
-          color: 'white', padding: '12px 24px', borderRadius: '12px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700,
-          display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s'
-        }}
-        onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-        onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+        className="btn-return-portal"
       >
         <ArrowLeft size={16} /> REGRESAR AL PORTAL
       </button>

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import bcrypt from 'bcryptjs';
+import StudentSchedule from '../components/StudentSchedule';
+import ProfileView from '../components/ProfileView';
+import PhotoValidationModule from '../components/PhotoValidationModule';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +12,8 @@ import {
   Users, UserPlus, FileUp, Search, LogOut, TrendingUp,
   CheckCircle2, XCircle, ShieldCheck, BarChart2, Settings,
   Upload, Edit2, X, Save, AlertTriangle, Lock, Bell, Shield,
-  Activity, Database, Key, Menu, GraduationCap, Wallet, ClipboardList
+  Activity, Database, Key, Menu, GraduationCap, Wallet, ClipboardList,
+  Image as ImageIcon
 } from 'lucide-react';
 
 /* ─── MODAL USUARIO (CREAR/EDITAR) ─────────────────────────────────── */
@@ -109,6 +113,9 @@ const UserFormModal = ({ student, onClose, onSave }) => {
                   </optgroup>
                   <optgroup label="Gestión Financiera">
                     <option value="CARTERA">Cartera / Cobros</option>
+                  </optgroup>
+                  <optgroup label="Gestión de Bienestar">
+                    <option value="BIENESTAR">Bienestar Universitario</option>
                   </optgroup>
                   <optgroup label="Seguridad y Admin">
                     <option value="VALIDADOR">Validador / Guardia</option>
@@ -443,6 +450,7 @@ const AdminDashboard = () => {
 
   const navItems = [
     { id: 'estudiantes', icon: <Users size={18} />, label: 'Inicio / Directorio' },
+    { id: 'validacion_fotos', icon: <ImageIcon size={18} />, label: 'Validación de Fotos' },
     { id: 'reportes', icon: <BarChart2 size={18} />, label: 'Reportes' },
     { id: 'seguridad', icon: <ShieldCheck size={18} />, label: 'Seguridad' },
     { id: 'config', icon: <Settings size={18} />, label: 'Configuración' },
@@ -542,6 +550,7 @@ const AdminDashboard = () => {
       {/* MAIN CONTAINER */}
       <main className="admin-main-container">
         {activeNav === 'reportes' && <ReportesSection students={students} logs={logs} />}
+        {activeNav === 'validacion_fotos' && <PhotoValidationModule />}
         {activeNav === 'seguridad' && <SeguridadSection students={students} logs={logs} />}
         {activeNav === 'config' && <ConfigSection />}
 
