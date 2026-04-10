@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario de Registro | UniSalamanca Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0a0e1a;
+      --bg-card: #111827;
+      --bg-input: #1a2033;
+      --border: #2a3550;
+      --border-focus: #4f8ef7;
+      --accent: #4f8ef7;
+      --accent-2: #7c5ff0;
+      --success: #22d3a1;
+      --error: #f75f5f;
+      --warning: #f7a84f;
+      --text-primary: #e8edf5;
+      --text-secondary: #8a9bba;
+      --text-muted: #4a5568;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 24px 48px rgba(0,0,0,0.5);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(79,142,247,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(124,95,240,0.08) 0%, transparent 50%);
+    }
+
+    /* ─── Header ─── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .page-header .logo-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, rgba(79,142,247,0.15), rgba(124,95,240,0.15));
+      border: 1px solid rgba(79,142,247,0.3);
+      border-radius: 50px;
+      padding: 8px 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .page-header .logo-badge::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.4; transform:scale(1.4); }
+    }
+    .page-header h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #e8edf5 0%, #4f8ef7 50%, #7c5ff0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 780px;
+      margin: 0 auto 40px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    /* ─── Grid layout ─── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px 28px;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+
+    /* ─── Field ─── */
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .field label .req { color: var(--error); font-size: 1rem; }
+
+    .field input,
+    .field select {
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 12px 16px;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      outline: none;
+      width: 100%;
+      appearance: none;
+    }
+    .field input::placeholder { color: var(--text-muted); }
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
+      background: #1e2840;
+    }
+    .field input.valid { border-color: var(--success); }
+    .field input.invalid, .field select.invalid { border-color: var(--error); }
+
+    .field-msg {
+      font-size: 0.78rem;
+      font-weight: 500;
+      min-height: 16px;
+      display: flex; align-items: center; gap: 4px;
+      transition: all 0.2s;
+    }
+    .field-msg.error { color: var(--error); }
+    .field-msg.success { color: var(--success); }
+
+    /* ─── SISBEN select arrow ─── */
+    .select-wrapper { position: relative; }
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute; right: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      pointer-events: none;
+      font-size: 1rem;
+    }
+    .select-wrapper select { padding-right: 36px; cursor: pointer; }
+
+    /* ─── Date ─── */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.6) sepia(1) hue-rotate(200deg);
+      cursor: pointer;
+    }
+
+    /* ─── Radio group ─── */
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 2px;
+    }
+    .radio-group label {
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: none;
+      letter-spacing: 0;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .radio-group label:hover { border-color: var(--accent); color: var(--text-primary); }
+    .radio-group input[type="radio"] { display: none; }
+
+    .radio-group label.selected {
+      background: linear-gradient(135deg, rgba(79,142,247,0.2), rgba(124,95,240,0.2));
+      border-color: var(--accent);
+      color: var(--text-primary);
+      box-shadow: 0 0 0 2px rgba(79,142,247,0.15);
+    }
+    .radio-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      flex-shrink: 0;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .radio-group label.selected .radio-dot {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 6px rgba(79,142,247,0.6);
+    }
+
+    /* ─── Buttons ─── */
+    .btn-row {
+      display: flex; gap: 14px;
+      margin-top: 10px;
+      grid-column: 1 / -1;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px 24px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .btn:active { transform: translateY(0); }
+    .btn-save {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(79,142,247,0.3);
+    }
+    .btn-clear {
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .btn-clear:hover { border-color: var(--warning); color: var(--warning); }
+
+    /* ─── SISBEN loading state ─── */
+    .sisben-status {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .sisben-status.loaded { color: var(--success); }
+    .sisben-status.error { color: var(--error); }
+
+    /* ─── Dataset table ─── */
+    .dataset-section {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .dataset-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .dataset-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .dataset-header h2 .badge {
+      background: linear-gradient(135deg, rgba(79,142,247,0.2), rgba(124,95,240,0.2));
+      border: 1px solid rgba(79,142,247,0.3);
+      border-radius: 50px;
+      padding: 2px 10px;
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+    .btn-export {
+      background: transparent;
+      border: 1.5px solid var(--success);
+      color: var(--success);
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-export:hover { background: rgba(34,211,161,0.1); transform: translateY(-1px); }
+
+    .table-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .table-empty {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .table-empty .icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .table-empty p { font-size: 0.9rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    thead tr {
+      background: rgba(79,142,247,0.08);
+      border-bottom: 1px solid var(--border);
+    }
+    thead th {
+      padding: 14px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(42,53,80,0.5);
+      transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(79,142,247,0.05); }
+    tbody td {
+      padding: 13px 16px;
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .td-id { font-family: 'Inter', monospace; color: var(--accent); font-weight: 600; }
+    .td-genero {
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .g-M { background: rgba(79,142,247,0.15); color: #7eb5ff; }
+    .g-F { background: rgba(247,95,183,0.15); color: #f77fbf; }
+    .g-NB { background: rgba(124,95,240,0.15); color: #a87fff; }
+    .g-T { background: rgba(34,211,161,0.15); color: #22d3a1; }
+    .g-C { background: rgba(247,168,79,0.15); color: #f7b85f; }
+
+    /* ─── Toast notification ─── */
+    .toast {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 20px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      display: flex; align-items: center; gap: 10px;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 9999;
+      max-width: 340px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error-toast { border-left: 4px solid var(--error); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .card { padding: 24px 18px; }
+      .btn-row { flex-direction: column; }
+    }
+
+    /* ─── Animations ─── */
+    @keyframes fadeSlideIn {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .animate-in { animation: fadeSlideIn 0.4s ease both; }
+
+    tbody tr.new-row {
+      animation: fadeSlideIn 0.4s ease both;
+      background: rgba(79,142,247,0.07);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════ HEADER ══════════════ -->
+  <header class="page-header animate-in">
+    <div class="logo-badge">🎓 UniSalamanca Digital</div>
+    <h1>Formulario de Registro</h1>
+    <p>Complete todos los campos requeridos para registrar la información del estudiante.</p>
+  </header>
+
+  <!-- ══════════════ FORM CARD ══════════════ -->
+  <div class="card animate-in" style="animation-delay:0.1s">
+    <form id="registrationForm" novalidate>
+      <div class="form-grid">
+
+        <!-- Identificación -->
+        <div class="field">
+          <label for="identificacion">Identificación <span class="req">*</span></label>
+          <input
+            type="text"
+            id="identificacion"
+            name="identificacion"
+            placeholder="Solo números"
+            inputmode="numeric"
+            maxlength="10"
+            autocomplete="off"
+          />
+          <span class="field-msg" id="msg-identificacion"></span>
+        </div>
+
+        <!-- Nombre -->
+        <div class="field">
+          <label for="nombre">Nombre Completo <span class="req">*</span></label>
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            placeholder="Nombres y apellidos"
+            maxlength="80"
+            autocomplete="off"
+          />
+          <span class="field-msg" id="msg-nombre"></span>
+        </div>
+
+        <!-- Correo -->
+        <div class="field full">
+          <label for="correo">Correo Electrónico <span class="req">*</span></label>
+          <input
+            type="email"
+            id="correo"
+            name="correo"
+            placeholder="usuario@dominio.com"
+            autocomplete="off"
+          />
+          <span class="field-msg" id="msg-correo"></span>
+        </div>
+
+        <!-- Fecha de nacimiento -->
+        <div class="field">
+          <label for="fechaNacimiento">Fecha de Nacimiento <span class="req">*</span></label>
+          <input
+            type="date"
+            id="fechaNacimiento"
+            name="fechaNacimiento"
+            min="1955-01-01"
+          />
+          <span class="field-msg" id="msg-fecha"></span>
+        </div>
+
+        <!-- Grupo SISBEN -->
+        <div class="field">
+          <label for="sisben">Grupo SISBEN <span class="req">*</span></label>
+          <div class="select-wrapper">
+            <select id="sisben" name="sisben">
+              <option value="">Cargando grupos SISBEN…</option>
+            </select>
+          </div>
+          <span class="sisben-status" id="sisben-status">⏳ Cargando desde sisben.json…</span>
+          <span class="field-msg" id="msg-sisben"></span>
+        </div>
+
+        <!-- Género -->
+        <div class="field full">
+          <label>Género <span class="req">*</span></label>
+          <div class="radio-group" id="generoGroup">
+            <label id="lbl-M">
+              <input type="radio" name="genero" value="Masculino" />
+              <span class="radio-dot"></span>
+              <span>Masculino</span>
+            </label>
+            <label id="lbl-F">
+              <input type="radio" name="genero" value="Femenino" />
+              <span class="radio-dot"></span>
+              <span>Femenino</span>
+            </label>
+            <label id="lbl-NB">
+              <input type="radio" name="genero" value="No Binario" />
+              <span class="radio-dot"></span>
+              <span>No Binario</span>
+            </label>
+            <label id="lbl-T">
+              <input type="radio" name="genero" value="Transgénero" />
+              <span class="radio-dot"></span>
+              <span>Transgénero</span>
+            </label>
+            <label id="lbl-C">
+              <input type="radio" name="genero" value="Cisgénero" />
+              <span class="radio-dot"></span>
+              <span>Cisgénero</span>
+            </label>
+          </div>
+          <span class="field-msg" id="msg-genero"></span>
+        </div>
+
+        <!-- Botones -->
+        <div class="btn-row">
+          <button type="button" class="btn btn-save" id="btnGuardar">
+            💾 Guardar
+          </button>
+          <button type="button" class="btn btn-clear" id="btnLimpiar">
+            🗑️ Limpiar
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+  <!-- ══════════════ DATASET ══════════════ -->
+  <section class="dataset-section animate-in" style="animation-delay:0.2s" id="datasetSection">
+    <div class="dataset-header">
+      <h2>
+        Dataset Registrado
+        <span class="badge" id="countBadge">0 registros</span>
+      </h2>
+      <button class="btn-export" id="btnExport" style="display:none">⬇ Exportar CSV</button>
+    </div>
+    <div class="table-wrapper" id="tableWrapper">
+      <div class="table-empty" id="emptyState">
+        <div class="icon">📋</div>
+        <p>Aún no hay registros guardados.<br>Complete el formulario y presione <strong>Guardar</strong>.</p>
+      </div>
+      <div id="tableContainer" style="display:none; overflow-x:auto;">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Identificación</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Fecha Nac.</th>
+              <th>SISBEN</th>
+              <th>Género</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ TOAST ══════════════ -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* ═══════════════════════════════════════
+       CONFIGURACIÓN GLOBAL
+    ════════════════════════════════════════ */
+    const dataset = [];
+    const today = new Date();
+
+    /* ═══════════════════════════════════════
+       1. FECHA: límite máximo = HOY, mínimo = 01/01/1955
+    ════════════════════════════════════════ */
+    const dateInput = document.getElementById('fechaNacimiento');
+    const yyyy = today.getFullYear();
+    const mm   = String(today.getMonth() + 1).padStart(2, '0');
+    const dd   = String(today.getDate()).padStart(2, '0');
+    dateInput.max = `${yyyy}-${mm}-${dd}`;
+    dateInput.min = '1955-01-01';
+
+    /* ═══════════════════════════════════════
+       2. CARGA DE SISBEN DESDE JSON EXTERNO
+    ════════════════════════════════════════ */
+    const sisbenSelect = document.getElementById('sisben');
+    const sisbenStatus = document.getElementById('sisben-status');
+
+    async function loadSisben() {
+      try {
+        const response = await fetch('./sisben.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const grupos = data.grupos || [];
+
+        sisbenSelect.innerHTML = '<option value="">-- Seleccione un grupo --</option>';
+        grupos.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g.codigo;
+          opt.textContent = g.descripcion;
+          sisbenSelect.appendChild(opt);
+        });
+
+        sisbenStatus.textContent = `✅ ${grupos.length} grupos cargados desde sisben.json`;
+        sisbenStatus.className = 'sisben-status loaded';
+      } catch (err) {
+        sisbenSelect.innerHTML = '<option value="">-- Error al cargar --</option>';
+        sisbenStatus.textContent = `❌ No se pudo cargar sisben.json: ${err.message}`;
+        sisbenStatus.className = 'sisben-status error';
+
+        // Fallback manual si fetch falla (ej. apertura directa desde archivo)
+        loadSisbenFallback();
+      }
+    }
+
+    function loadSisbenFallback() {
+      const fallback = [
+        { codigo: 'A1', descripcion: 'Grupo A1 - Pobreza Extrema' },
+        { codigo: 'A2', descripcion: 'Grupo A2 - Pobreza Extrema' },
+        { codigo: 'A3', descripcion: 'Grupo A3 - Pobreza Extrema' },
+        { codigo: 'B1', descripcion: 'Grupo B1 - Pobreza' },
+        { codigo: 'B2', descripcion: 'Grupo B2 - Pobreza' },
+        { codigo: 'B3', descripcion: 'Grupo B3 - Pobreza' },
+        { codigo: 'C1', descripcion: 'Grupo C1 - Vulnerable' },
+        { codigo: 'C2', descripcion: 'Grupo C2 - Vulnerable' },
+        { codigo: 'C3', descripcion: 'Grupo C3 - Vulnerable' },
+        { codigo: 'NO_SISBEN', descripcion: 'No clasificado / Sin SISBEN' },
+      ];
+      sisbenSelect.innerHTML = '<option value="">-- Seleccione un grupo --</option>';
+      fallback.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g.codigo;
+        opt.textContent = g.descripcion;
+        sisbenSelect.appendChild(opt);
+      });
+      sisbenStatus.textContent = '⚠ Datos precargados (modo sin servidor). Abra desde un servidor local para actualizar.';
+      sisbenStatus.className = 'sisben-status';
+    }
+
+    loadSisben();
+
+    /* ═══════════════════════════════════════
+       3. RADIO BUTTONS – ESTILO VISUAL
+    ════════════════════════════════════════ */
+    document.querySelectorAll('.radio-group input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll('.radio-group label').forEach(l => l.classList.remove('selected'));
+        radio.parentElement.classList.add('selected');
+        clearMsg('genero');
+      });
+    });
+
+    /* ═══════════════════════════════════════
+       4. VALIDACIONES EN TIEMPO REAL
+    ════════════════════════════════════════ */
+    // 4.1 Identificación – solo numérico
+    const idInput = document.getElementById('identificacion');
+    idInput.addEventListener('input', () => {
+      idInput.value = idInput.value.replace(/\D/g, ''); // bloquea no-numéricos
+      validateId();
+    });
+
+    function validateId() {
+      const val = idInput.value.trim();
+      if (!val) return setMsg('identificacion', '', '');
+      if (val.length < 6) return setMsg('identificacion', 'error', '⚠ Mínimo 6 dígitos.');
+      if (val.length > 10) return setMsg('identificacion', 'error', '⚠ Máximo 10 dígitos.');
+      setMsg('identificacion', 'success', '✓ Identificación válida.');
+      return true;
+    }
+
+    // 4.2 Nombre – alfanumérico, sin especiales (se permiten tildes y ñ)
+    const nameInput = document.getElementById('nombre');
+    nameInput.addEventListener('input', validateNombre);
+
+    function validateNombre() {
+      const val = nameInput.value.trim();
+      const specialRe = /[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s0-9]/;
+      if (!val) return setMsg('nombre', '', '');
+      if (specialRe.test(val)) {
+        setMsg('nombre', 'error', '✗ No se permiten caracteres especiales.');
+        nameInput.classList.add('invalid'); nameInput.classList.remove('valid');
+        return false;
+      }
+      if (val.length < 3) return setMsg('nombre', 'error', '⚠ Mínimo 3 caracteres.');
+      setMsg('nombre', 'success', '✓ Nombre válido.');
+      return true;
+    }
+
+    // 4.3 Correo
+    const emailInput = document.getElementById('correo');
+    emailInput.addEventListener('input', validateCorreo);
+
+    function validateCorreo() {
+      const val = emailInput.value.trim();
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      if (!val) return setMsg('correo', '', '');
+      if (!re.test(val)) {
+        setMsg('correo', 'error', '✗ Correo electrónico inválido.');
+        return false;
+      }
+      setMsg('correo', 'success', '✓ Correo válido.');
+      return true;
+    }
+
+    // 4.4 Fecha
+    dateInput.addEventListener('change', validateFecha);
+
+    function validateFecha() {
+      const val = dateInput.value;
+      if (!val) return setMsg('fecha', '', '');
+      const selected = new Date(val + 'T00:00:00');
+      if (selected < new Date('1955-01-01')) {
+        setMsg('fecha', 'error', '✗ La fecha no puede ser anterior a 1955.');
+        return false;
+      }
+      if (selected > today) {
+        setMsg('fecha', 'error', '✗ La fecha no puede ser futura.');
+        return false;
+      }
+      setMsg('fecha', 'success', '✓ Fecha válida.');
+      return true;
+    }
+
+    // 4.5 SISBEN
+    sisbenSelect.addEventListener('change', validateSisben);
+    function validateSisben() {
+      if (!sisbenSelect.value) {
+        setMsg('sisben', 'error', '⚠ Seleccione un grupo SISBEN.');
+        sisbenSelect.classList.add('invalid'); sisbenSelect.classList.remove('valid');
+        return false;
+      }
+      clearMsg('sisben');
+      sisbenSelect.classList.remove('invalid'); sisbenSelect.classList.add('valid');
+      return true;
+    }
+
+    /* ═══════════════════════════════════════
+       5. HELPERS de MENSAJES y CLASES
+    ════════════════════════════════════════ */
+    function setMsg(field, type, text) {
+      const el = document.getElementById(`msg-${field}`);
+      const inp = document.getElementById(field) || document.getElementById('sisben');
+      if (!el) return;
+      el.textContent = text;
+      el.className = `field-msg ${type}`;
+      if (inp && field !== 'genero' && field !== 'fecha') {
+        inp.classList.toggle('valid', type === 'success');
+        inp.classList.toggle('invalid', type === 'error');
+      }
+      return type === 'success';
+    }
+
+    function clearMsg(field) {
+      const el = document.getElementById(`msg-${field}`);
+      if (el) { el.textContent = ''; el.className = 'field-msg'; }
+      const inp = document.getElementById(field);
+      if (inp) { inp.classList.remove('valid', 'invalid'); }
+    }
+
+    /* ═══════════════════════════════════════
+       6. FORMULARIO COMPLETO - VALIDAR TODO
+    ════════════════════════════════════════ */
+    function validateAll() {
+      let ok = true;
+
+      // Identificación
+      const idVal = idInput.value.trim();
+      if (!idVal || idVal.length < 6 || idVal.length > 10) {
+        setMsg('identificacion', 'error', '✗ Ingrese un número de identificación válido (6–10 dígitos).');
+        ok = false;
+      } else validateId();
+
+      // Nombre
+      if (!nameInput.value.trim()) {
+        setMsg('nombre', 'error', '✗ El nombre es obligatorio.');
+        ok = false;
+      } else if (!validateNombre()) ok = false;
+
+      // Correo
+      if (!emailInput.value.trim()) {
+        setMsg('correo', 'error', '✗ El correo electrónico es obligatorio.');
+        ok = false;
+      } else if (!validateCorreo()) ok = false;
+
+      // Fecha
+      if (!dateInput.value) {
+        setMsg('fecha', 'error', '✗ Seleccione la fecha de nacimiento.');
+        ok = false;
+      } else if (!validateFecha()) ok = false;
+
+      // SISBEN
+      if (!sisbenSelect.value) {
+        setMsg('sisben', 'error', '✗ Seleccione un grupo SISBEN.');
+        sisbenSelect.classList.add('invalid');
+        ok = false;
+      }
+
+      // Género
+      const generoChecked = document.querySelector('input[name="genero"]:checked');
+      if (!generoChecked) {
+        document.getElementById('msg-genero').textContent = '✗ Seleccione una opción de género.';
+        document.getElementById('msg-genero').className = 'field-msg error';
+        ok = false;
+      }
+
+      return ok;
+    }
+
+    /* ═══════════════════════════════════════
+       7. BOTÓN GUARDAR → AGREGA AL DATASET
+    ════════════════════════════════════════ */
+    document.getElementById('btnGuardar').addEventListener('click', () => {
+      if (!validateAll()) {
+        showToast('❌ Corrija los errores antes de guardar.', 'error-toast');
+        return;
+      }
+
+      const generoChecked = document.querySelector('input[name="genero"]:checked');
+      const generoVal = generoChecked ? generoChecked.value : '';
+      const sisbenText = sisbenSelect.options[sisbenSelect.selectedIndex].textContent;
+
+      const record = {
+        id: idInput.value.trim(),
+        nombre: nameInput.value.trim(),
+        correo: emailInput.value.trim(),
+        fecha: dateInput.value,
+        sisben: `${sisbenSelect.value} — ${sisbenText.split(' — ')[0] || sisbenText}`,
+        genero: generoVal,
+      };
+
+      dataset.push(record);
+      appendRow(record, dataset.length);
+      updateCount();
+      showToast(`✅ Registro #${dataset.length} guardado correctamente.`, 'success');
+
+      // Reset form after save
+      limpiarFormulario(false); // no mostrar toast de limpiar
+    });
+
+    /* ═══════════════════════════════════════
+       8. BOTÓN LIMPIAR
+    ════════════════════════════════════════ */
+    document.getElementById('btnLimpiar').addEventListener('click', () => {
+      limpiarFormulario(true);
+    });
+
+    function limpiarFormulario(showMsg = true) {
+      document.getElementById('registrationForm').reset();
+      ['identificacion','nombre','correo','fecha','sisben','genero'].forEach(clearMsg);
+      document.querySelectorAll('.radio-group label').forEach(l => l.classList.remove('selected'));
+      [idInput, nameInput, emailInput, dateInput, sisbenSelect].forEach(el => {
+        el.classList.remove('valid','invalid');
+      });
+      if (showMsg) showToast('🗑️ Formulario limpiado.', 'success');
+    }
+
+    /* ═══════════════════════════════════════
+       9. AGREGAR FILA AL DATASET
+    ════════════════════════════════════════ */
+    function appendRow(record, rowNum) {
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('tableContainer').style.display = 'block';
+      document.getElementById('btnExport').style.display = 'inline-block';
+
+      const tbody = document.getElementById('tableBody');
+      const tr = document.createElement('tr');
+      tr.className = 'new-row';
+
+      const generoCode = generoClass(record.genero);
+      const sisbenShort = record.sisben.split(' — ')[0];
+
+      tr.innerHTML = `
+        <td><span style="color:var(--text-muted);font-size:0.8rem">#${rowNum}</span></td>
+        <td class="td-id">${escapeHtml(record.id)}</td>
+        <td>${escapeHtml(record.nombre)}</td>
+        <td style="color:var(--accent)">${escapeHtml(record.correo)}</td>
+        <td style="color:var(--text-secondary)">${formatDate(record.fecha)}</td>
+        <td><span style="font-size:0.82rem;color:var(--warning);font-weight:600">${escapeHtml(sisbenShort)}</span></td>
+        <td><span class="td-genero ${generoCode}">${escapeHtml(record.genero)}</span></td>
+      `;
+
+      setTimeout(() => tr.classList.remove('new-row'), 1000);
+      tbody.appendChild(tr);
+    }
+
+    function generoClass(g) {
+      if (g === 'Masculino')  return 'g-M';
+      if (g === 'Femenino')   return 'g-F';
+      if (g === 'No Binario') return 'g-NB';
+      if (g.includes('Transgén')) return 'g-T';
+      if (g.includes('Cisgén'))  return 'g-C';
+      return 'g-C';
+    }
+
+    function formatDate(val) {
+      if (!val) return '—';
+      const [y,m,d] = val.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ═══════════════════════════════════════
+       10. CONTADOR DE REGISTROS
+    ════════════════════════════════════════ */
+    function updateCount() {
+      const n = dataset.length;
+      document.getElementById('countBadge').textContent =
+        n === 1 ? '1 registro' : `${n} registros`;
+    }
+
+    /* ═══════════════════════════════════════
+       11. EXPORTAR CSV
+    ════════════════════════════════════════ */
+    document.getElementById('btnExport').addEventListener('click', () => {
+      if (!dataset.length) return;
+      const headers = ['#','Identificacion','Nombre','Correo','Fecha_Nacimiento','Grupo_SISBEN','Genero'];
+      const rows = dataset.map((r, i) =>
+        [i+1, r.id, `"${r.nombre}"`, r.correo, r.fecha, r.sisben, r.genero].join(',')
+      );
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url;
+      a.download = `registros_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click(); URL.revokeObjectURL(url);
+      showToast('📥 CSV exportado correctamente.', 'success');
+    });
+
+    /* ═══════════════════════════════════════
+       12. TOAST NOTIFICATION
+    ════════════════════════════════════════ */
+    let toastTimer;
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = `toast ${type} show`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+  </script>
+</body>
+</html>

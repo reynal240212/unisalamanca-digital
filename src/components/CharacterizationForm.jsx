@@ -210,7 +210,8 @@ const CharacterizationForm = ({ user, onComplete }) => {
     identificacion: (v) => {
       if (!v) return 'La identificación es obligatoria.';
       if (!/^\d+$/.test(v)) return 'Solo se permiten números.';
-      if (v.length < 5) return 'Mínimo 5 dígitos.';
+      if (v.length < 6) return 'Mínimo 6 dígitos.';
+      if (v.length > 10) return 'Máximo 10 dígitos.';
       return '';
     },
     nombreCompleto: (v) => {
@@ -358,9 +359,9 @@ const CharacterizationForm = ({ user, onComplete }) => {
                 <input
                   type="text"
                   inputMode="numeric"
-                  placeholder="Solo números, mín. 5 dígitos"
+                  placeholder="6 a 10 dígitos"
                   value={formData.identificacion}
-                  maxLength={15}
+                  maxLength={10}
                   onChange={e => set('identificacion', e.target.value.replace(/\D/g, ''))}
                   style={inputStyle('identificacion')}
                 />
