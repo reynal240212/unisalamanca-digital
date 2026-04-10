@@ -311,8 +311,8 @@ const StudentDashboard = () => {
         {renderContent()}
       </main>
 
-      {/* SALMI CHATBOT ASISTENTE 24/7 */}
-      <SalmiChatbot />
+      {/* SALMI CHATBOT ASISTENTE 24/7 — TEMPORALMENTE OCULTO */}
+      {/* <SalmiChatbot /> */}
     </div>
   </div>
 );

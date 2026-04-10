@@ -1,0 +1,25 @@
+{
+  "grupos": [
+    { "codigo": "A1", "descripcion": "Grupo A1 - Pobreza Extrema (Puntaje 0 - 12.49)" },
+    { "codigo": "A2", "descripcion": "Grupo A2 - Pobreza Extrema (Puntaje 12.50 - 17.87)" },
+    { "codigo": "A3", "descripcion": "Grupo A3 - Pobreza Extrema (Puntaje 17.88 - 21.07)" },
+    { "codigo": "A4", "descripcion": "Grupo A4 - Pobreza Extrema (Puntaje 21.08 - 23.80)" },
+    { "codigo": "A5", "descripcion": "Grupo A5 - Pobreza Extrema (Puntaje 23.81 - 26.01)" },
+    { "codigo": "B1", "descripcion": "Grupo B1 - Pobreza (Puntaje 26.02 - 28.55)" },
+    { "codigo": "B2", "descripcion": "Grupo B2 - Pobreza (Puntaje 28.56 - 31.64)" },
+    { "codigo": "B3", "descripcion": "Grupo B3 - Pobreza (Puntaje 31.65 - 34.99)" },
+    { "codigo": "B4", "descripcion": "Grupo B4 - Pobreza (Puntaje 35.00 - 38.00)" },
+    { "codigo": "B5", "descripcion": "Grupo B5 - Pobreza (Puntaje 38.01 - 41.36)" },
+    { "codigo": "B6", "descripcion": "Grupo B6 - Pobreza (Puntaje 41.37 - 45.04)" },
+    { "codigo": "B7", "descripcion": "Grupo B7 - Pobreza (Puntaje 45.05 - 49.05)" },
+    { "codigo": "C1", "descripcion": "Grupo C1 - Vulnerable (Puntaje 49.06 - 53.09)" },
+    { "codigo": "C2", "descripcion": "Grupo C2 - Vulnerable (Puntaje 53.10 - 57.17)" },
+    { "codigo": "C3", "descripcion": "Grupo C3 - Vulnerable (Puntaje 57.18 - 61.31)" },
+    { "codigo": "C4", "descripcion": "Grupo C4 - Vulnerable (Puntaje 61.32 - 65.58)" },
+    { "codigo": "C5", "descripcion": "Grupo C5 - Vulnerable (Puntaje 65.59 - 70.19)" },
+    { "codigo": "C6", "descripcion": "Grupo C6 - Vulnerable (Puntaje 70.20 - 75.44)" },
+    { "codigo": "C7", "descripcion": "Grupo C7 - Vulnerable (Puntaje 75.45 - 81.60)" },
+    { "codigo": "C8", "descripcion": "Grupo C8 - Vulnerable (Puntaje 81.61 - 100.00)" },
+    { "codigo": "NO_SISBEN", "descripcion": "No clasificado / Sin SISBEN" }
+  ]
+}
