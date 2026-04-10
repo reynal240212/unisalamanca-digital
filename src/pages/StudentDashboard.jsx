@@ -80,7 +80,8 @@ const StudentDashboard = () => {
       case 'dashboard':
         return (
           <div className="section-reveal dashboard-main-content">
-            <SalmiAdviceComponent student={studentData} characterization={characterizationData} />
+            {/* MENTOR DIGITAL — TEMPORALMENTE OCULTO */}
+            {/* <SalmiAdviceComponent student={studentData} characterization={characterizationData} /> */}
             <div className="section-reveal-single">
               <div className="glass-card welcome-header">
                 <h1 className="welcome-title">
