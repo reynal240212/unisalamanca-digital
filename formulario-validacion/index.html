@@ -658,10 +658,17 @@
     ════════════════════════════════════════ */
     // 4.1 Identificación – solo numérico
     const idInput = document.getElementById('identificacion');
-    idInput.addEventListener('input', () => {
-      idInput.value = idInput.value.replace(/\D/g, ''); // bloquea no-numéricos
-      validateId();
+
+    // Bloquea teclas no numéricas ANTES de que se escriban (sin reasignar el valor)
+    idInput.addEventListener('keydown', (e) => {
+      const allowed = ['Backspace','Delete','Tab','Escape','Enter',
+                       'ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'];
+      if (allowed.includes(e.key)) return;   // teclas de control: permitir
+      if (e.ctrlKey || e.metaKey) return;    // Ctrl+C, Ctrl+V, etc.: permitir
+      if (!/^\d$/.test(e.key)) e.preventDefault(); // bloquea todo lo que no sea dígito
     });
+
+    idInput.addEventListener('input', validateId);
 
     function validateId() {
       const val = idInput.value.trim();
