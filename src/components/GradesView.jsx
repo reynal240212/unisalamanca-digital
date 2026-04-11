@@ -4,8 +4,40 @@ import {
   ChevronDown, Filter, Info, CheckCircle2, XCircle, Clock, Database
 } from 'lucide-react';
 
-const GradesView = () => {
-  const [selectedSemester, setSelectedSemester] = useState('2024-1');
+const GradesView = ({ user }) => {
+  const [selectedSemester, setSelectedSemester] = useState('2026-1');
+
+  // Generar lista de periodos dinámicamente desde la fecha de vinculación
+  const generatePeriods = () => {
+    const periods = [];
+    const currentYear = 2026;
+    const currentSem = 1; // Primer semestre
+    
+    // Parsear fecha de ingreso (ej: 2023-08-01)
+    const entryDate = user?.entry_date ? new Date(user.entry_date) : new Date();
+    let startYear = entryDate.getFullYear();
+    let startSem = entryDate.getMonth() < 6 ? 1 : 2;
+
+    if (isNaN(startYear)) {
+      startYear = 2024;
+      startSem = 1;
+    }
+
+    for (let y = currentYear; y >= startYear; y--) {
+      const maxSem = (y === currentYear) ? currentSem : 2;
+      const minSem = (y === startYear) ? startSem : 1;
+      
+      for (let s = maxSem; s >= minSem; s--) {
+        periods.push({
+          id: `${y}-${s}`,
+          label: `${y} - ${s === 1 ? 'Primer Semestre' : 'Segundo Semestre'} ${y === currentYear && s === currentSem ? '(Actual)' : ''}`
+        });
+      }
+    }
+    return periods;
+  };
+
+  const academicPeriods = generatePeriods();
 
   // Datos vacíos esperando integración real con Q10
   const gradesData = {};
@@ -37,8 +69,9 @@ const GradesView = () => {
               onChange={(e) => setSelectedSemester(e.target.value)}
               className="select-premium"
             >
-              <option value="2024-1">2024 - Primer Semestre (Actual)</option>
-              {/* Estos se llenarán dinámicamente desde Q10 */}
+              {academicPeriods.map(period => (
+                <option key={period.id} value={period.id}>{period.label}</option>
+              ))}
             </select>
             <ChevronDown className="select-icon" size={18} />
           </div>

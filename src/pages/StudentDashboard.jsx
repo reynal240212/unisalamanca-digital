@@ -233,7 +233,7 @@ const StudentDashboard = () => {
       case 'notas':
         return (
           <div className="section-reveal" style={{ padding: '20px' }}>
-            <GradesView />
+            <GradesView user={studentData} />
           </div>
         );
       default: return null;
