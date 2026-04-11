@@ -20,6 +20,7 @@ import FinanceView from '../components/FinanceView';
 
 import { useQR } from '../hooks/useQR';
 import { useCharacterization } from '../hooks/useCharacterization';
+import { useSchedule } from '../hooks/useSchedule';
 
 const StudentDashboard = () => {
   const { user, logout } = useAuth();
@@ -28,6 +29,39 @@ const StudentDashboard = () => {
   
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { schedule } = useSchedule(user?.id);
+
+  // Lógica para encontrar la próxima clase
+  const getNextClass = () => {
+    if (!schedule || schedule.length === 0) return null;
+    
+    const now = new Date();
+    const daysEn = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const daysEs = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const currentDayEs = daysEs[now.getDay()];
+    
+    // Filtrar clases de hoy
+    const todayClasses = schedule.filter(s => 
+      s.blocks?.some(b => b.day_of_week === currentDayEs)
+    );
+
+    if (todayClasses.length === 0) return null;
+
+    const currentTimeStr = now.toTimeString().slice(0, 8); // "HH:MM:SS"
+    
+    // Encontrar la clase que sigue o la que está ocurriendo ahora
+    const next = todayClasses
+      .map(s => {
+        const block = s.blocks.find(b => b.day_of_week === currentDayEs);
+        return { ...s, ...block };
+      })
+      .filter(c => c.end_time > currentTimeStr)
+      .sort((a, b) => a.start_time.localeCompare(b.start_time))[0];
+
+    return next;
+  };
+
+  const nextClass = getNextClass();
   // Efecto para inicializar Elfsight cuando cambie la pestaña a noticias
   useEffect(() => {
     if (activeTab === 'noticias') {
@@ -85,50 +119,126 @@ const StudentDashboard = () => {
       case 'dashboard':
         return (
           <div className="section-reveal dashboard-main-content">
-            {/* MENTOR DIGITAL — TEMPORALMENTE OCULTO */}
-            {/* <SalmiAdviceComponent student={studentData} characterization={characterizationData} /> */}
-            <div className="section-reveal-single">
-              <div className="glass-card welcome-header">
-                <h1 className="welcome-title">
-                  ¡Hola, {(studentData?.name || 'Estudiante').split(' ')[0]}! 👋
-                </h1>
-                <p className="welcome-subtitle">
-                  Bienvenido a tu ecosistema digital UniSalamanca. Aquí tienes todo bajo control.
-                </p>
-                
-                <div className="stats-grid-responsive">
-                  {[
-                    { icon: <BookOpen className="text-primary" />, label: 'Mi Semestre', value: studentData.semester || '...' },
-                    { icon: <Star className="text-secondary" />, label: 'Mi Promedio', value: studentData.gpa || '0.0' },
-                    { icon: <Bell className="text-accent" />, label: 'Notificaciones', value: '3' }
-                  ].map((stat, i) => (
-                    <div key={i} className="kpi-card-premium">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-                         {stat.icon}
-                         <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>{stat.label}</span>
-                      </div>
-                      <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--primary-dark)' }}>{stat.value}</div>
+            {/* HEROU SECTION CON SALMI MENTOR */}
+            <div className="dashboard-hero-layout" style={{ marginBottom: '24px' }}>
+               <SalmiAdviceComponent student={studentData} characterization={characterizationData} />
+            </div>
+
+            <div className="dashboard-grid-premium">
+              {/* COLUMNA IZQUIERDA: ESTADO Y PRÓXIMA CLASE */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div className="glass-card welcome-header" style={{ padding: '30px' }}>
+                  <h1 className="welcome-title" style={{ fontSize: '1.8rem' }}>
+                    ¡Hola, {(studentData?.name || 'Estudiante').split(' ')[0]}! 👋
+                  </h1>
+                  <p className="welcome-subtitle">
+                    Hoy es {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}.
+                  </p>
+                  
+                  {/* BARRA DE PROGRESO SEMESTRAL (Sencilla) */}
+                  <div style={{ marginTop: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', marginBottom: '8px' }}>
+                      <span>AVANCE DEL SEMESTRE</span>
+                      <span>35%</span>
                     </div>
-                  ))}
+                    <div style={{ height: '6px', background: 'rgba(0,0,0,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+                      <div style={{ width: '35%', height: '100%', background: 'linear-gradient(90deg, var(--primary), var(--secondary))', borderRadius: '10px' }}></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* WIDGET PRÓXIMA CLASE */}
+                <div className="glass-card" style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: nextClass ? 'var(--secondary)' : '#cbd5e1' }}></div>
+                    <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'var(--primary-dark)' }}>PRÓXIMA CLASE</h3>
+                  </div>
+
+                  {nextClass ? (
+                    <div className="kpi-card-premium" style={{ background: 'rgba(22, 182, 214, 0.03)', border: '1px solid rgba(22, 182, 214, 0.1)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <p style={{ margin: 0, fontWeight: 900, fontSize: '1.1rem', color: 'var(--primary-dark)' }}>{nextClass.subject}</p>
+                          <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#64748b' }}>{nextClass.teacher}</p>
+                        </div>
+                        <div style={{ padding: '4px 10px', background: 'white', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 900, color: 'var(--secondary)' }}>
+                           {nextClass.start_time?.slice(0, 5)}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#64748b' }}>
+                            <MapPin size={14} /> {nextClass.classroom}
+                         </div>
+                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#64748b' }}>
+                            <Clock size={14} /> Hoy
+                         </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '20px', background: '#f8fafc', borderRadius: '20px', border: '1px dashed #e2e8f0' }}>
+                       <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem' }}>No tienes más clases hoy. ¡Descansa!</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
+              {/* COLUMNA DERECHA: ACCIONES Y RESUMEN */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {/* ACCIONES RÁPIDAS */}
+                <div className="glass-card" style={{ padding: '24px' }}>
+                  <h3 style={{ margin: '0 0 20px 0', fontSize: '0.9rem', fontWeight: 900, color: 'var(--primary-dark)' }}>ACCESOS RÁPIDOS</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    {[
+                      { icon: <Wallet size={18} />, label: 'Mis Pagos', tab: 'finanzas' },
+                      { icon: <Library size={18} />, label: 'Biblioteca', tab: 'biblioteca' },
+                      { icon: <Bell size={18} />, label: 'Mensajes', tab: 'noticias' },
+                      { icon: <ShieldCheck size={18} />, label: 'Soporte', tab: 'ajustes' }
+                    ].map((btn, i) => (
+                      <button 
+                        key={i} 
+                        onClick={() => setActiveTab(btn.tab)}
+                        className="nav-item-premium" 
+                        style={{ margin: 0, background: 'rgba(255,255,255,0.5)', justifyContent: 'center', gap: '10px', fontSize: '0.8rem', padding: '12px' }}
+                      >
+                        {btn.icon} {btn.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* KPI CARDS (Rediseñadas en vertical para esta columna) */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                  {[
+                    { icon: <BookOpen className="text-primary" />, label: 'Mi Semestre', value: studentData.semester || '...' },
+                    { icon: <Star className="text-secondary" />, label: 'Mi Promedio', value: studentData.gpa || '0.0' },
+                  ].map((stat, i) => (
+                    <div key={i} className="kpi-card-premium" style={{ margin: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                         {stat.icon}
+                         <div>
+                           <p style={{ margin: 0, fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>{stat.label}</p>
+                           <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 900, color: 'var(--primary-dark)' }}>{stat.value}</p>
+                         </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
                 {!profileCompleted && (
-                  <div className="glass-card" style={{ border: '2px dashed var(--secondary)', background: 'rgba(22, 182, 214, 0.05)', marginTop: '20px' }}>
-                    <div className="flex-center-between">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', textAlign: 'left' }}>
-                        <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', flexShrink: 0 }}>
-                          <UserCircle size={32} color="var(--secondary)" />
+                  <div className="glass-card alert-characterization" style={{ border: '2px dashed var(--secondary)', background: 'rgba(22, 182, 214, 0.05)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'center' }}>
+                        <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                          <UserCircle size={24} color="var(--secondary)" />
                         </div>
                         <div>
-                          <h3 style={{ margin: 0, fontWeight: 800 }}>Completa tu Caracterización</h3>
-                          <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#64748b' }}>Es necesario este paso para activar tu carnet digital.</p>
+                          <h3 style={{ margin: 0, fontWeight: 800, fontSize: '0.9rem' }}>Tarea Pendiente</h3>
+                          <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#64748b' }}>Tu carnet digital requiere que completes tu caracterización.</p>
                         </div>
-                      </div>
-                      <button onClick={() => navigate('/characterization')} className="btn-primary-premium">Empezar</button>
+                        <button onClick={() => navigate('/characterization')} className="btn-primary-premium" style={{ width: '100%' }}>Completar</button>
                     </div>
                   </div>
                 )}
+              </div>
             </div>
           </div>
         );

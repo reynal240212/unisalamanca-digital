@@ -1382,22 +1382,84 @@ body {
 }
 
 /* RESPONSIVE UTILITIES FOR DASHBOARDS */
-.responsive-grid-2 {
+/* DASHBOARD GRID PREMIUM */
+.dashboard-grid-premium {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 28px;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+  animation: contentReveal 0.8s ease-out;
 }
 
 @media (max-width: 992px) {
-  .responsive-grid-2 {
+  .dashboard-grid-premium {
     grid-template-columns: 1fr;
   }
 }
 
-.responsive-grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+.welcome-header {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.welcome-header::after {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(22, 182, 214, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* SALMI ADVICE COMPONENTS REFINEMENTS */
+.dashboard-hero-layout .salmi-advice-container {
+  margin-top: 0;
+  border: none;
+  background: linear-gradient(135deg, rgba(42, 34, 102, 0.95) 0%, rgba(22, 182, 214, 0.95) 100%);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 20px 40px rgba(42, 34, 102, 0.15);
+}
+
+.dashboard-hero-layout .salmi-bubble-glass {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.dashboard-hero-layout .salmi-badge {
+  background: rgba(22, 182, 214, 0.3);
+  color: white;
+}
+
+.dashboard-hero-layout .salmi-text-typewriter {
+  color: white;
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
+.dashboard-hero-layout .salmi-refresh-btn {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ALERT CHARACTERIZATION */
+.alert-characterization {
+  transition: all 0.3s ease;
+}
+
+.alert-characterization:hover {
+  transform: translateY(-5px);
+  border-color: var(--secondary) !important;
+  box-shadow: 0 15px 30px rgba(22, 182, 214, 0.1);
+}
+
+@keyframes contentReveal {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 }
 
 @media (max-width: 992px) {
