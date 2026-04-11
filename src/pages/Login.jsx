@@ -13,8 +13,28 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const recaptchaRef = useRef();
 
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const navigate = useNavigate();
+
+  // Si ya hay sesión activa, redirigir al dashboard correspondiente
+  useEffect(() => {
+    if (loading) return;
+    if (!user) return;
+    const roleMap = {
+      ADMIN: '/admin',
+      COORD_ACADEMICO: '/academic',
+      DIRECTOR_PROGRAMA: '/academic',
+      PROFESOR: '/teacher',
+      SECRETARIA_ACADEMICA: '/registro',
+      CARTERA: '/cartera',
+      ADMISIONES: '/admisiones',
+      BIENESTAR: '/bienestar',
+      VALIDADOR: '/validator',
+      ESTUDIANTE: '/student',
+      EGRESADO: '/student',
+    };
+    navigate(roleMap[user.role] || '/student', { replace: true });
+  }, [user, loading]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,15 +47,21 @@ const Login = () => {
     setIsLoading(true);
     try {
       const u = await login(email, password);
-      if (u.role === 'ADMIN') navigate('/admin');
-      else if (u.role === 'COORD_ACADEMICO' || u.role === 'DIRECTOR_PROGRAMA') navigate('/academic');
-      else if (u.role === 'PROFESOR') navigate('/teacher');
-      else if (u.role === 'SECRETARIA_ACADEMICA') navigate('/registro');
-      else if (u.role === 'CARTERA') navigate('/cartera');
-      else if (u.role === 'ADMISIONES') navigate('/admisiones');
-      else if (u.role === 'BIENESTAR') navigate('/bienestar');
-      else if (u.role === 'VALIDADOR') navigate('/validator');
-      else navigate('/student');
+      // replace:true elimina /login del historial — el botón "atrás" NO regresará al login
+      const roleMap = {
+        ADMIN: '/admin',
+        COORD_ACADEMICO: '/academic',
+        DIRECTOR_PROGRAMA: '/academic',
+        PROFESOR: '/teacher',
+        SECRETARIA_ACADEMICA: '/registro',
+        CARTERA: '/cartera',
+        ADMISIONES: '/admisiones',
+        BIENESTAR: '/bienestar',
+        VALIDADOR: '/validator',
+        ESTUDIANTE: '/student',
+        EGRESADO: '/student',
+      };
+      navigate(roleMap[u.role] || '/student', { replace: true });
     } catch (err) {
       setError('Credenciales inválidas o cuenta suspendida');
       setCaptchaToken(null);

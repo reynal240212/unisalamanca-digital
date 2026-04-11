@@ -76,6 +76,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('auth_user');
+    // Reemplaza la entrada actual del historial con '/' para que
+    // el botón "atrás" NO regrese a páginas protegidas tras cerrar sesión
+    window.location.replace('/');
   };
 
   return (
