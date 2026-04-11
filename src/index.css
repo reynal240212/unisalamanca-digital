@@ -3013,3 +3013,95 @@ body {
   .avatar-upload-container { margin: 0 auto; }
 }
 
+/* ===== GRADES VIEW STYLES ===== */
+.grades-container { display: flex; flex-direction: column; gap: 30px; }
+
+.grades-header-premium {
+  padding: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.grades-header-main { display: flex; align-items: center; gap: 20px; }
+.header-icon-box {
+  width: 60px;
+  height: 60px;
+  background: var(--primary);
+  color: white;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(42, 34, 102, 0.2);
+}
+
+.semester-selector-wrapper { min-width: 250px; }
+.select-premium {
+  width: 100%;
+  padding: 12px 20px;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.select-premium:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 4px rgba(22, 182, 214, 0.1); }
+
+.grades-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+.kpi-icon-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; }
+.kpi-value { font-size: 1.8rem; font-weight: 900; color: var(--primary-dark); letter-spacing: -1px; }
+
+.table-container-premium { padding: 30px; }
+.table-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.table-title { font-size: 1.2rem; font-weight: 800; color: var(--primary-dark); margin: 0; }
+
+.grades-table-wrapper { overflow-x: auto; margin: 0 -30px; padding: 0 30px; }
+.grades-table-premium { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+.grades-table-premium th { padding: 15px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #f1f5f9; }
+.grades-table-premium td { padding: 20px 15px; background: rgba(255,255,255,0.5); font-weight: 600; font-size: 0.95rem; }
+.grades-table-premium tr td:first-child { border-radius: 12px 0 0 12px; }
+.grades-table-premium tr td:last-child { border-radius: 0 12px 12px 0; }
+
+.subject-name-cell { display: flex; align-items: center; gap: 12px; font-weight: 800; color: var(--primary-dark); }
+.subject-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.grade-value { color: #1e293b; font-weight: 700; }
+.final-grade-badge { 
+  background: white; 
+  padding: 6px 12px; 
+  border-radius: 10px; 
+  font-weight: 900; 
+  min-width: 45px; 
+  display: inline-block;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.final-grade-badge.success { color: var(--secondary); border: 1.5px solid rgba(22, 182, 214, 0.2); }
+.final-grade-badge.danger { color: #ef4444; border: 1.5px solid rgba(239, 68, 68, 0.2); }
+
+.status-tag { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 8px; 
+  padding: 6px 14px; 
+  border-radius: 10px; 
+  font-size: 0.75rem; 
+  font-weight: 800; 
+}
+.status-tag.aprobado { background: #f0fdf4; color: #15803d; }
+.status-tag.reprobado { background: #fef2f2; color: #991b1b; }
+.status-tag.en-curso { background: #fffbeb; color: #b45309; }
+
+.table-footer-info { display: flex; align-items: center; gap: 10px; margin-top: 24px; padding: 15px; background: rgba(42, 34, 102, 0.03); border-radius: 12px; border: 1px solid rgba(42, 34, 102, 0.05); }
+.table-footer-info p { margin: 0; font-size: 0.8rem; color: #475569; font-weight: 500; }
+
+@media (max-width: 768px) {
+  .grades-header-main { margin-bottom: 10px; }
+  .table-container-premium { padding: 20px; }
+  .grades-stats-grid { grid-template-columns: 1fr; }
+}

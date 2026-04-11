@@ -12,6 +12,7 @@ import SalmiAdviceComponent from '../components/SalmiAdviceComponent';
 import SalmiChatbot from '../components/SalmiChatbot';
 import StudentSchedule from '../components/StudentSchedule';
 import ProfileView from '../components/ProfileView';
+import GradesView from '../components/GradesView';
 
 import { useQR } from '../hooks/useQR';
 import { useCharacterization } from '../hooks/useCharacterization';
@@ -229,6 +230,12 @@ const StudentDashboard = () => {
             />
           </div>
         );
+      case 'notas':
+        return (
+          <div className="section-reveal" style={{ padding: '20px' }}>
+            <GradesView />
+          </div>
+        );
       default: return null;
     }
   };
@@ -265,6 +272,7 @@ const StudentDashboard = () => {
             { id: 'dashboard', label: 'Inicio', icon: <LayoutDashboard size={18} /> },
             { id: 'qr', label: 'Mi Carnet QR', icon: <QrCode size={18} /> },
             { id: 'horario', label: 'Mi Horario', icon: <Calendar size={18} /> },
+            { id: 'notas', label: 'Mis Notas', icon: <BookOpen size={18} /> },
             { id: 'perfil', label: 'Mi Perfil', icon: <UserCircle size={18} /> },
             { id: 'caracterizacion', label: 'Actualizar Datos', icon: <Settings size={18} /> },
           ].map(item => (
