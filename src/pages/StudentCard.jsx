@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { useQR } from '../hooks/useQR';
 import { useNavigate } from 'react-router-dom';
 import StudentCardComponent from '../components/StudentCardComponent';
 import { LogOut, Camera, Check, RotateCcw, ShieldCheck } from 'lucide-react';
 
 const StudentCard = () => {
   const [student, setStudent] = useState(null);
-  const [qrValue, setQrValue] = useState('');
-  const [progress, setProgress] = useState(100);
+  const { user, logout } = useAuth();
+  const { qrValue, timeLeft } = useQR(user?.id);
+  // Calculamos el progreso basado en los segundos restantes (0-30s)
+  const progress = (timeLeft / 30) * 100;
+  
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [capturedImg, setCapturedImg] = useState(null);
@@ -17,7 +21,6 @@ const StudentCard = () => {
   
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,26 +29,8 @@ const StudentCard = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (student) {
-      generateDynamicQR();
-      const interval = setInterval(() => {
-        generateDynamicQR();
-        setProgress(100);
-      }, 30000);
-
-      const timer = setInterval(() => {
-        setProgress(prev => Math.max(0, prev - (100 / 30)));
-      }, 1000);
-
-      return () => {
-        clearInterval(interval);
-        clearInterval(timer);
-      };
-    }
-  }, [student]);
-
   const fetchStudentData = async () => {
+    if (!user?.id) return;
     const { data, error } = await supabase
       .from('user')
       .select('*')
@@ -56,12 +41,6 @@ const StudentCard = () => {
       setStudent(data);
       if (!data.photo_url) setShowOnboarding(true);
     }
-  };
-
-  const generateDynamicQR = () => {
-    const timeBlock = Math.floor(Date.now() / 30000);
-    const value = `UNIS|${user.id}|${timeBlock}`;
-    setQrValue(value);
   };
 
   const startCamera = async () => {
