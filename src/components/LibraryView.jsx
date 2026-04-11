@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { 
+  Library, Search, Book, Bookmark, Clock, 
   MapPin, CheckCircle2, ChevronRight, Info, Database
 } from 'lucide-react';
 
