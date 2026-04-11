@@ -730,7 +730,12 @@ const CharacterizationForm = ({ user, onComplete }) => {
 
   // ── Vista principal del stepper ───────────────────────
   return (
-    <div className="glass-card" style={{ maxWidth: '850px', margin: '0 auto', boxShadow: '0 40px 100px rgba(0,0,0,0.1)' }}>
+    <div className="glass-card" style={{ 
+      maxWidth: '850px', 
+      margin: '0 auto', 
+      boxShadow: '0 40px 100px rgba(0,0,0,0.1)',
+      padding: window.innerWidth < 768 ? '20px' : '40px'
+    }}>
       {/* STEPPER */}
       <div className="characterization-stepper" style={{ marginBottom: '48px' }}>
         {steps.map(s => (
@@ -755,24 +760,44 @@ const CharacterizationForm = ({ user, onComplete }) => {
       </div>
 
       {/* BOTONES NAVEGACIÓN */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px', paddingTop: '30px', borderTop: '1px dotted #e2e8f0' }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        marginTop: '40px', 
+        paddingTop: '30px', 
+        borderTop: '1px dotted #e2e8f0',
+        flexWrap: 'wrap',
+        gap: '15px' 
+      }}>
         <button onClick={prevStep} className="btn-secondary-premium" disabled={step === 1 || isSaving}
-          style={{ opacity: (step === 1 || isSaving) ? 0.3 : 1, padding: '14px 28px' }}>
+          style={{ 
+            opacity: (step === 1 || isSaving) ? 0.3 : 1, 
+            padding: '14px 28px',
+            flex: window.innerWidth < 480 ? '1' : 'none'
+          }}>
           <ArrowLeft size={18} /> Anterior
         </button>
 
         {step < 4 ? (
           <button onClick={handleNext} className="btn-primary-premium" disabled={isSaving}
-            style={{ padding: '14px 28px', background: 'var(--primary)' }}>
+            style={{ 
+              padding: '14px 28px', 
+              background: 'var(--primary)',
+              flex: window.innerWidth < 480 ? '1' : 'none'
+            }}>
             Continuar <ArrowRight size={18} />
           </button>
         ) : (
           <button onClick={() => setShowSuccess(true)} className="btn-primary-premium"
-            style={{ background: 'linear-gradient(135deg, var(--secondary), #0e94ad)', padding: '14px 32px' }}
+            style={{ 
+              background: 'linear-gradient(135deg, var(--secondary), #0e94ad)', 
+              padding: '14px 32px',
+              flex: window.innerWidth < 480 ? '1' : 'none'
+            }}
             disabled={isSaving}>
             {isSaving
               ? <><Loader2 size={18} className="animate-spin" /> Sincronizando...</>
-              : <>Revisar y Finalizar <CheckCircle2 size={18} /></>}
+              : <>Revisar <CheckCircle2 size={18} /></>}
           </button>
         )}
       </div>
