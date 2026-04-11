@@ -77,6 +77,15 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
     </div>
   );
 
+  const getTotalSemesters = (program) => {
+    const p = program?.toLowerCase() || '';
+    if (p.includes('tecnolog')) return 6;
+    if (p.includes('técnic') || p.includes('tecnic')) return 4;
+    return 10; // Default para profesionales/ingenierías
+  };
+
+  const totalSems = getTotalSemesters(user?.program);
+
   return (
     <div className="profile-view-wrapper section-reveal">
       {/* HEADER PRINCIPAL PREMIUM */}
@@ -99,7 +108,7 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
               <GraduationCap size={18} /> {user?.program}
             </p>
             
-            <SemesterProgress current={user?.semester} />
+            <SemesterProgress current={user?.semester} total={totalSems} />
           </div>
 
           <div className="profile-hero-actions">
