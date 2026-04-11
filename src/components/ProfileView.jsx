@@ -2,13 +2,60 @@ import React from 'react';
 import { 
   User, Mail, Calendar, BookOpen, Star, 
   MapPin, Phone, Heart, Users, Briefcase, 
-  Shield, CreditCard, Clock, CheckCircle2, ChevronRight
+  Shield, CreditCard, Clock, CheckCircle2, ChevronRight,
+  GraduationCap, Award, Landmark, Fingerprint
 } from 'lucide-react';
 import AvatarUpload from './AvatarUpload';
 
 const ProfileView = ({ user, characterization, onEditRequest }) => {
-  const getInitials = (name) => {
-    return name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'US';
+  
+  const GPACircle = ({ gpa }) => {
+    const value = parseFloat(gpa) || 0;
+    const max = 5.0; // Sistema de calificación de 0 a 5.0
+    const percentage = (value / max) * 100;
+    const radius = 35;
+    const circumference = 2 * Math.PI * radius;
+    const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+    return (
+      <div className="gpa-stats-container">
+        <div className="gpa-circle-wrapper">
+          <svg className="gpa-circle-svg">
+            <circle className="gpa-circle-bg" cx="40" cy="40" r={radius} />
+            <circle 
+              className="gpa-circle-progress" 
+              cx="40" 
+              cy="40" 
+              r={radius} 
+              strokeDasharray={circumference}
+              style={{ strokeDashoffset }}
+            />
+          </svg>
+          <div className="gpa-circle-text">{value.toFixed(1)}</div>
+        </div>
+        <div className="gpa-label-group">
+          <span className="gpa-label-title" style={{ display: 'block', fontWeight: 800, color: 'var(--primary-dark)', fontSize: '0.9rem' }}>Promedio</span>
+          <span className="gpa-label-subtitle" style={{ display: 'block', fontSize: '0.7rem', color: '#94a3b8', fontWeight: 600 }}>Acumulado</span>
+        </div>
+      </div>
+    );
+  };
+
+  const SemesterProgress = ({ current, total = 10 }) => {
+    const curr = parseInt(current) || 1;
+    const percentage = (curr / total) * 100;
+
+    return (
+      <div className="semester-timeline-container">
+        <div className="timeline-header">
+          <span className="timeline-label">Grado de Avance</span>
+          <span className="timeline-percent">{curr} de {total} Semestres</span>
+        </div>
+        <div className="timeline-track">
+          <div className="timeline-bar" style={{ width: `${percentage}%` }}></div>
+        </div>
+      </div>
+    );
   };
 
   const InfoCard = ({ icon, title, label, value, color = "var(--primary)" }) => (
@@ -32,48 +79,57 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
 
   return (
     <div className="profile-view-wrapper section-reveal">
-      {/* HEADER PRINCIPAL */}
+      {/* HEADER PRINCIPAL PREMIUM */}
       <div className="profile-hero-card glass-card">
         <div className="profile-hero-bg"></div>
         <div className="profile-hero-content">
           <AvatarUpload user={user} onUploadComplete={() => {}} />
+          
           <div className="profile-hero-text">
             <h2 className="profile-name">{user?.name}</h2>
             <div className="profile-badges">
               <span className="badge-premium role-badge">
-                 <Shield size={12} /> {user?.role || 'ESTUDIANTE'}
+                 <Shield size={14} /> {user?.role || 'ESTUDIANTE'}
               </span>
               <span className="badge-premium status-badge">
-                 <CheckCircle2 size={12} /> {user?.status || 'Active'}
+                 <CheckCircle2 size={14} /> {user?.status || 'Active'}
               </span>
             </div>
-            <p className="profile-program">{user?.program}</p>
+            <p className="profile-program">
+              <GraduationCap size={18} /> {user?.program}
+            </p>
+            
+            <SemesterProgress current={user?.semester} />
           </div>
-          <button onClick={onEditRequest} className="btn-edit-profile">
-             Actualizar Datos <ChevronRight size={18} />
-          </button>
+
+          <div className="profile-hero-actions">
+            <GPACircle gpa={user?.gpa} />
+            <button onClick={onEditRequest} className="btn-edit-profile" style={{ marginTop: '20px', width: '100%' }}>
+               Actualizar Datos <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="profile-grid">
-        {/* COLUMNA IZQUIERDA: ACADÉMICO */}
+        {/* COLUMNA IZQUIERDA: ACADÉMICO Y FORMAL */}
         <div className="profile-column">
           <div className="glass-card profile-section">
-            <SectionTitle icon={<BookOpen size={20} />} title="Información Académica" />
+            <SectionTitle icon={<Award size={20} />} title="Información Académica" />
             <div className="info-items-grid">
-               <InfoCard icon={<Calendar size={18} />} label="Semestre Actual" value={user?.semester} color="#4f46e5" />
-               <InfoCard icon={<Star size={18} />} label="Promedio (GPA)" value={user?.gpa} color="#f59e0b" />
-               <InfoCard icon={<Clock size={18} />} label="Fecha Ingreso" value={user?.entry_date} color="#10b981" />
-               <InfoCard icon={<CreditCard size={18} />} label="Modalidad" value={user?.study_modality} color="#6366f1" />
+               <InfoCard icon={<Calendar size={20} />} label="Semestre" value={`${user?.semester}° Semestre`} color="#4f46e5" />
+               <InfoCard icon={<Clock size={20} />} label="Ingreso" value={user?.entry_date} color="#10b981" />
+               <InfoCard icon={<Landmark size={20} />} label="Sede" value={characterization?.university_branch || 'Principal'} color="#f59e0b" />
+               <InfoCard icon={<BookOpen size={20} />} label="Modalidad" value={user?.study_modality || 'Presencial'} color="#6366f1" />
             </div>
           </div>
 
           <div className="glass-card profile-section">
-            <SectionTitle icon={<User size={20} />} title="Identidad Institucional" />
+            <SectionTitle icon={<Fingerprint size={20} />} title="Identidad Institucional" />
             <div className="info-items-grid">
-               <InfoCard icon={<Shield size={18} />} label="Tipo Documento" value={characterization?.document_type} color="#ef4444" />
-               <InfoCard icon={<CreditCard size={18} />} label="Número Documento" value={user?.document_id} color="#06b6d4" />
-               <InfoCard icon={<Mail size={18} />} label="Correo Institucional" value={user?.email} color="#8b5cf6" />
+               <InfoCard icon={<Shield size={20} />} label="Tipo Doc" value={characterization?.document_type} color="#ef4444" />
+               <InfoCard icon={<CreditCard size={20} />} label="Número" value={user?.document_id} color="#06b6d4" />
+               <InfoCard icon={<Mail size={20} />} label="Correo Uni" value={user?.email} color="#8b5cf6" />
             </div>
           </div>
         </div>
@@ -81,30 +137,30 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
         {/* COLUMNA DERECHA: PERSONAL Y CONTACTO */}
         <div className="profile-column">
           <div className="glass-card profile-section">
-            <SectionTitle icon={<Users size={20} />} title="Información Personal" />
+            <SectionTitle icon={<User size={20} />} title="Información Personal" />
             <div className="info-items-grid">
-               <InfoCard icon={<Phone size={18} />} label="Teléfono Celular" value={characterization?.phone} color="#f43f5e" />
-               <InfoCard icon={<MapPin size={18} />} label="Dirección" value={characterization?.address} color="#3b82f6" />
-               <InfoCard icon={<Heart size={18} />} label="Grupo Sanguíneo" value={characterization?.blood_type} color="#de1f26" />
-               <InfoCard icon={<Users size={18} />} label="Estado Civil" value={characterization?.marital_status} color="#ec4899" />
+               <InfoCard icon={<Phone size={20} />} label="Celular" value={characterization?.phone} color="#f43f5e" />
+               <InfoCard icon={<MapPin size={20} />} label="Dirección" value={characterization?.address} color="#3b82f6" />
+               <InfoCard icon={<Heart size={20} />} label="Factor RH" value={characterization?.blood_type} color="#de1f26" />
+               <InfoCard icon={<Users size={20} />} label="Estado Civil" value={characterization?.marital_status} color="#ec4899" />
             </div>
           </div>
 
           <div className="glass-card profile-section">
-            <SectionTitle icon={<Shield size={20} />} title="Contacto de Emergencia" />
+            <SectionTitle icon={<Phone size={20} />} title="Contacto de Emergencia" />
             <div className="info-items-grid">
-               <InfoCard icon={<User size={18} />} label="Nombre Contacto" value={characterization?.emergency_contact} color="#f97316" />
-               <InfoCard icon={<Phone size={18} />} label="Teléfono" value={characterization?.emergency_phone} color="#10b981" />
-               <InfoCard icon={<Users size={18} />} label="Parentesco" value={characterization?.emergency_relationship} color="#0891b2" />
+               <InfoCard icon={<User size={20} />} label="Nombre" value={characterization?.emergency_contact} color="#f97316" />
+               <InfoCard icon={<Phone size={20} />} label="Teléfono" value={characterization?.emergency_phone} color="#10b981" />
+               <InfoCard icon={<Heart size={20} />} label="Parentesco" value={characterization?.emergency_relationship} color="#0891b2" />
             </div>
           </div>
           
-          {characterization?.is_working === 'Si' && (
+          {(characterization?.is_working === 'Si' || characterization?.work_company) && (
             <div className="glass-card profile-section">
               <SectionTitle icon={<Briefcase size={20} />} title="Información Laboral" />
               <div className="info-items-grid">
-                <InfoCard icon={<Briefcase size={18} />} label="Empresa" value={characterization?.work_company} color="#475569" />
-                <InfoCard icon={<User size={18} />} label="Cargo" value={characterization?.work_role} color="#64748b" />
+                <InfoCard icon={<Landmark size={20} />} label="Empresa" value={characterization?.work_company} color="#475569" />
+                <InfoCard icon={<Briefcase size={20} />} label="Cargo" value={characterization?.work_role} color="#64748b" />
               </div>
             </div>
           )}
