@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   HeartPulse, Activity, Users, Calendar, 
-  MapPin, Clock, ChevronRight, Info, CheckCircle2
+  MapPin, Clock, ChevronRight, Info, CheckCircle2, Database
 } from 'lucide-react';
 
 const WellbeingView = ({ user }) => {

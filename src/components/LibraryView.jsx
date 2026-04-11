@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Library, Search, Book, Bookmark, Clock, 
-  MapPin, CheckCircle2, ChevronRight, Info
+  MapPin, CheckCircle2, ChevronRight, Info, Database
 } from 'lucide-react';
 
 const LibraryView = ({ user }) => {
@@ -124,7 +122,7 @@ const LibraryView = ({ user }) => {
                 <h2 style={{ fontWeight: 900, color: 'var(--primary-dark)', marginBottom: '10px' }}>Reserva de Espacio</h2>
                 <p style={{ color: '#64748b', marginBottom: '25px' }}>Selecciona el cubículo o sala que necesites.</p>
                 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <form onSubmit={handleBooking} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div>
                     <label className="input-label-premium">Tipo de Espacio</label>
                     <select className="select-premium" style={{ width: '100%' }}>
