@@ -42,61 +42,30 @@ const WellbeingView = ({ user }) => {
         </div>
       </div>
 
-      <div className="student-dashboard-grid" style={{ marginTop: '24px' }}>
-        {/* LADO IZQUIERDO: SERVICIOS */}
-        <div className="profile-column">
-          <div className="glass-card" style={{ padding: '30px' }}>
-            <h3 style={{ margin: '0 0 20px 0', fontWeight: 800, color: 'var(--primary-dark)' }}>Servicios Disponibles</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-              {services.map((service) => (
-                <div 
-                  key={service.id} 
-                  className="kpi-card-premium" 
-                  style={{ cursor: 'pointer', transition: '0.3s' }}
-                  onClick={() => setSelectedService(service)}
-                >
-                  <div className="kpi-icon-row">
-                    <div style={{ color: service.color }}>{service.icon}</div>
-                    <span style={{ fontWeight: 800 }}>{service.name}</span>
-                  </div>
-                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '10px 0 15px' }}>{service.desc}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span className="status-tag en-curso" style={{ fontSize: '0.65rem' }}>AGENDAR CITA</span>
-                    <ChevronRight size={16} color="#94a3b8" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* CONTENIDO PRINCIPAL: ESTADO VACÍO */}
+      <div className="glass-card" style={{ padding: '80px 40px', textAlign: 'center', marginTop: '24px' }}>
+        <div style={{ 
+          width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(236, 72, 153, 0.05)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ec4899',
+          margin: '0 auto 20px'
+        }}>
+          <Database size={40} />
+        </div>
+        <div>
+          <h3 style={{ margin: 0, fontWeight: 800, color: 'var(--primary-dark)' }}>Sincronización de Servicios Pendiente</h3>
+          <p style={{ color: '#64748b', maxWidth: '450px', margin: '8px auto' }}>
+            Los servicios de **Bienestar Universitario** (Salud, Deportes y Cultura) están siendo integrados con el sistema de agendamiento central.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '10px', justifyContent: 'center' }}>
+          <span className="status-tag en-curso" style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899' }}>
+            <Clock size={14} /> Configurando Agenda
+          </span>
         </div>
 
-        {/* LADO DERECHO: MIS CITAS / CONTACTO */}
-        <div className="profile-column">
-          <div className="glass-card" style={{ padding: '30px' }}>
-            <h3 style={{ margin: '0 0 20px 0', fontWeight: 800, color: 'var(--primary-dark)' }}>Próximas Actividades</h3>
-            {upcomingAppointments.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {upcomingAppointments.map((app, i) => (
-                  <div key={i} className="info-item-premium" style={{ border: '1px solid #f1f5f9', borderRadius: '16px' }}>
-                    <div className="info-item-icon" style={{ background: 'rgba(var(--secondary-rgb), 0.1)', color: 'var(--secondary)' }}>
-                      <Calendar size={20} />
-                    </div>
-                    <div className="info-item-content">
-                      <span className="info-item-value">{app.service}</span>
-                      <span className="info-item-label">{app.date} · {app.time}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.9rem' }}>No tienes citas programadas.</p>
-            )}
-
-            <div className="table-footer-info" style={{ marginTop: '30px', background: 'rgba(42, 34, 102, 0.03)' }}>
-              <Info size={16} /> 
-              <p>Atención de urgencias físicas en el consultorio médico (Bloque C) sin cita previa.</p>
-            </div>
-          </div>
+        <div className="table-footer-info" style={{ marginTop: '50px' }}>
+          <Info size={16} /> 
+          <p>La atención presencial en el Bloque C continúa funcionando con normalidad para todos los estudiantes.</p>
         </div>
       </div>
 

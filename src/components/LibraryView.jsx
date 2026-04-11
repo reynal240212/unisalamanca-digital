@@ -80,42 +80,30 @@ const LibraryView = ({ user }) => {
         </div>
       </div>
 
-      {/* CONTENIDO PRINCIPAL: RECURSOS DESTACADOS */}
-      <div className="glass-card" style={{ padding: '30px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h3 style={{ margin: 0, fontWeight: 800, color: 'var(--primary-dark)' }}>Recursos Recomendados</h3>
-          <button 
-            className="btn-login-modern" 
-            style={{ padding: '8px 16px', fontSize: '0.85rem', marginTop: 0 }}
-            onClick={() => setShowBookingModal(true)}
-          >
-            RESERVAR ESPACIO
-          </button>
+      {/* CONTENIDO PRINCIPAL: ESTADO VACÍO */}
+      <div className="glass-card" style={{ padding: '60px 40px', textAlign: 'center' }}>
+        <div style={{ 
+          width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(42, 34, 102, 0.05)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)',
+          margin: '0 auto 20px'
+        }}>
+          <Database size={40} />
+        </div>
+        <div>
+          <h3 style={{ margin: 0, fontWeight: 800, color: 'var(--primary-dark)' }}>Sincronización Pendiente</h3>
+          <p style={{ color: '#64748b', maxWidth: '400px', margin: '8px auto' }}>
+            El catálogo de la **Biblioteca Física y Digital** se está sincronizando. Pronto podrás buscar y reservar recursos desde aquí.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '10px', justifyContent: 'center' }}>
+          <span className="status-tag en-curso">
+            <Clock size={14} /> Esperando Conexión
+          </span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          {books.map((book, i) => (
-            <div key={i} className="info-item-premium" style={{ border: '1px solid #f1f5f9', background: 'rgba(255,255,255,0.5)', borderRadius: '16px', transition: '0.3s', cursor: 'pointer' }}>
-              <div className="info-item-icon" style={{ background: book.status === 'Disponible' ? 'rgba(22, 163, 74, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: book.status === 'Disponible' ? 'var(--success)' : 'var(--error)' }}>
-                <Book size={20} />
-              </div>
-              <div className="info-item-content" style={{ flex: 1 }}>
-                <span className="info-item-value">{book.title}</span>
-                <span className="info-item-label">{book.author} · {book.location}</span>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <span className={`status-tag ${book.status === 'Disponible' ? 'en-curso' : 'terminado'}`} style={{ fontSize: '0.7rem' }}>
-                  {book.status}
-                </span>
-                <ChevronRight size={16} color="#94a3b8" />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="table-footer-info" style={{ marginTop: '24px' }}>
+        <div className="table-footer-info" style={{ marginTop: '40px' }}>
           <Info size={16} /> 
-          <p>La devolución de libros físicos debe realizarse directamente en ventanilla antes de la fecha de vencimiento.</p>
+          <p>Para préstamos urgentes, por favor dirígete a la recepción de la biblioteca institucional.</p>
         </div>
       </div>
 
