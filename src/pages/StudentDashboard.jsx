@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { 
   LayoutDashboard, UserCircle, QrCode, LogOut, 
-  Bell, Settings, BookOpen, ShieldCheck, Star, Calendar, Menu
+  Bell, Settings, BookOpen, ShieldCheck, Star, Calendar, Menu,
+  Library, HeartPulse, Wallet
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -13,6 +14,9 @@ import SalmiChatbot from '../components/SalmiChatbot';
 import StudentSchedule from '../components/StudentSchedule';
 import ProfileView from '../components/ProfileView';
 import GradesView from '../components/GradesView';
+import LibraryView from '../components/LibraryView';
+import WellbeingView from '../components/WellbeingView';
+import FinanceView from '../components/FinanceView';
 
 import { useQR } from '../hooks/useQR';
 import { useCharacterization } from '../hooks/useCharacterization';
@@ -236,6 +240,24 @@ const StudentDashboard = () => {
             <GradesView user={studentData} />
           </div>
         );
+      case 'biblioteca':
+        return (
+          <div className="section-reveal" style={{ padding: '20px' }}>
+            <LibraryView user={studentData} />
+          </div>
+        );
+      case 'bienestar':
+        return (
+          <div className="section-reveal" style={{ padding: '20px' }}>
+            <WellbeingView user={studentData} />
+          </div>
+        );
+      case 'finanzas':
+        return (
+          <div className="section-reveal" style={{ padding: '20px' }}>
+            <FinanceView user={studentData} />
+          </div>
+        );
       default: return null;
     }
   };
@@ -273,6 +295,9 @@ const StudentDashboard = () => {
             { id: 'qr', label: 'Mi Carnet QR', icon: <QrCode size={18} /> },
             { id: 'horario', label: 'Mi Horario', icon: <Calendar size={18} /> },
             { id: 'notas', label: 'Mis Notas', icon: <BookOpen size={18} /> },
+            { id: 'biblioteca', label: 'Biblioteca', icon: <Library size={18} /> },
+            { id: 'bienestar', label: 'Bienestar', icon: <HeartPulse size={18} /> },
+            { id: 'finanzas', label: 'Finanzas', icon: <Wallet size={18} /> },
             { id: 'perfil', label: 'Mi Perfil', icon: <UserCircle size={18} /> },
             { id: 'caracterizacion', label: 'Actualizar Datos', icon: <Settings size={18} /> },
           ].map(item => (
