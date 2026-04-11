@@ -1460,6 +1460,40 @@ body {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* QUICK ACTION BUTTONS (DASHBOARD) */
+.dashboard-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: white;
+  color: var(--primary-dark);
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.dashboard-action-btn:hover {
+  transform: translateY(-3px);
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 10px 20px rgba(42, 34, 102, 0.2);
+}
+
+.dashboard-action-btn svg {
+  color: var(--secondary);
+  transition: color 0.3s ease;
+}
+
+.dashboard-action-btn:hover svg {
+  color: white;
 }
 
 @media (max-width: 992px) {

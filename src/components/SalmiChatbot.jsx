@@ -17,6 +17,13 @@ const SalmiChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
+  // Escuchar evento para abrir el chat externamente
+  useEffect(() => {
+    const handleOpenChat = () => setIsOpen(true);
+    window.addEventListener('open-salmi-chat', handleOpenChat);
+    return () => window.removeEventListener('open-salmi-chat', handleOpenChat);
+  }, []);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputText.trim()) return;

@@ -3,7 +3,7 @@ import { supabase } from '../services/supabase';
 import { 
   LayoutDashboard, UserCircle, QrCode, LogOut, 
   Bell, Settings, BookOpen, ShieldCheck, Star, Calendar, Menu,
-  Library, HeartPulse, Wallet
+  Library, HeartPulse, Wallet, MapPin, Clock
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -197,8 +197,8 @@ const StudentDashboard = () => {
                       <button 
                         key={i} 
                         onClick={() => setActiveTab(btn.tab)}
-                        className="nav-item-premium" 
-                        style={{ margin: 0, background: 'rgba(255,255,255,0.5)', justifyContent: 'center', gap: '10px', fontSize: '0.8rem', padding: '12px' }}
+                        className="dashboard-action-btn" 
+                        style={{ margin: 0 }}
                       >
                         {btn.icon} {btn.label}
                       </button>
@@ -455,8 +455,8 @@ const StudentDashboard = () => {
         {renderContent()}
       </main>
 
-      {/* SALMI CHATBOT ASISTENTE 24/7 — TEMPORALMENTE OCULTO */}
-      {/* <SalmiChatbot /> */}
+      {/* SALMI CHATBOT ASISTENTE 24/7 */}
+      <SalmiChatbot />
     </div>
   </div>
 );

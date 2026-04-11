@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, MessageCircle, RefreshCw } from 'lucide-react';
+import { Sparkles, MessageCircle, RefreshCw, ArrowRight } from 'lucide-react';
+import { supabase } from '../services/supabase';
 
 const SalmiAdviceComponent = ({ student, characterization }) => {
   const [advice, setAdvice] = useState('');
@@ -34,12 +35,37 @@ const SalmiAdviceComponent = ({ student, characterization }) => {
     return advicePool[Math.floor(Math.random() * advicePool.length)];
   };
 
-  const generateNewAdvice = () => {
+  const generateNewAdvice = async () => {
     if (isTyping) return;
-    const newAdvice = getContextualAdvice();
-    setAdvice(newAdvice);
-    setDisplayedText('');
     setIsTyping(true);
+    setDisplayedText('');
+    
+    try {
+      // Prompt dinámico basado en contexto real
+      const prompt = `Genera un consejo muy corto (máximo 140 caracteres) para enviarle a ${(student?.name || 'un estudiante').split(' ')[0]}. 
+      Contexto: Estudia ${student?.program || 'su carrera'}, semestre ${student?.semester || 'actual'}. Promedio: ${student?.gpa || 'N/A'}. 
+      ${characterization?.is_working === 'Si' ? 'Dato: Trabaja y estudia al tiempo.' : ''}
+      El tono debe ser motivacional pero profesional. Solo devuelve el consejo, sin introducciones.`;
+
+      const { data, error } = await supabase.functions.invoke('salmi-ai', {
+        body: { message: prompt }
+      });
+
+      if (error || !data) throw new Error("IA offline");
+      
+      setAdvice(data.response);
+    } catch (err) {
+      console.warn("Salmi AI Fallback:", err);
+      // Fallback a lógica local si falla la IA
+      const newAdvice = getContextualAdvice();
+      setAdvice(newAdvice);
+    }
+  };
+
+  const handleOpenChat = () => {
+    // Emitir evento para abrir el chatbot
+    const event = new CustomEvent('open-salmi-chat');
+    window.dispatchEvent(event);
   };
 
   useEffect(() => {
@@ -92,8 +118,29 @@ const SalmiAdviceComponent = ({ student, characterization }) => {
         </div>
 
         <div className="salmi-bubble-footer">
-          <MessageCircle size={14} />
-          <span>Salmi te acompaña</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <MessageCircle size={14} />
+            <span>Salmi te acompaña</span>
+          </div>
+          
+          <button 
+            onClick={handleOpenChat}
+            className="salmi-chat-link-btn"
+            style={{ 
+              background: 'transparent', 
+              border: 'none', 
+              color: 'white', 
+              fontSize: '0.7rem', 
+              fontWeight: 800, 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '4px',
+              cursor: 'pointer',
+              opacity: 0.8
+            }}
+          >
+            Preguntar más a Salmi <ArrowRight size={12} />
+          </button>
         </div>
       </div>
     </div>
