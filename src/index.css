@@ -3039,6 +3039,19 @@ body {
 }
 
 .semester-selector-wrapper { min-width: 250px; }
+.custom-select-container { position: relative; width: 100%; }
+.select-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #94a3b8; }
+
+.input-label-premium {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
 .select-premium {
   width: 100%;
   padding: 12px 20px;
@@ -3050,8 +3063,9 @@ body {
   appearance: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  outline: none;
 }
-.select-premium:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 4px rgba(22, 182, 214, 0.1); }
+.select-premium:focus { border-color: var(--secondary); box-shadow: 0 0 0 4px rgba(22, 182, 214, 0.1); }
 
 .grades-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
 .kpi-icon-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; }
