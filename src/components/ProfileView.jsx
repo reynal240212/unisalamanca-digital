@@ -79,17 +79,18 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
 
   const getTotalSemesters = (program) => {
     const p = program?.toLowerCase() || '';
-    if (p.includes('tecnolog')) return 6;
+    // Incluímos palabras clave para detectar tecnologías de 6 semestres
+    if (p.includes('tecnolog') || p.includes('software') || p.includes('sistemas')) return 6;
     if (p.includes('técnic') || p.includes('tecnic')) return 4;
-    return 10; // Default para profesionales/ingenierías
+    return 10; // Default para programas profesionales
   };
 
   const totalSems = getTotalSemesters(user?.program);
 
   return (
     <div className="profile-view-wrapper section-reveal">
-      {/* HEADER PRINCIPAL PREMIUM */}
-      <div className="profile-hero-card glass-card">
+      {/* HEADER PRINCIPAL PREMIUM REDISEÑADO */}
+      <div className="profile-hero-card">
         <div className="profile-hero-bg"></div>
         <div className="profile-hero-content">
           <AvatarUpload user={user} onUploadComplete={() => {}} />
@@ -105,7 +106,7 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
               </span>
             </div>
             <p className="profile-program">
-              <GraduationCap size={18} /> {user?.program}
+              <GraduationCap size={20} /> {user?.program}
             </p>
             
             <SemesterProgress current={user?.semester} total={totalSems} />
@@ -113,7 +114,7 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
 
           <div className="profile-hero-actions">
             <GPACircle gpa={user?.gpa} />
-            <button onClick={onEditRequest} className="btn-edit-profile" style={{ marginTop: '20px', width: '100%' }}>
+            <button onClick={onEditRequest} className="btn-edit-profile">
                Actualizar Datos <ChevronRight size={18} />
             </button>
           </div>
@@ -121,46 +122,46 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
       </div>
 
       <div className="profile-grid">
-        {/* COLUMNA IZQUIERDA: ACADÉMICO Y FORMAL */}
+        {/* COLUMNA IZQUIERDA: ACADÉMICO */}
         <div className="profile-column">
           <div className="glass-card profile-section">
             <SectionTitle icon={<Award size={20} />} title="Información Académica" />
             <div className="info-items-grid">
-               <InfoCard icon={<Calendar size={20} />} label="Semestre" value={`${user?.semester}° Semestre`} color="#4f46e5" />
-               <InfoCard icon={<Clock size={20} />} label="Ingreso" value={user?.entry_date} color="#10b981" />
-               <InfoCard icon={<Landmark size={20} />} label="Sede" value={characterization?.university_branch || 'Principal'} color="#f59e0b" />
-               <InfoCard icon={<BookOpen size={20} />} label="Modalidad" value={user?.study_modality || 'Presencial'} color="#6366f1" />
+               <InfoCard icon={<Calendar size={22} />} label="Semestre Actual" value={user?.semester ? `${user?.semester}° Semestre` : null} color="#4f46e5" />
+               <InfoCard icon={<Clock size={22} />} label="Fecha de Ingreso" value={user?.entry_date} color="#10b981" />
+               <InfoCard icon={<Landmark size={22} />} label="Sede Institucional" value={characterization?.university_branch || 'Sede Principal'} color="#f59e0b" />
+               <InfoCard icon={<BookOpen size={22} />} label="Modalidad Estudio" value={user?.study_modality || 'Presencial'} color="#6366f1" />
             </div>
           </div>
 
           <div className="glass-card profile-section">
             <SectionTitle icon={<Fingerprint size={20} />} title="Identidad Institucional" />
             <div className="info-items-grid">
-               <InfoCard icon={<Shield size={20} />} label="Tipo Doc" value={characterization?.document_type} color="#ef4444" />
-               <InfoCard icon={<CreditCard size={20} />} label="Número" value={user?.document_id} color="#06b6d4" />
-               <InfoCard icon={<Mail size={20} />} label="Correo Uni" value={user?.email} color="#8b5cf6" />
+               <InfoCard icon={<Shield size={22} />} label="Tipo de Documento" value={characterization?.document_type} color="#ef4444" />
+               <InfoCard icon={<CreditCard size={22} />} label="Número Documento" value={user?.document_id} color="#06b6d4" />
+               <InfoCard icon={<Mail size={22} />} label="Email Institucional" value={user?.email} color="#8b5cf6" />
             </div>
           </div>
         </div>
 
-        {/* COLUMNA DERECHA: PERSONAL Y CONTACTO */}
+        {/* COLUMNA DERECHA: PERSONAL */}
         <div className="profile-column">
           <div className="glass-card profile-section">
             <SectionTitle icon={<User size={20} />} title="Información Personal" />
             <div className="info-items-grid">
-               <InfoCard icon={<Phone size={20} />} label="Celular" value={characterization?.phone} color="#f43f5e" />
-               <InfoCard icon={<MapPin size={20} />} label="Dirección" value={characterization?.address} color="#3b82f6" />
-               <InfoCard icon={<Heart size={20} />} label="Factor RH" value={characterization?.blood_type} color="#de1f26" />
-               <InfoCard icon={<Users size={20} />} label="Estado Civil" value={characterization?.marital_status} color="#ec4899" />
+               <InfoCard icon={<Phone size={22} />} label="Teléfono Celular" value={characterization?.phone} color="#f43f5e" />
+               <InfoCard icon={<MapPin size={22} />} label="Dirección Residencia" value={characterization?.address} color="#3b82f6" />
+               <InfoCard icon={<Heart size={22} />} label="Grupo Sanguíneo/RH" value={characterization?.blood_type} color="#de1f26" />
+               <InfoCard icon={<Users size={22} />} label="Estado Civil" value={characterization?.marital_status} color="#ec4899" />
             </div>
           </div>
 
           <div className="glass-card profile-section">
             <SectionTitle icon={<Phone size={20} />} title="Contacto de Emergencia" />
             <div className="info-items-grid">
-               <InfoCard icon={<User size={20} />} label="Nombre" value={characterization?.emergency_contact} color="#f97316" />
-               <InfoCard icon={<Phone size={20} />} label="Teléfono" value={characterization?.emergency_phone} color="#10b981" />
-               <InfoCard icon={<Heart size={20} />} label="Parentesco" value={characterization?.emergency_relationship} color="#0891b2" />
+               <InfoCard icon={<User size={22} />} label="Nombre Contacto" value={characterization?.emergency_contact} color="#f97316" />
+               <InfoCard icon={<Phone size={22} />} label="Teléfono Contacto" value={characterization?.emergency_phone} color="#10b981" />
+               <InfoCard icon={<Heart size={22} />} label="Vínculo/Parentesco" value={characterization?.emergency_relationship} color="#0891b2" />
             </div>
           </div>
           
@@ -168,8 +169,8 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
             <div className="glass-card profile-section">
               <SectionTitle icon={<Briefcase size={20} />} title="Información Laboral" />
               <div className="info-items-grid">
-                <InfoCard icon={<Landmark size={20} />} label="Empresa" value={characterization?.work_company} color="#475569" />
-                <InfoCard icon={<Briefcase size={20} />} label="Cargo" value={characterization?.work_role} color="#64748b" />
+                <InfoCard icon={<Landmark size={22} />} label="Empresa/Organización" value={characterization?.work_company} color="#475569" />
+                <InfoCard icon={<Briefcase size={22} />} label="Cargo Desempeñado" value={characterization?.work_role} color="#64748b" />
               </div>
             </div>
           )}
