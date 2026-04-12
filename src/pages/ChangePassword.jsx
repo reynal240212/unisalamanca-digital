@@ -29,12 +29,12 @@ const ChangePassword = () => {
     setError('');
 
     if (password.length < 6) {
-      setError('La contraseña es demasiado corta (mínimo 6 caracteres).');
+      setError('La contraseña debe tener al menos 6 caracteres.');
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Las contraseñas ingresadas no coinciden.');
+      setError('Las contraseñas no coinciden.');
       return;
     }
 
@@ -66,10 +66,10 @@ const ChangePassword = () => {
           COORD_ACADEMICO: '/academic',
         };
         navigate(roleMap[user.role] || '/student', { replace: true });
-      }, 2500);
+      }, 2000);
 
     } catch (err) {
-      setError('Error crítico de actualización: ' + err.message);
+      setError('Error al actualizar: ' + err.message);
     } finally {
       setIsLoading(false);
     }
@@ -79,12 +79,14 @@ const ChangePassword = () => {
     return (
       <div className="login-page">
         <div className="identity-overlay"><div className="identity-mesh"></div></div>
-        <div className="login-card" style={{ maxWidth: '500px', textAlign: 'center', padding: '60px 40px' }}>
-          <div className="success-pulse" style={{ margin: '0 auto 30px' }}>
-            <CheckCircle2 size={48} color="#10b981" />
+        <div className="login-card" style={{ gridTemplateColumns: '1fr', maxWidth: '500px', textAlign: 'center' }}>
+          <div className="login-form-side" style={{ alignItems: 'center', padding: '60px 40px' }}>
+            <div className="success-pulse" style={{ marginBottom: '24px' }}>
+              <CheckCircle2 size={60} color="#10b981" />
+            </div>
+            <h2 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary)', marginBottom: '12px' }}>¡Acceso Asegurado!</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Tu contraseña ha sido actualizada. Redirigiendo al campus digital...</p>
           </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b', marginBottom: '16px' }}>¡Seguridad Validada!</h2>
-          <p style={{ color: '#64748b', fontSize: '1.1rem', lineHeight: 1.6 }}>Tu nueva contraseña ha sido establecida correctamente. Iniciando sesión segura...</p>
         </div>
       </div>
     );
@@ -92,128 +94,114 @@ const ChangePassword = () => {
 
   return (
     <div className="login-page">
-      {/* Fondo Premium */}
       <div className="identity-overlay">
         <div className="identity-mesh"></div>
       </div>
 
-      <div className="login-card" style={{ maxWidth: '900px', padding: 0, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
-        <div className="responsive-grid-2" style={{ gap: 0 }}>
-          
-          {/* Panel Lateral Informativo */}
-          <div style={{ 
-            background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)', 
-            padding: '60px 40px',
-            color: 'white',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'relative', zIndex: 2 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.2)', padding: '10px', borderRadius: '12px' }}>
-                  <ShieldCheck size={28} />
-                </div>
-                <span style={{ fontWeight: 800, fontSize: '1.4rem', letterSpacing: '-0.5px' }}>UniSalamanca <span style={{ opacity: 0.7 }}>Digital</span></span>
+      <div className="login-card">
+        {/* Panel Izquierdo - Informativo (Se oculta en móvil automáticamente por CSS) */}
+        <div className="login-info">
+          <div style={{ position: 'relative', zIndex: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '40px', justifyContent: 'center' }}>
+              <div style={{ background: 'rgba(255,255,255,0.2)', padding: '12px', borderRadius: '15px' }}>
+                <ShieldCheck size={32} />
               </div>
-              
-              <h2 style={{ fontSize: '2.5rem', fontWeight: 900, lineHeight: 1.1, marginBottom: '24px' }}>Asegura tu Identidad</h2>
-              <p style={{ opacity: 0.8, fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '32px' }}>
-                Para proteger tu información académica, es obligatorio establecer una contraseña personal y única en tu primer inicio de sesión.
-              </p>
-
-              <div style={{ display: 'grid', gap: '16px' }}>
-                {[
-                  'Usa mayúsculas y números',
-                  'Evita fechas de nacimiento',
-                  'No compartas tus credenciales'
-                ].map((text, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px' }}>
-                    <div style={{ width: '6px', height: '6px', background: '#3b82f6', borderRadius: '50%' }}></div>
-                    {text}
-                  </div>
-                ))}
-              </div>
+              <h2 style={{ fontSize: '1.8rem', fontWeight: 900, margin: 0 }}>UniSalamanca</h2>
             </div>
-            {/* Elemento decorativo */}
-            <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '200px', height: '200px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
-          </div>
 
-          {/* Formulario de Configuración */}
-          <div style={{ padding: '60px 50px', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(20px)' }}>
-            <div style={{ marginBottom: '40px' }}>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginBottom: '8px' }}>Nueva Contraseña</h3>
-              <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Escribe tu nueva clave y confírmala para continuar.</p>
+            <h1 style={{ fontSize: '2.8rem', fontWeight: 900, lineHeight: 1, marginBottom: '24px' }}>
+              Seguridad de <span style={{ color: 'rgba(255,255,255,0.7)' }}>Cuenta</span>
+            </h1>
+            
+            <p style={{ fontSize: '1.1rem', opacity: 0.9, marginBottom: '40px', lineHeight: 1.6 }}>
+              Para garantizar la integridad de tu identidad digital, debes establecer una contraseña privada en tu primer ingreso.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }}>
+              {[
+                'Cifrado avanzado de extremo a extremo',
+                'Protección contra accesos no autorizados',
+                'Validación de identidad institucional'
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.08)', padding: '15px', borderRadius: '12px' }}>
+                  <div style={{ width: '8px', height: '8px', background: 'var(--secondary)', borderRadius: '50%' }}></div>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Panel Derecho - Formulario (Responsivo y Adaptable) */}
+        <div className="login-form-side">
+          <div className="login-form-container">
+            <div className="form-header">
+              <h2 className="form-title">Establecer Clave</h2>
+              <p className="form-subtitle">Configura tu nueva contraseña de acceso.</p>
             </div>
 
             <form onSubmit={handleUpdatePassword}>
               <div className="input-group">
-                <label style={{ color: '#1e293b', fontWeight: 700, fontSize: '0.85rem' }}>
-                   NUEVA CONTRASEÑA
-                </label>
+                <label>Nueva Contraseña</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showPwd ? "text" : "password"}
                     value={password}
-                    placeholder="Escribe tu contraseña segura"
+                    placeholder="Mínimo 6 caracteres"
                     onChange={e => setPassword(e.target.value)}
                     required
-                    className="input-premium"
-                    style={{ paddingRight: '45px', background: 'white' }}
+                    style={{ paddingRight: '50px' }}
                   />
                   <button 
-                    type="button"
+                    type="button" 
                     onClick={() => setShowPwd(!showPwd)}
-                    style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                    style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
                   >
                     {showPwd ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
               </div>
 
-              <div className="input-group" style={{ marginBottom: '32px' }}>
-                <label style={{ color: '#1e293b', fontWeight: 700, fontSize: '0.85rem' }}>
-                   CONFIRMAR CONTRASEÑA
-                </label>
+              <div className="input-group" style={{ marginBottom: '30px' }}>
+                <label>Confirmar Contraseña</label>
                 <input
                   type={showPwd ? "text" : "password"}
                   value={confirmPassword}
                   placeholder="Repite la contraseña"
                   onChange={e => setConfirmPassword(e.target.value)}
                   required
-                  className="input-premium"
-                  style={{ background: 'white' }}
                 />
               </div>
 
               {error && (
-                <div style={{ padding: '16px', background: '#fff1f2', border: '1px solid #fda4af', borderRadius: '12px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <ShieldAlert size={20} color="#e11d48" />
-                  <p style={{ fontSize: '0.88rem', color: '#be123c', fontWeight: 600 }}>{error}</p>
+                <div style={{ 
+                  padding: '15px', 
+                  background: 'rgba(239, 68, 68, 0.1)', 
+                  borderLeft: '4px solid var(--error)', 
+                  borderRadius: '10px', 
+                  marginBottom: '25px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '12px' 
+                }}>
+                  <ShieldAlert size={20} color="var(--error)" />
+                  <span style={{ fontSize: '0.85rem', color: '#b91c1c', fontWeight: 700 }}>{error}</span>
                 </div>
               )}
 
-              <button 
-                className="login-button" 
-                style={{ width: '100%', padding: '18px', fontSize: '1rem', fontWeight: 800 }} 
-                disabled={isLoading}
-              >
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-                  {isLoading ? 'ASEGURANDO CUENTA...' : 'GUARDAR CONFIGURACIÓN'} <ArrowRight size={20} />
-                </span>
+              <button className="login-button" style={{ width: '100%' }} disabled={isLoading}>
+                {isLoading ? 'PROCESANDO...' : 'ACTUALIZAR Y ENTRAR'}
+                <ArrowRight size={20} style={{ marginLeft: '10px', verticalAlign: 'middle' }} />
               </button>
             </form>
 
-            <div style={{ marginTop: '32px', display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '16px', background: '#f8fafc', borderRadius: '12px' }}>
-              <Info size={18} color="#3b82f6" style={{ marginTop: '2px' }} />
-              <p style={{ fontSize: '0.8rem', color: '#64748b', lineHeight: 1.5 }}>
-                Toda la información es encriptada con tecnología SHA-256 antes de guardarse en nuestros servidores de alta seguridad.
+            <div style={{ marginTop: '30px', padding: '15px', background: '#f8fafc', borderRadius: '15px', display: 'flex', gap: '12px' }}>
+              <Info size={18} color="var(--secondary)" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                Usa una combinación de letras, números y símbolos para mayor seguridad. No compartas esta clave con nadie.
               </p>
             </div>
           </div>
-
         </div>
       </div>
     </div>
