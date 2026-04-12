@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Search, Plus, CheckCircle, XCircle, AlertTriangle, LogOut, Menu, Trash2, ArrowLeft } from 'lucide-react';
+import { CreditCard, Search, Plus, CheckCircle, XCircle, AlertTriangle, LogOut, Menu, Trash2, ArrowLeft, Users, DollarSign, FileText } from 'lucide-react';
+import DashboardLayout from '../components/layout/DashboardLayout';
 
 const STATUS_CONFIG = {
   paid:     { label: 'Pagado',    color: '#16a34a', bg: '#f0fdf4', icon: <CheckCircle size={14} /> },
@@ -79,210 +80,252 @@ const CarteraDashboard = () => {
   const isPazYSalvo = totalDebt === 0;
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
-      <div className="mobile-top-bar">
-        <span style={{ fontWeight: 900, color: 'var(--primary)' }}>Cartera</span>
-        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="menu-circle"><Menu size={20} /></button>
-      </div>
-      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
+  const navItems = [
+    ...(user?.role === 'ADMIN' ? [{
+      title: 'Administración',
+      items: [
+        { id: 'back_admin', icon: <ArrowLeft size={18} />, label: 'Volver a Panel Admin', onClick: () => navigate('/admin') }
+      ]
+    }] : []),
+    {
+      title: 'Servicios Financieros',
+      items: [
+        { id: 'inicio', icon: <CreditCard size={18} />, label: 'Estado de Cartera', onClick: () => setSelected(null) },
+      ]
+    }
+  ];
 
-      <aside className={`admin-sidebar-premium ${isSidebarOpen ? 'open' : ''}`}>
-        <div style={{ padding: '28px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: 'white', fontSize: '1.2rem' }}>
-              {(user?.name || 'C').charAt(0)}
-            </div>
-            <div>
-              <p style={{ fontWeight: 900, fontSize: '0.9rem', margin: 0, color: 'white' }}>{user?.name?.split(' ')[0]}</p>
-              <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', background: '#16a34a', color: 'white', padding: '2px 8px', borderRadius: '20px', display: 'inline-block', marginTop: '4px' }}>Cartera</span>
-            </div>
-          </div>
-        </div>
-        <nav style={{ flex: 1, padding: '20px 12px' }}>
-          {user?.role === 'ADMIN' && (
-            <button onClick={() => navigate('/admin')} className="admin-nav-item" style={{ marginBottom: '12px', borderLeft: '3px solid var(--secondary)', background: 'rgba(255,255,255,0.05)' }}>
-              <ArrowLeft size={18} /> <span style={{ fontWeight: 800 }}>Volver a Panel Admin</span>
-            </button>
-          )}
-          <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', padding: '0 8px', marginBottom: '10px' }}>
-            {filtered.length} Estudiantes
+  return (
+    <DashboardLayout
+      user={user}
+      navItems={navItems}
+      activeNav={selected ? selected.id : 'inicio'}
+      setActiveNav={() => {}} 
+      logout={logout}
+      navigate={navigate}
+    >
+      <div className="section-reveal">
+        <div style={{ marginBottom: '32px' }}>
+          <h1 style={{ fontSize: '2.4rem', fontWeight: 900, color: '#1e293b', margin: 0, letterSpacing: '-1px' }}>
+            {selected ? 'Gestión de Cuenta' : 'Cartera Institucional'}
+          </h1>
+          <p style={{ color: '#64748b', marginTop: '6px', fontSize: '1.1rem' }}>
+            {selected ? `Administrando obligaciones de ${selected.name}` : 'Módulo de control financiero y paz y salvo'}
           </p>
-          {filtered.slice(0, 12).map(s => (
-            <button key={s.id} onClick={() => { loadObligations(s); setIsSidebarOpen(false); }}
-              className={`admin-nav-item ${selected?.id === s.id ? 'active' : ''}`} style={{ fontSize: '0.8rem' }}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name.split(' ').slice(0, 2).join(' ')}</span>
-            </button>
-          ))}
-        </nav>
-        <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <button onClick={() => { logout(); navigate('/'); }} className="btn-logout-premium">
-            <LogOut size={18} /> <span>Cerrar Sesión</span>
-          </button>
         </div>
-      </aside>
 
-      <main className="admin-main-container">
-        <div className="section-reveal">
-          <div style={{ marginBottom: '28px' }}>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#1e293b', margin: 0 }}>Gestión de Cartera</h1>
-            <p style={{ color: '#64748b', marginTop: '4px' }}>Obligaciones financieras y paz y salvo estudiantil</p>
-          </div>
-
-          {/* SEARCH */}
-          <div style={{ position: 'relative', maxWidth: '380px', marginBottom: '24px' }}>
-            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+        {/* SEARCH (Only if no student selected) */}
+        {!selected && (
+          <div style={{ position: 'relative', maxWidth: '450px', marginBottom: '32px' }}>
+            <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
             <input
-              style={{ width: '100%', padding: '12px 16px 12px 38px', borderRadius: '14px', border: '1px solid #e2e8f0', background: 'white', fontSize: '0.85rem', outline: 'none' }}
-              placeholder="Buscar estudiante..." value={search} onChange={e => setSearch(e.target.value)} />
+              className="premium-input-search"
+              style={{ width: '100%', padding: '14px 16px 14px 48px', borderRadius: '18px', border: '1px solid #e2e8f0', background: 'white', fontSize: '1rem', outline: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}
+              placeholder="Buscar estudiante por nombre o programa..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
+        )}
 
-          {!selected ? (
-            /* TABLA DE TODOS LOS ESTUDIANTES */
-            <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
-              <div style={{ overflowX: 'auto' }}>
-                <table className="premium-table">
-                  <thead><tr><th>ESTUDIANTE</th><th>PROGRAMA</th><th>SEMESTRE</th><th>ACCIÓN</th></tr></thead>
-                  <tbody>
-                    {filtered.map(s => (
-                      <tr key={s.id}>
-                        <td>
-                          <div>
-                            <p style={{ margin: 0, fontWeight: 800, color: '#1e293b', fontSize: '0.85rem' }}>{s.name}</p>
-                            <p style={{ margin: 0, fontSize: '0.72rem', color: '#94a3b8' }}>{s.email}</p>
-                          </div>
-                        </td>
-                        <td style={{ fontSize: '0.8rem', color: '#475569' }}>{s.program || 'N/A'}</td>
-                        <td><span style={{ background: '#eef2ff', color: 'var(--primary)', padding: '3px 8px', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800 }}>{s.semester}</span></td>
-                        <td>
-                          <button onClick={() => loadObligations(s)}
-                            style={{ background: '#f0fdf4', border: 'none', borderRadius: '8px', padding: '6px 14px', cursor: 'pointer', color: '#16a34a', fontWeight: 700, fontSize: '0.75rem' }}>
-                            Ver Cuenta
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ) : (
-            /* DETALLE DE ESTUDIANTE */
-            <div>
-              <button onClick={() => setSelected(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', marginBottom: '20px', fontSize: '0.85rem' }}>
-                ← Volver al listado
-              </button>
-
-              {/* HEADER ESTUDIANTE + PAZ Y SALVO */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
-                <div style={{ flex: 1 }}>
-                  <h2 style={{ margin: 0, fontWeight: 900, color: '#1e293b' }}>{selected.name}</h2>
-                  <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '0.85rem' }}>{selected.program} · {selected.semester}</p>
-                </div>
-                <div style={{
-                  padding: '14px 24px', borderRadius: '16px',
-                  background: isPazYSalvo ? '#f0fdf4' : '#fef2f2',
-                  border: `2px solid ${isPazYSalvo ? '#16a34a' : '#ef4444'}`,
-                  display: 'flex', alignItems: 'center', gap: '10px'
-                }}>
-                  {isPazYSalvo ? <CheckCircle size={24} color="#16a34a" /> : <XCircle size={24} color="#ef4444" />}
-                  <div>
-                    <p style={{ margin: 0, fontWeight: 900, color: isPazYSalvo ? '#16a34a' : '#ef4444', fontSize: '0.95rem' }}>
-                      {isPazYSalvo ? '✅ Paz y Salvo' : '❌ Tiene Deudas'}
-                    </p>
-                    {!isPazYSalvo && <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700, color: '#ef4444' }}>Pendiente: {formatCOP(totalDebt)}</p>}
-                  </div>
-                </div>
-                <button onClick={() => setShowForm(!showForm)} className="btn-primary-premium">
-                  <Plus size={16} /> Nueva Obligación
-                </button>
-              </div>
-
-              {/* FORM NUEVA OBLIGACIÓN */}
-              {showForm && (
-                <form onSubmit={addObligation} style={{ background: '#f8fafc', borderRadius: '16px', padding: '24px', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
-                  <h4 style={{ margin: '0 0 20px', fontWeight: 800, color: '#1e293b' }}>Registrar Obligación</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '14px' }}>
-                    <div style={{ gridColumn: 'span 2' }}>
-                      <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Concepto *</label>
-                      <input className="input-premium" style={{ width: '100%' }} required
-                        placeholder="Ej: Matrícula 2026-1, Pensión Junio..."
-                        value={form.concept} onChange={e => setForm(f => ({ ...f, concept: e.target.value }))} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Monto (COP)</label>
-                      <input className="input-premium" style={{ width: '100%' }} type="number" min={0} step={1000}
-                        placeholder="1200000" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Fecha Límite</label>
-                      <input className="input-premium" style={{ width: '100%' }} type="date"
-                        value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Período</label>
-                      <input className="input-premium" style={{ width: '100%' }}
-                        value={form.period} onChange={e => setForm(f => ({ ...f, period: e.target.value }))} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Notas</label>
-                      <input className="input-premium" style={{ width: '100%' }}
-                        value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
-                    <button type="button" onClick={() => setShowForm(false)} className="btn-secondary-premium">Cancelar</button>
-                    <button type="submit" className="btn-primary-premium" disabled={saving}>{saving ? 'Guardando...' : 'Registrar Obligación'}</button>
-                  </div>
-                </form>
-              )}
-
-              {/* LISTA OBLIGACIONES */}
-              {obligations.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '60px', background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', color: '#94a3b8' }}>
-                  <CreditCard size={40} style={{ opacity: 0.3, marginBottom: '12px' }} />
-                  <p style={{ margin: 0, fontWeight: 600 }}>Sin obligaciones registradas</p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {obligations.map(o => {
-                    const cfg = STATUS_CONFIG[o.status] || STATUS_CONFIG.pending;
-                    return (
-                      <div key={o.id} style={{ background: 'white', borderRadius: '16px', padding: '18px 20px', border: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                        <div style={{ flex: 1 }}>
-                          <p style={{ margin: 0, fontWeight: 800, color: '#1e293b' }}>{o.concept}</p>
-                          <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>
-                            Período {o.period}{o.due_date ? ` · Vence: ${o.due_date}` : ''}
-                            {o.paid_at ? ` · Pagado: ${new Date(o.paid_at).toLocaleDateString('es-CO')}` : ''}
-                          </p>
-                          {o.notes && <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic' }}>{o.notes}</p>}
+        {!selected ? (
+          /* TABLA DE TODOS LOS ESTUDIANTES */
+          <div className="premium-table-container">
+            <table className="premium-table">
+              <thead>
+                <tr>
+                  <th>IDENTIDAD ESTUDIANTIL</th>
+                  <th>PROGRAMA ACADÉMICO</th>
+                  <th>SEMESTRE</th>
+                  <th>ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(s => (
+                  <tr key={s.id}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        <div style={{
+                          width: '42px', height: '42px', borderRadius: '14px',
+                          background: `linear-gradient(135deg, hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 93%), #fff)`,
+                          color: `hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 30%)`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, border: '1px solid rgba(0,0,0,0.05)'
+                        }}>
+                          {(s.name || '?').charAt(0).toUpperCase()}
                         </div>
-                        <span style={{ fontWeight: 900, fontSize: '1rem', color: '#1e293b' }}>{formatCOP(o.amount)}</span>
-                        <span style={{ padding: '4px 12px', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 800, background: cfg.bg, color: cfg.color, display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          {cfg.icon} {cfg.label}
-                        </span>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          {(o.status === 'pending' || o.status === 'overdue') && (
-                            <button onClick={() => markPaid(o.id)}
-                              style={{ background: '#f0fdf4', border: 'none', borderRadius: '8px', padding: '6px 12px', cursor: 'pointer', color: '#16a34a', fontWeight: 700, fontSize: '0.72rem' }}>
-                              ✓ Marcar Pagado
-                            </button>
-                          )}
-                          <button onClick={() => deleteObligation(o.id)}
-                            style={{ background: '#fef2f2', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer', color: '#ef4444' }}>
-                            <Trash2 size={14} />
-                          </button>
+                        <div>
+                          <p style={{ margin: 0, fontWeight: 800, color: '#1e293b', fontSize: '1rem' }}>{s.name}</p>
+                          <p style={{ margin: 0, fontSize: '0.8rem', color: '#94a3b8' }}>{s.email}</p>
                         </div>
                       </div>
-                    );
-                  })}
+                    </td>
+                    <td style={{ fontSize: '0.95rem', color: '#475569', fontWeight: 600 }}>{s.program || 'Sin Programa'}</td>
+                    <td>
+                      <span style={{ background: '#eef2ff', color: 'var(--primary)', padding: '6px 14px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 900 }}>
+                        {s.semester}º Sem.
+                      </span>
+                    </td>
+                    <td>
+                      <button onClick={() => loadObligations(s)}
+                        className="btn-action-view"
+                        style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '10px 18px', cursor: 'pointer', color: '#16a34a', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <DollarSign size={16} /> Consultar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          /* DETALLE DE ESTUDIANTE */
+          <div className="section-reveal">
+            <button onClick={() => setSelected(null)}
+              style={{ background: 'rgba(7, 137, 178, 0.05)', border: 'none', color: 'var(--primary)', fontWeight: 800, cursor: 'pointer', marginBottom: '32px', fontSize: '0.9rem', padding: '12px 20px', borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              ← Volver al Listado General
+            </button>
+
+            {/* HEADER ESTUDIANTE + KPI CARDS */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '24px', marginBottom: '40px' }}>
+               <div style={{ background: 'white', padding: '32px', borderRadius: '24px', border: '1px solid #f1f5f9', boxShadow: 'var(--card-shadow)', display: 'flex', alignItems: 'center', gap: '24px' }}>
+                  <div style={{ width: '70px', height: '70px', borderRadius: '20px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: '1.8rem' }}>
+                    {selected.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontWeight: 900, color: '#1e293b', fontSize: '1.8rem', letterSpacing: '-0.5px' }}>{selected.name}</h2>
+                    <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: '1.1rem', fontWeight: 600 }}>{selected.program} · Semestre {selected.semester}</p>
+                  </div>
+               </div>
+
+               <div style={{
+                  padding: '24px', borderRadius: '24px',
+                  background: isPazYSalvo ? '#f0fdf4' : '#fef2f2',
+                  border: `2px solid ${isPazYSalvo ? '#22c55e' : '#ef4444'}`,
+                  display: 'flex', alignItems: 'center', gap: '20px', boxShadow: 'var(--card-shadow)'
+                }}>
+                  <div style={{ 
+                    width: '56px', height: '56px', borderRadius: '16px', 
+                    background: isPazYSalvo ? '#dcfce7' : '#fee2e2',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: isPazYSalvo ? '#16a34a' : '#ef4444'
+                  }}>
+                    {isPazYSalvo ? <CheckCircle size={32} /> : <AlertTriangle size={32} />}
+                  </div>
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 900, color: isPazYSalvo ? '#16a34a' : '#ef4444', fontSize: '1.2rem', letterSpacing: '-0.3px' }}>
+                      {isPazYSalvo ? 'Estado: Paz y Salvo' : 'Estado: Pendiente'}
+                    </p>
+                    <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: isPazYSalvo ? '#16a34a' : '#b91c1c' }}>
+                      {isPazYSalvo ? 'Sin deudas activas' : `Saldo: ${formatCOP(totalDebt)}`}
+                    </p>
+                  </div>
                 </div>
-              )}
             </div>
-          )}
-        </div>
-      </main>
-    </div>
+
+            {/* ACTION BAR */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+               <h3 style={{ margin: 0, fontWeight: 900, color: '#1e293b', fontSize: '1.2rem' }}>
+                 Historial de Obligaciones
+               </h3>
+               <button onClick={() => setShowForm(!showForm)} className="btn-primary-premium" style={{ padding: '12px 24px', borderRadius: '16px' }}>
+                 <Plus size={20} style={{ marginRight: '8px' }} /> Generar Cobro
+               </button>
+            </div>
+
+            {/* FORM NUEVA OBLIGACIÓN */}
+            {showForm && (
+              <form onSubmit={addObligation} className="section-reveal" style={{ background: 'white', borderRadius: '24px', padding: '32px', marginBottom: '32px', border: '1px solid var(--primary)', boxShadow: 'var(--premium-shadow-hover)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                   <h4 style={{ margin: 0, fontWeight: 900, color: 'var(--primary)', fontSize: '1.2rem' }}>Registrar Nueva Obligación</h4>
+                   <button onClick={() => setShowForm(false)} type="button" style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>✕</button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                  <div style={{ gridColumn: 'span 3' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>Descripción del Concepto *</label>
+                    <input className="input-premium" style={{ width: '100%', padding: '14px', borderRadius: '12px' }} required
+                      placeholder="Ej: Matrícula Ordinaria 2026-1, Derechos de Grado, Certificado..."
+                      value={form.concept} onChange={e => setForm(f => ({ ...f, concept: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Valor (COP)</label>
+                    <input className="input-premium" style={{ width: '100%', padding: '14px', borderRadius: '12px' }} type="number" min={0} step={1000}
+                      placeholder="0" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Fecha Vencimiento</label>
+                    <input className="input-premium" style={{ width: '100%', padding: '14px', borderRadius: '12px' }} type="date"
+                      value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Ciclo/Período</label>
+                    <input className="input-premium" style={{ width: '100%', padding: '14px', borderRadius: '12px' }}
+                      value={form.period} onChange={e => setForm(f => ({ ...f, period: e.target.value }))} />
+                  </div>
+                  <div style={{ gridColumn: 'span 3' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>Notas Administrativas</label>
+                    <textarea className="input-premium" style={{ width: '100%', padding: '14px', borderRadius: '12px', height: '80px', resize: 'none' }}
+                      value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Observaciones sobre el pago o saldo..." />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
+                  <button type="submit" className="btn-primary-premium" style={{ padding: '14px 28px', flex: 1 }} disabled={saving}>
+                    {saving ? 'Procesando...' : 'Generar Obligación Financiera'}
+                  </button>
+                  <button type="button" onClick={() => setShowForm(false)} className="btn-secondary-premium" style={{ padding: '14px 28px' }}>Descartar</button>
+                </div>
+              </form>
+            )}
+
+            {/* LISTA OBLIGACIONES */}
+            {obligations.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '80px 20px', background: 'white', borderRadius: '24px', border: '1px solid #f1f5f9', color: '#94a3b8' }}>
+                <CreditCard size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
+                <h3 style={{ margin: 0, color: '#475569' }}>Historial Limpio</h3>
+                <p style={{ margin: '8px 0 0', fontWeight: 500 }}>Este estudiante no posee registros financieros en el sistema.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {obligations.map(o => {
+                  const cfg = STATUS_CONFIG[o.status] || STATUS_CONFIG.pending;
+                  return (
+                    <div key={o.id} className="kpi-card" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', border: '1px solid #f1f5f9' }}>
+                      <div className="kpi-icon-box" style={{ background: cfg.bg, color: cfg.color, marginBottom: 0 }}>
+                         {cfg.icon}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ margin: 0, fontWeight: 900, color: '#1e293b', fontSize: '1.1rem' }}>{o.concept}</p>
+                        <div style={{ display: 'flex', gap: '16px', marginTop: '4px' }}>
+                           <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8', fontWeight: 700 }}>{o.period}</p>
+                           {o.due_date && <p style={{ margin: 0, fontSize: '0.85rem', color: o.status === 'overdue' ? '#ef4444' : '#64748b', fontWeight: 700 }}>Vence: {o.due_date}</p>}
+                           {o.paid_at && <p style={{ margin: 0, fontSize: '0.85rem', color: '#16a34a', fontWeight: 700 }}>Pagado el: {new Date(o.paid_at).toLocaleDateString()}</p>}
+                        </div>
+                        {o.notes && <p style={{ margin: '6px 0 0', fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic', fontWeight: 500 }}>Nota: {o.notes}</p>}
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                         <p style={{ margin: 0, fontWeight: 900, fontSize: '1.4rem', color: '#1e293b', letterSpacing: '-0.5px' }}>{formatCOP(o.amount)}</p>
+                         <span style={{ padding: '5px 14px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 900, background: cfg.bg, color: cfg.color, display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+                           {cfg.label.toUpperCase()}
+                         </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        {(o.status === 'pending' || o.status === 'overdue') && (
+                          <button onClick={() => markPaid(o.id)}
+                            style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '10px 16px', cursor: 'pointer', color: '#16a34a', fontWeight: 800, fontSize: '0.8rem' }}>
+                            Saldar Deuda
+                          </button>
+                        )}
+                        <button onClick={() => deleteObligation(o.id)}
+                          style={{ background: '#fef2f2', border: 'none', borderRadius: '12px', padding: '10px', cursor: 'pointer', color: '#ef4444', border: '1px solid #fee2e2' }}>
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </DashboardLayout>
+  );
+};
   );
 };
 

@@ -4,9 +4,10 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { 
   Users, Search, LogOut, Menu, Image as ImageIcon, 
-  Heart, BarChart2, ShieldCheck, UserCircle 
+  Heart, BarChart2, ShieldCheck, UserCircle, ArrowLeft, ArrowUpRight
 } from 'lucide-react';
 import PhotoValidationModule from '../components/PhotoValidationModule';
+import DashboardLayout from '../components/layout/DashboardLayout';
 
 const BienestarDashboard = () => {
   const { user, logout } = useAuth();
@@ -44,107 +45,110 @@ const BienestarDashboard = () => {
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
-      {/* MOBILE TOP BAR */}
-      <div className="mobile-top-bar">
-        <span style={{ fontWeight: 900, color: 'var(--primary)' }}>Bienestar Universitario</span>
-        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="menu-circle">
-          <Menu size={20} />
-        </button>
-      </div>
+  const navItems = [
+    ...(user?.role === 'ADMIN' ? [{
+      title: 'Administración',
+      items: [
+        { id: 'back_admin', icon: <ArrowLeft size={18} />, label: 'Volver a Panel Admin', onClick: () => navigate('/admin') }
+      ]
+    }] : []),
+    {
+      title: 'Gestión Institucional',
+      items: [
+        { id: 'validacion', icon: <ImageIcon size={18} />, label: 'Validación de Fotos', onClick: () => setActiveNav('validacion') },
+        { id: 'estudiantes', icon: <Users size={18} />, label: 'Expedientes', onClick: () => setActiveNav('estudiantes') },
+        { id: 'reportes', icon: <BarChart2 size={18} />, label: 'Analítica de Riesgo', onClick: () => setActiveNav('reportes') },
+      ]
+    }
+  ];
 
-      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
+  return (
+    <DashboardLayout
+      user={user}
+      navItems={navItems}
+      activeNav={activeNav}
+      setActiveNav={setActiveNav}
+      logout={logout}
+      navigate={navigate}
+    >
+      <div className="section-reveal">
+        {/* HEADER SECTION */}
+        <div style={{ marginBottom: '40px' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#1e293b', margin: 0, letterSpacing: '-1.2px' }}>
+            Bienestar Universitario
+          </h1>
+          <p style={{ color: '#64748b', marginTop: '8px', fontSize: '1.1rem', fontWeight: 500 }}>
+            Infraestructura de acompañamiento y validación estudiantil.
+          </p>
+        </div>
 
-      {/* SIDEBAR */}
-      <aside className={`admin-sidebar-premium ${isSidebarOpen ? 'open' : ''}`}>
-        <div style={{ padding: '28px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ 
-              width: '44px', height: '44px', borderRadius: '14px', 
-              background: 'linear-gradient(135deg, #ec4899, #be185d)', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center', 
-              fontWeight: 900, color: 'white', fontSize: '1.2rem' 
-            }}>
-              {(user?.name || 'B').charAt(0)}
+        {/* METRICS SUMMARY */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px', marginBottom: '48px' }}>
+          <div className="kpi-card" style={{ padding: '32px' }}>
+            <div className="kpi-icon-box" style={{ background: '#fdf2f8', color: '#db2777' }}>
+              <Users size={24} />
             </div>
-            <div>
-              <p style={{ fontWeight: 900, fontSize: '0.9rem', margin: 0, color: 'white' }}>{user?.name?.split(' ')[0]}</p>
-              <span style={{ 
-                fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', 
-                background: 'rgba(236, 72, 153, 0.2)', color: '#fbcfe8', 
-                padding: '2px 8px', borderRadius: '20px', display: 'inline-block', marginTop: '4px' 
-              }}>
-                Bienestar
-              </span>
+            <p style={{ margin: '16px 0 6px', fontSize: '0.8rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Población Estudiantil</p>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
+              <h3 style={{ fontSize: '2.8rem', fontWeight: 900, color: '#1e293b', margin: 0, lineHeight: 1 }}>{stats.totalEstudiantes}</h3>
+              <span style={{ color: '#10b981', fontSize: '0.85rem', fontWeight: 700, paddingBottom: '8px' }}>+ Activos</span>
+            </div>
+          </div>
+
+          <div className="kpi-card" style={{ padding: '32px', border: '2px solid rgba(22, 182, 214, 0.2)' }}>
+            <div className="kpi-icon-box" style={{ background: '#ecfeff', color: 'var(--primary)' }}>
+              <ImageIcon size={24} />
+            </div>
+            <p style={{ margin: '16px 0 6px', fontSize: '0.8rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Verificaciones Pendientes</p>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
+              <h3 style={{ fontSize: '2.8rem', fontWeight: 900, color: 'var(--primary)', margin: 0, lineHeight: 1 }}>{stats.pendientesFoto}</h3>
+              <button 
+                onClick={() => setActiveNav('validacion')} 
+                style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', paddingBottom: '8px' }}
+              >
+                <ArrowUpRight size={20} />
+              </button>
             </div>
           </div>
         </div>
 
-        <nav style={{ flex: 1, padding: '20px 0' }}>
-          {user?.role === 'ADMIN' && (
-            <button onClick={() => navigate('/admin')} className="admin-nav-item" style={{ marginBottom: '12px', borderLeft: '3px solid var(--secondary)', background: 'rgba(255,255,255,0.05)' }}>
-              <ImageIcon size={18} style={{ transform: 'rotate(180deg)' }} /> <span>Volver a Admin</span>
-            </button>
-          )}
-          {navItems.map(item => (
-            <button 
-              key={item.id} 
-              onClick={() => { setActiveNav(item.id); setIsSidebarOpen(false); }}
-              className={`admin-nav-item ${activeNav === item.id ? 'active' : ''}`}
-            >
-              {item.icon} <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-
-        <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <button onClick={() => { logout(); navigate('/'); }} className="btn-logout-premium">
-            <LogOut size={18} /> <span>Cerrar Sesión</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* MAIN CONTENT */}
-      <main className="admin-main-container">
+        {/* MODULE RENDERER */}
         <div className="section-reveal">
-          <div style={{ marginBottom: '40px' }}>
-            <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b', margin: 0 }}>Panel de Bienestar</h1>
-            <p style={{ color: '#64748b' }}>Gestión de identidad y acompañamiento estudiantil</p>
-          </div>
-
-          <div className="responsive-grid-3" style={{ marginBottom: '40px' }}>
-            <div className="kpi-card">
-              <div className="kpi-icon-box" style={{ background: '#fdf2f8', color: '#db2777' }}><Users size={22} /></div>
-              <p style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Estudiantes</p>
-              <h3 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b' }}>{stats.totalEstudiantes}</h3>
-            </div>
-            <div className="kpi-card" style={{ border: '2px solid rgba(22, 182, 214, 0.2)' }}>
-              <div className="kpi-icon-box" style={{ background: '#ecfeff', color: 'var(--primary)' }}><ImageIcon size={22} /></div>
-              <p style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Fotos Pendientes</p>
-              <h3 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary)' }}>{stats.pendientesFoto}</h3>
-            </div>
-          </div>
-
-          {activeNav === 'validacion' && <PhotoValidationModule />}
+          {activeNav === 'validacion' && (
+             <div style={{ background: 'white', borderRadius: '32px', padding: '10px', boxShadow: 'var(--card-shadow)', border: '1px solid #f1f5f9' }}>
+               <PhotoValidationModule />
+             </div>
+          )}
           
           {activeNav === 'estudiantes' && (
-            <div className="glass-card" style={{ padding: '40px', textAlign: 'center' }}>
-               <UserCircle size={48} color="#94a3b8" style={{ marginBottom: '20px' }} />
-               <h3 style={{ fontWeight: 800, color: '#1e293b' }}>Directorio Estudiantil</h3>
-               <p style={{ color: '#64748b' }}>Acceso a fichas técnicas y caracterización en desarrollo.</p>
+            <div className="glass-card" style={{ padding: '80px 40px', textAlign: 'center', borderRadius: '32px', border: '1px dotted #e2e8f0' }}>
+               <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', color: '#94a3b8' }}>
+                 <UserCircle size={48} />
+               </div>
+               <h3 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>Directorio y Expedientes</h3>
+               <p style={{ color: '#64748b', maxWidth: '500px', margin: '0 auto', fontSize: '1.1rem', lineHeight: 1.6 }}>
+                 En la siguiente fase, podrás acceder a las fichas técnicas, historial de caracterización y seguimientos psicosociales de cada estudiante.
+               </p>
+               <button className="btn-secondary-premium" style={{ marginTop: '32px', padding: '12px 32px' }}>Solicitar Acceso Temprano</button>
             </div>
           )}
           
           {activeNav === 'reportes' && (
-            <div className="glass-card" style={{ padding: '40px', textAlign: 'center' }}>
-               <BarChart2 size={48} color="#94a3b8" style={{ marginBottom: '20px' }} />
-               <h3 style={{ fontWeight: 800, color: '#1e293b' }}>Reportes de Bienestar</h3>
-               <p style={{ color: '#64748b' }}>Gráficas de riesgo y deserción próximamente.</p>
+            <div className="glass-card" style={{ padding: '80px 40px', textAlign: 'center', borderRadius: '32px' }}>
+               <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: '#f0f9ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', color: '#0ea5e9' }}>
+                 <BarChart2 size={48} />
+               </div>
+               <h3 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>Inteligencia de Datos</h3>
+               <p style={{ color: '#64748b', maxWidth: '500px', margin: '0 auto', fontSize: '1.1rem', lineHeight: 1.6 }}>
+                 Estamos integrando algoritmos de detección de riesgo de deserción y analítica de salud mental institucional. Estará disponible en el próximo ciclo académico.
+               </p>
             </div>
           )}
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
+  );
+};
   );
 };
 

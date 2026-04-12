@@ -3,8 +3,9 @@ import { supabase } from '../services/supabase';
 import { 
   LayoutDashboard, UserCircle, QrCode, LogOut, 
   Bell, Settings, BookOpen, ShieldCheck, Star, Calendar, Menu,
-  Library, HeartPulse, Wallet, MapPin, Clock
+  Library, HeartPulse, Wallet, MapPin, Clock, ArrowLeft, Headphones
 } from 'lucide-react';
+import DashboardLayout from '../components/layout/DashboardLayout';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import CharacterizationForm from '../components/CharacterizationForm';
@@ -368,96 +369,54 @@ const StudentDashboard = () => {
             <FinanceView user={studentData} />
           </div>
         );
-      default: return null;
+      default: return   const navItems = [
+    {
+      title: 'Experiencia',
+      items: [
+        { id: 'dashboard', label: 'Mi Panel', icon: <LayoutDashboard size={18} />, onClick: () => setActiveTab('dashboard') },
+        { id: 'qr', label: 'Identificación QR', icon: <QrCode size={18} />, onClick: () => setActiveTab('qr') },
+        { id: 'horario', label: 'Agenda Semanal', icon: <Calendar size={18} />, onClick: () => setActiveTab('horario') },
+        { id: 'notas', label: 'Rendimiento Académico', icon: <BookOpen size={18} />, onClick: () => setActiveTab('notas') },
+      ]
+    },
+    {
+      title: 'Campus Digital',
+      items: [
+        { id: 'biblioteca', label: 'Biblioteca Digital', icon: <Library size={18} />, onClick: () => setActiveTab('biblioteca') },
+        { id: 'bienestar', label: 'Vida Universitaria', icon: <HeartPulse size={18} />, onClick: () => setActiveTab('bienestar') },
+        { id: 'finanzas', label: 'Gestión Financiera', icon: <Wallet size={18} />, onClick: () => setActiveTab('finanzas') },
+      ]
+    },
+    {
+      title: 'Comunidad',
+      items: [
+        { id: 'perfil', label: 'Perfil de Estudiante', icon: <UserCircle size={18} />, onClick: () => setActiveTab('perfil') },
+        { id: 'noticias', label: 'Eventos y Noticias', icon: <Bell size={18} />, onClick: () => setActiveTab('noticias') },
+        { id: 'caracterizacion', label: 'Personalización', icon: <Settings size={18} />, onClick: () => setActiveTab('caracterizacion') },
+      ]
     }
-  };
+  ];
 
   return (
-    <div className="student-dashboard-wrapper">
-      {/* MOBILE TOP BAR */}
-      <div className="mobile-top-bar">
-         <img src="/images/escudo.png" alt="US" style={{ height: '28px' }} />
-         <button onClick={toggleSidebar} className="menu-circle">
-            <Menu size={20} />
-         </button>
-      </div>
-
-      {/* OVERLAY */}
-      {isSidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
-
-      <div className="student-sidebar-layout">
-        {/* SIDEBAR ESTUDIANTE PREMIUM */}
-        <aside className={`student-sidebar-premium ${isSidebarOpen ? 'open' : ''}`}>
-          <div className="sidebar-profile-mini">
-             <div className="avatar-mini-sidebar">
-                <img src={studentData.photo_url || '/images/default-avatar.png'} alt="P" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-             </div>
-             <div style={{ overflow: 'hidden' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 900, whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{(studentData?.name || 'Estudiante').split(' ')[0]}</p>
-                <p style={{ margin: 0, fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>{studentData.program?.substring(0, 15)}...</p>
-             </div>
-          </div>
-
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <p className="sidebar-label-premium">Principal</p>
-          {[
-            { id: 'dashboard', label: 'Inicio', icon: <LayoutDashboard size={18} /> },
-            { id: 'qr', label: 'Mi Carnet QR', icon: <QrCode size={18} /> },
-            { id: 'horario', label: 'Mi Horario', icon: <Calendar size={18} /> },
-            { id: 'notas', label: 'Mis Notas', icon: <BookOpen size={18} /> },
-            { id: 'biblioteca', label: 'Biblioteca', icon: <Library size={18} /> },
-            { id: 'bienestar', label: 'Bienestar', icon: <HeartPulse size={18} /> },
-            { id: 'finanzas', label: 'Finanzas', icon: <Wallet size={18} /> },
-            { id: 'perfil', label: 'Mi Perfil', icon: <UserCircle size={18} /> },
-            { id: 'caracterizacion', label: 'Actualizar Datos', icon: <Settings size={18} /> },
-          ].map(item => (
-            <button 
-              key={item.id} 
-              onClick={() => { setActiveTab(item.id); closeSidebar(); }} 
-              className={`nav-item-premium ${activeTab === item.id ? 'active' : ''}`}
-            >
-              {item.icon} {item.label}
-            </button>
-          ))}
-
-          {[
-            { id: 'noticias', label: 'Noticias US', icon: <Bell size={18} /> },
-          ].map(item => (
-            <button 
-              key={item.id} 
-              onClick={() => {
-                if (item.id === 'caracterizacion') {
-                    navigate('/characterization');
-                } else {
-                    setActiveTab(item.id);
-                }
-                closeSidebar();
-              }} 
-              className={`nav-item-premium ${activeTab === item.id ? 'active' : ''}`}
-            >
-              {item.icon} {item.label}
-            </button>
-          ))}
-
-          <p className="sidebar-label-premium">Cuenta</p>
-          <button className="nav-item-premium"><Settings size={18} /> Ajustes</button>
-        </nav>
-
-        <div style={{ padding: '24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <button onClick={handleLogout} className="btn-logout-premium" style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.6)' }}>
-             <LogOut size={18} /> Salir
-          </button>
-        </div>
-      </aside>
-
-      {/* CONTENIDO PRINCIPAL */}
-      <main className="student-main-container">
+    <DashboardLayout
+      user={user}
+      navItems={navItems}
+      activeNav={activeTab}
+      setActiveNav={setActiveTab}
+      logout={logout}
+      navigate={navigate}
+      variant="student"
+    >
+      <div className="section-reveal">
         {renderContent()}
-      </main>
-
-      {/* SALMI CHATBOT ASISTENTE 24/7 */}
+      </div>
+      
+      {/* ASISTENTE SALMI FLOTANTE */}
       <SalmiChatbot />
-    </div>
+    </DashboardLayout>
+  );
+};
+</div>
   </div>
 );
 };

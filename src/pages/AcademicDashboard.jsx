@@ -4,8 +4,9 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Calendar, BarChart2, LogOut, Search,
-  Plus, Trash2, X, Save, Clock, MapPin, BookOpen, Menu, ArrowLeft
+  Plus, Trash2, X, Save, Clock, MapPin, BookOpen, Menu, ArrowLeft, GraduationCap, Briefcase
 } from 'lucide-react';
+import DashboardLayout from '../components/layout/DashboardLayout';
 
 /* ─── MODAL HORARIO ────────────────────────────────────────────── */
 const ScheduleModal = ({ student, onClose, onSaved }) => {
@@ -140,6 +141,91 @@ const ScheduleModal = ({ student, onClose, onSaved }) => {
             <button type="button" onClick={onClose} className="btn-secondary-premium" style={{ flex: 1 }}>Cancelar</button>
             <button type="submit" className="btn-primary-premium" style={{ flex: 2 }} disabled={saving}>
               <Save size={16} /> {saving ? 'Guardando...' : 'Guardar Materia'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+/* ─── MODAL ASIGNACIÓN DOCENTE ─────────────────────────────────── */
+const TeacherAssignmentModal = ({ teacher, programs, onClose, onSaved }) => {
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchAvailableSubjects();
+  }, []);
+
+  const fetchAvailableSubjects = async () => {
+    const { data } = await supabase
+      .from('program_curriculum')
+      .select('subjects')
+      .in('program_id', programs.map(p => p.id));
+    
+    // Parsear materias de los strings separados por coma
+    const allSubjects = data.flatMap(d => d.subjects.split(',').map(s => s.trim()));
+    setSubjects([...new Set(allSubjects)].sort());
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (!selectedSubject) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('teacher_assignments')
+        .insert({ 
+          teacher_id: teacher.id, 
+          subject: selectedSubject,
+          period: '2026-1'
+        });
+      if (error) throw error;
+      onSaved();
+      onClose();
+    } catch (err) {
+      alert('Error: ' + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="premium-modal-overlay">
+      <div className="premium-modal-content" style={{ maxWidth: '450px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div>
+            <h2 style={{ fontWeight: 900, fontSize: '1.3rem', color: '#1e293b', margin: 0 }}>Asignar Materia</h2>
+            <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' }}>Docente: {teacher.name}</p>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+            <X size={20} color="#94a3b8" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSave}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+              Seleccionar Materia del Programa
+            </label>
+            <select 
+              className="input-premium" 
+              style={{ width: '100%' }} 
+              value={selectedSubject} 
+              onChange={e => setSelectedSubject(e.target.value)}
+              required
+            >
+              <option value="">-- Seleccionar materia --</option>
+              {subjects.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button type="button" onClick={onClose} className="btn-secondary-premium" style={{ flex: 1 }}>Cancelar</button>
+            <button type="submit" className="btn-primary-premium" style={{ flex: 2 }} disabled={saving}>
+              <Save size={16} /> {saving ? 'Asignando...' : 'Confirmar Asignación'}
             </button>
           </div>
         </form>
@@ -306,11 +392,115 @@ const HorariosSection = ({ students }) => {
   );
 };
 
+/* ─── SECCIÓN DOCENTES ─────────────────────────────────────────── */
+const DocentesSection = ({ teachers, directorPrograms }) => {
+  const [assignments, setAssignments] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchAssignments();
+  }, [teachers]);
+
+  const fetchAssignments = async () => {
+    setLoading(true);
+    const { data } = await supabase.from('teacher_assignments').select('*');
+    const mapping = {};
+    data?.forEach(asg => {
+      if (!mapping[asg.teacher_id]) mapping[asg.teacher_id] = [];
+      mapping[asg.teacher_id].push(asg);
+    });
+    setAssignments(mapping);
+    setLoading(false);
+  };
+
+  const removeAssignment = async (id) => {
+    if (!confirm('¿Quitar esta asignación?')) return;
+    await supabase.from('teacher_assignments').delete().eq('id', id);
+    fetchAssignments();
+  };
+
+  return (
+    <div className="section-reveal">
+      <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b', margin: 0 }}>Planta Docente</h1>
+          <p style={{ color: '#64748b', marginTop: '4px' }}>Gestión de carga académica institucional</p>
+        </div>
+      </div>
+
+      <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
+        <table className="premium-table">
+          <thead>
+            <tr>
+              {['PROFESOR', 'CARGA ACADÉMICA', 'ACCIONES'].map(h => <th key={h}>{h}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {teachers.map(t => (
+              <tr key={t.id}>
+                <td style={{ width: '300px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontWeight: 900 }}>
+                      {t.name[0]}
+                    </div>
+                    <div>
+                      <p style={{ margin: 0, fontWeight: 800, color: '#1e293b' }}>{t.name}</p>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8' }}>{t.email}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {(assignments[t.id] || []).length === 0 ? (
+                      <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic' }}>Sin asignación</span>
+                    ) : (
+                      assignments[t.id].map(asg => (
+                        <span key={asg.id} style={{ background: '#f0f9ff', color: '#0369a1', padding: '4px 10px', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700, border: '1px solid #bae6fd', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <BookOpen size={12} /> {asg.subject}
+                          <button onClick={() => removeAssignment(asg.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px', display: 'flex' }}>
+                            <X size={10} />
+                          </button>
+                        </span>
+                      ))
+                    )}
+                  </div>
+                </td>
+                <td style={{ width: '150px' }}>
+                  <button 
+                    onClick={() => { setSelectedTeacher(t); setShowModal(true); }}
+                    className="btn-primary-premium" 
+                    style={{ padding: '8px 16px', fontSize: '0.75rem' }}
+                  >
+                    <Plus size={14} /> Asignar Carga
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {showModal && selectedTeacher && (
+        <TeacherAssignmentModal 
+          teacher={selectedTeacher}
+          programs={directorPrograms}
+          onClose={() => setShowModal(false)}
+          onSaved={fetchAssignments}
+        />
+      )}
+    </div>
+  );
+};
+
 /* ─── ACADEMIC DASHBOARD PRINCIPAL ────────────────────────────── */
 const AcademicDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [students, setStudents] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [academicPrograms, setAcademicPrograms] = useState([]);
   const [activeNav, setActiveNav] = useState('horarios');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -322,8 +512,14 @@ const AcademicDashboard = () => {
       navigate('/login');
       return;
     }
-    fetchStudents();
+    fetchDashboardData();
   }, [user]);
+
+  const fetchDashboardData = async () => {
+    await fetchStudents();
+    await fetchTeachers();
+    await fetchPrograms();
+  };
 
   const fetchStudents = async () => {
     let query = supabase
@@ -342,139 +538,100 @@ const AcademicDashboard = () => {
     setStudents(data || []);
   };
 
-  const navItems = [
-    { id: 'horarios', icon: <Calendar size={18} />, label: 'Horarios' },
-    { id: 'estudiantes', icon: <Users size={18} />, label: 'Estudiantes' },
-  ];
-
-  const getRoleLabel = () => {
-    if (user?.role === 'COORD_ACADEMICO') return 'Coordinador Académico';
-    if (user?.role === 'DIRECTOR_PROGRAMA') return 'Director de Programa';
-    return user?.role;
+  const fetchTeachers = async () => {
+    // Para la lógica real de la U, los directores pueden ver a todos los profesores
+    // pero solo asignarles materias de SUS programas.
+    const { data } = await supabase
+      .from('user')
+      .select('*')
+      .eq('role', 'PROFESOR')
+      .eq('status', 'Active')
+      .order('name');
+    setTeachers(data || []);
   };
 
-  const roleBadgeColor = isCoord ? 'var(--secondary)' : '#7c3aed';
+  const fetchPrograms = async () => {
+    const { data } = await supabase
+      .from('academic_programs')
+      .select('*')
+      .in('name', myPrograms);
+    setAcademicPrograms(data || []);
+  };
+
+  const navItems = [
+    ...(user?.role === 'ADMIN' ? [{
+      title: 'Administración',
+      items: [
+        { id: 'back_admin', icon: <ArrowLeft size={18} />, label: 'Volver a Panel Admin', onClick: () => navigate('/admin') }
+      ]
+    }] : []),
+    {
+      title: 'Gestión Académica',
+      items: [
+        { id: 'horarios', icon: <Calendar size={18} />, label: 'Horarios Estudiantiles' },
+        { id: 'docentes', icon: <GraduationCap size={18} />, label: 'Gestión Docente' },
+        { id: 'estudiantes', icon: <Users size={18} />, label: 'Listado Estudiantes' },
+      ]
+    }
+  ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
-      {/* MOBILE TOP BAR */}
-      <div className="mobile-top-bar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src="/images/escudo.png" alt="US" style={{ height: '32px' }} />
-          <span style={{ fontWeight: 900, color: 'var(--primary)', fontSize: '0.9rem' }}>
-            {isCoord ? 'Coordinación' : 'Dirección'}
-          </span>
-        </div>
-        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="menu-circle">
-          <Menu size={20} />
-        </button>
-      </div>
-
-      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
-
-      {/* SIDEBAR */}
-      <aside className={`admin-sidebar-premium ${isSidebarOpen ? 'open' : ''}`}>
-        <div style={{ padding: '28px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: roleBadgeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.2rem', color: 'white' }}>
-              {(user?.name || 'A').charAt(0)}
-            </div>
-            <div>
-              <p style={{ fontWeight: 900, fontSize: '0.9rem', margin: 0 }}>
-                {user?.name?.split(' ')[0]}
-              </p>
-              <span style={{
-                fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase',
-                background: roleBadgeColor, color: 'white', padding: '2px 8px',
-                borderRadius: '20px', display: 'inline-block', marginTop: '4px'
-              }}>
-                {getRoleLabel()}
-              </span>
-            </div>
-          </div>
-
-          {!isCoord && myPrograms.length > 0 && (
-            <div style={{ marginTop: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '10px' }}>
-              <p style={{ fontSize: '0.6rem', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: '6px' }}>Tus Programas</p>
-              {myPrograms.map(p => (
-                <p key={p} style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.7)', margin: '2px 0', lineHeight: 1.3 }}>· {p}</p>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <nav style={{ flex: 1, padding: '20px 0' }}>
-          {user?.role === 'ADMIN' && (
-            <button onClick={() => navigate('/admin')} className="admin-nav-item" style={{ marginBottom: '12px', borderLeft: '3px solid var(--secondary)', background: 'rgba(255,255,255,0.05)' }}>
-              <ArrowLeft size={18} /> <span style={{ fontWeight: 800 }}>Volver a Panel Admin</span>
-            </button>
-          )}
-          {navItems.map(item => (
-            <button key={item.id}
-              onClick={() => { setActiveNav(item.id); setIsSidebarOpen(false); }}
-              className={`admin-nav-item ${activeNav === item.id ? 'active' : ''}`}>
-              {item.icon} <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-
-        <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <button onClick={() => { logout(); navigate('/'); }} className="btn-logout-premium">
-            <LogOut size={18} /> <span>Cerrar Sesión</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* MAIN */}
-      <main className="admin-main-container">
-        {activeNav === 'horarios' && <HorariosSection students={students} />}
-        {activeNav === 'estudiantes' && (
-          <div className="section-reveal">
-            <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b', marginBottom: '8px' }}>
-              {isCoord ? 'Todos los Estudiantes' : 'Mis Estudiantes'}
-            </h1>
-            <p style={{ color: '#64748b', marginBottom: '32px' }}>
-              {students.length} estudiante{students.length !== 1 ? 's' : ''} activo{students.length !== 1 ? 's' : ''}
-              {!isCoord && myPrograms.length > 0 && ` en tus programas`}
-            </p>
-            <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
-              <table className="premium-table">
-                <thead>
-                  <tr>
-                    {['ESTUDIANTE', 'PROGRAMA', 'SEMESTRE', 'ESTADO'].map(h => <th key={h}>{h}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map(s => (
-                    <tr key={s.id}>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{
-                            width: '38px', height: '38px', borderRadius: '12px',
-                            background: `hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 93%)`,
-                            color: `hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 30%)`,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900
-                          }}>
-                            {(s.name || '?').charAt(0)}
-                          </div>
-                          <div>
-                            <p style={{ margin: 0, fontWeight: 800, color: '#1e293b', fontSize: '0.9rem' }}>{s.name}</p>
-                            <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8' }}>{s.email}</p>
-                          </div>
+    <DashboardLayout
+      user={user}
+      navItems={navItems}
+      activeNav={activeNav}
+      setActiveNav={setActiveNav}
+      logout={logout}
+      navigate={navigate}
+    >
+      {activeNav === 'horarios' && <HorariosSection students={students} />}
+      {activeNav === 'docentes' && <DocentesSection teachers={teachers} directorPrograms={academicPrograms} />}
+      {activeNav === 'estudiantes' && (
+        <div className="section-reveal">
+          <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b', marginBottom: '8px' }}>
+            {isCoord ? 'Todos los Estudiantes' : 'Mis Estudiantes'}
+          </h1>
+          <p style={{ color: '#64748b', marginBottom: '32px' }}>
+            {students.length} estudiante{students.length !== 1 ? 's' : ''} activo{students.length !== 1 ? 's' : ''}
+            {!isCoord && myPrograms.length > 0 && ` en tus programas`}
+          </p>
+          <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
+            <table className="premium-table">
+              <thead>
+                <tr>
+                  {['ESTUDIANTE', 'PROGRAMA', 'SEMESTRE', 'ESTADO'].map(h => <th key={h}>{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {students.map(s => (
+                  <tr key={s.id}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{
+                          width: '38px', height: '38px', borderRadius: '12px',
+                          background: `hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 93%)`,
+                          color: `hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 30%)`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900
+                        }}>
+                          {(s.name || '?').charAt(0)}
                         </div>
-                      </td>
-                      <td style={{ fontSize: '0.85rem', color: '#475569' }}>{s.program || 'N/A'}</td>
-                      <td><span style={{ background: '#eef2ff', color: 'var(--primary)', padding: '4px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 800 }}>{s.semester}</span></td>
-                      <td><span className={`status-badge ${s.status === 'Active' ? 'status-active' : 'status-suspended'}`}>{s.status === 'Active' ? 'Activo' : 'Suspendido'}</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <div>
+                          <p style={{ margin: 0, fontWeight: 800, color: '#1e293b', fontSize: '0.9rem' }}>{s.name}</p>
+                          <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8' }}>{s.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ fontSize: '0.85rem', color: '#475569' }}>{s.program || 'N/A'}</td>
+                    <td><span style={{ background: '#eef2ff', color: 'var(--primary)', padding: '4px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 800 }}>{s.semester}</span></td>
+                    <td><span className={`status-badge ${s.status === 'Active' ? 'status-active' : 'status-suspended'}`}>{s.status === 'Active' ? 'Activo' : 'Suspendido'}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-      </main>
-    </div>
+        </div>
+      )}
+    </DashboardLayout>
   );
 };
 

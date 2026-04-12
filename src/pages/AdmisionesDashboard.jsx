@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { UserPlus, Search, Filter, LogOut, Menu, ChevronRight, CheckCircle, Clock, XCircle, AlertCircle, Plus, X, ArrowLeft } from 'lucide-react';
+import { UserPlus, Search, Filter, LogOut, Menu, ChevronRight, CheckCircle, Clock, XCircle, AlertCircle, Plus, X, ArrowLeft, Users, Briefcase, GraduationCap } from 'lucide-react';
+import DashboardLayout from '../components/layout/DashboardLayout';
 
 const STATUS_CONFIG = {
   pending:   { label: 'Inscrito',  color: '#ca8a04', bg: '#fef9c3', icon: <Clock size={12} /> },
@@ -145,147 +146,174 @@ const AdmisionesDashboard = () => {
   const counts = Object.keys(STATUS_CONFIG).reduce((acc, k) => ({ ...acc, [k]: applicants.filter(a => a.status === k).length }), {});
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
-      <div className="mobile-top-bar">
-        <span style={{ fontWeight: 900, color: 'var(--primary)' }}>Admisiones</span>
-        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="menu-circle"><Menu size={20} /></button>
-      </div>
-      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
+  const navItems = [
+    ...(user?.role === 'ADMIN' ? [{
+      title: 'Administración',
+      items: [
+        { id: 'back_admin', icon: <ArrowLeft size={18} />, label: 'Volver a Panel Admin', onClick: () => navigate('/admin') }
+      ]
+    }] : []),
+    {
+      title: 'Módulo de Ingreso',
+      items: [
+        { id: 'all', icon: <Users size={18} />, label: 'Gestión General', onClick: () => setFilterStatus('all') },
+      ]
+    },
+    {
+      title: 'Filtros de Proceso',
+      items: Object.entries(STATUS_CONFIG).map(([key, cfg]) => ({
+        id: key,
+        icon: React.cloneElement(cfg.icon, { size: 18 }),
+        label: cfg.label,
+        onClick: () => setFilterStatus(key)
+      }))
+    }
+  ];
 
-      <aside className={`admin-sidebar-premium ${isSidebarOpen ? 'open' : ''}`}>
-        <div style={{ padding: '28px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: 'white', fontSize: '1.2rem' }}>
-              {(user?.name || 'A').charAt(0)}
-            </div>
-            <div>
-              <p style={{ fontWeight: 900, fontSize: '0.9rem', margin: 0, color: 'white' }}>{user?.name?.split(' ')[0]}</p>
-              <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', background: '#7c3aed', color: 'white', padding: '2px 8px', borderRadius: '20px', display: 'inline-block', marginTop: '4px' }}>Admisiones</span>
-            </div>
+  return (
+    <DashboardLayout
+      user={user}
+      navItems={navItems}
+      activeNav={filterStatus}
+      setActiveNav={setFilterStatus}
+      logout={logout}
+      navigate={navigate}
+    >
+      <div className="section-reveal">
+        {/* HEADER SECTION */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px', gap: '20px', flexWrap: 'wrap' }}>
+          <div>
+            <h1 style={{ fontSize: '2.4rem', fontWeight: 900, color: '#1e293b', margin: 0, letterSpacing: '-1px' }}>
+              Admisiones y Registro
+            </h1>
+            <p style={{ color: '#64748b', marginTop: '6px', fontSize: '1.1rem', fontWeight: 500 }}>
+              {filterStatus === 'all' ? 'Control de aspirantes y nuevos ingresos' : `Filtrando por: ${STATUS_CONFIG[filterStatus]?.label}`}
+            </p>
           </div>
-        </div>
-        <nav style={{ flex: 1, padding: '20px 12px' }}>
-          {user?.role === 'ADMIN' && (
-            <button onClick={() => navigate('/admin')} className="admin-nav-item" style={{ marginBottom: '12px', borderLeft: '3px solid var(--secondary)', background: 'rgba(255,255,255,0.05)' }}>
-              <ArrowLeft size={18} /> <span style={{ fontWeight: 800 }}>Volver a Panel Admin</span>
-            </button>
-          )}
-          {[{ status: 'all', label: `Todos (${applicants.length})` }, ...Object.entries(STATUS_CONFIG).map(([k, v]) => ({ status: k, label: `${v.label} (${counts[k] || 0})` }))].map(item => (
-            <button key={item.status} onClick={() => { setFilterStatus(item.status); setIsSidebarOpen(false); }}
-              className={`admin-nav-item ${filterStatus === item.status ? 'active' : ''}`} style={{ fontSize: '0.82rem' }}>
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-        <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <button onClick={() => { logout(); navigate('/'); }} className="btn-logout-premium">
-            <LogOut size={18} /> <span>Cerrar Sesión</span>
+          <button onClick={() => setShowModal(true)} className="btn-primary-premium" style={{ padding: '14px 28px', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(7, 137, 178, 0.3)' }}>
+            <UserPlus size={20} style={{ marginRight: '8px' }} /> Registrar Aspirante
           </button>
         </div>
-      </aside>
 
-      <main className="admin-main-container">
-        <div className="section-reveal">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
-            <div>
-              <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#1e293b', margin: 0 }}>Gestión de Admisiones</h1>
-              <p style={{ color: '#64748b', marginTop: '4px' }}>{applicants.length} aspirantes registrados</p>
-            </div>
-            <button onClick={() => setShowModal(true)} className="btn-primary-premium">
-              <Plus size={16} /> Nuevo Aspirante
-            </button>
-          </div>
-
-          {/* KPI CARDS */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '14px', marginBottom: '28px' }}>
-            {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-              <div key={key} style={{ background: 'white', borderRadius: '16px', padding: '16px', border: `1px solid ${cfg.bg}`, cursor: 'pointer' }}
-                onClick={() => setFilterStatus(key)}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: cfg.color }}>
-                  {cfg.icon}
-                  <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase' }}>{cfg.label}</span>
-                </div>
-                <p style={{ margin: 0, fontSize: '2rem', fontWeight: 900, color: '#1e293b' }}>{counts[key] || 0}</p>
+        {/* STATS OVERVIEW */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+          {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+            <div 
+              key={key} 
+              className={`kpi-card ${filterStatus === key ? 'active' : ''}`}
+              style={{ padding: '24px', cursor: 'pointer', border: filterStatus === key ? '2px solid var(--primary)' : '1px solid #f1f5f9' }}
+              onClick={() => setFilterStatus(key)}
+            >
+              <div className="kpi-icon-box" style={{ background: cfg.bg, color: cfg.color }}>
+                {cfg.icon}
               </div>
-            ))}
-          </div>
-
-          {/* SEARCH */}
-          <div style={{ position: 'relative', maxWidth: '380px', marginBottom: '20px' }}>
-            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-            <input style={{ width: '100%', padding: '10px 16px 10px 38px', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white', fontSize: '0.85rem', outline: 'none' }}
-              placeholder="Buscar aspirante o programa..." value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
-
-          {/* TABLA ASPIRANTES */}
-          <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
-            <div style={{ overflowX: 'auto' }}>
-              <table className="premium-table">
-                <thead>
-                  <tr>
-                    <th>ASPIRANTE</th>
-                    <th>PROGRAMA</th>
-                    <th>PERÍODO</th>
-                    <th>ESTADO</th>
-                    <th>ACCIONES</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.length === 0 ? (
-                    <tr><td colSpan={5} style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>Sin aspirantes con este filtro</td></tr>
-                  ) : filtered.map(a => {
-                    const cfg = STATUS_CONFIG[a.status] || STATUS_CONFIG.pending;
-                    return (
-                      <tr key={a.id}>
-                        <td>
-                          <div>
-                            <p style={{ margin: 0, fontWeight: 800, color: '#1e293b', fontSize: '0.85rem' }}>{a.full_name}</p>
-                            <p style={{ margin: 0, fontSize: '0.72rem', color: '#94a3b8' }}>{a.email || a.phone || '—'}</p>
-                          </div>
-                        </td>
-                        <td style={{ fontSize: '0.8rem', color: '#475569', maxWidth: '180px' }}>{a.program_interest || 'Por definir'}</td>
-                        <td style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569' }}>{a.entry_period}</td>
-                        <td>
-                          <span style={{ padding: '4px 10px', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800, background: cfg.bg, color: cfg.color, display: 'flex', alignItems: 'center', gap: '5px', width: 'fit-content' }}>
-                            {cfg.icon} {cfg.label}
-                          </span>
-                        </td>
-                        <td>
-                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                            {a.status === 'pending' && (
-                              <button onClick={() => updateStatus(a.id, 'reviewing')} style={{ background: '#ecfeff', border: 'none', borderRadius: '8px', padding: '5px 10px', cursor: 'pointer', color: '#0891b2', fontWeight: 700, fontSize: '0.72rem' }}>
-                                Revisar
-                              </button>
-                            )}
-                            {a.status === 'reviewing' && (
-                              <>
-                                <button onClick={() => updateStatus(a.id, 'approved')} style={{ background: '#f0fdf4', border: 'none', borderRadius: '8px', padding: '5px 10px', cursor: 'pointer', color: '#16a34a', fontWeight: 700, fontSize: '0.72rem' }}>
-                                  ✓ Aprobar
-                                </button>
-                                <button onClick={() => updateStatus(a.id, 'rejected')} style={{ background: '#fef2f2', border: 'none', borderRadius: '8px', padding: '5px 10px', cursor: 'pointer', color: '#ef4444', fontWeight: 700, fontSize: '0.72rem' }}>
-                                  ✗ Rechazar
-                                </button>
-                              </>
-                            )}
-                            {a.status === 'approved' && (
-                              <button onClick={() => enrollApplicant(a)} style={{ background: 'var(--primary)', border: 'none', borderRadius: '8px', padding: '5px 12px', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: '0.72rem' }}>
-                                🎓 Matricular
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <p style={{ margin: '12px 0 4px', fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{cfg.label}</p>
+              <p style={{ margin: 0, fontSize: '2.2rem', fontWeight: 900, color: '#1e293b' }}>{counts[key] || 0}</p>
             </div>
-          </div>
+          ))}
         </div>
-      </main>
+
+        {/* SEARCH BAR */}
+        <div style={{ position: 'relative', maxWidth: '420px', marginBottom: '32px' }}>
+          <Search size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+          <input 
+            className="premium-input-search"
+            style={{ width: '100%', padding: '14px 16px 14px 48px', borderRadius: '18px', border: '1px solid #e2e8f0', background: 'white', fontSize: '1rem', outline: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}
+            placeholder="Buscar por nombre, correo o programa..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+
+        {/* DATA TABLE */}
+        <div className="premium-table-container">
+          <table className="premium-table">
+            <thead>
+              <tr>
+                <th>ESTADO | IDENTIDAD DEL ASPIRANTE</th>
+                <th>PROGRAMA DE INTERÉS</th>
+                <th>PERÍODO</th>
+                <th>SIGUIENTE PASO</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', padding: '100px 20px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#94a3b8' }}>
+                       <Search size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
+                       <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>No se encontraron aspirantes bajo estos criterios</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : filtered.map(a => {
+                const cfg = STATUS_CONFIG[a.status] || STATUS_CONFIG.pending;
+                return (
+                  <tr key={a.id}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div style={{
+                          width: '48px', height: '48px', borderRadius: '16px',
+                          background: cfg.bg, color: cfg.color,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem'
+                        }}>
+                          {React.cloneElement(cfg.icon, { size: 24 })}
+                        </div>
+                        <div>
+                          <p style={{ margin: 0, fontWeight: 900, color: '#1e293b', fontSize: '1.05rem' }}>{a.full_name}</p>
+                          <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 500 }}>{a.email || a.phone || 'Sin contacto'}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', fontWeight: 700, fontSize: '0.95rem' }}>
+                         <GraduationCap size={16} color="var(--primary)" />
+                         {a.program_interest || 'Sin Definir'}
+                       </div>
+                    </td>
+                    <td style={{ fontWeight: 800, color: '#1e293b' }}>
+                       <span style={{ background: '#f8fafc', padding: '6px 12px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '0.85rem' }}>
+                         {a.entry_period}
+                       </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {a.status === 'pending' && (
+                          <button onClick={() => updateStatus(a.id, 'reviewing')} className="btn-action-primary" style={{ background: '#ecfeff', color: '#0891b2', border: '1px solid #cffafe' }}>
+                            Evaluar Perfil
+                          </button>
+                        )}
+                        {a.status === 'reviewing' && (
+                          <>
+                            <button onClick={() => updateStatus(a.id, 'approved')} className="btn-action-primary" style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #dcfce7' }}>
+                              <CheckCircle size={14} style={{ marginRight: '6px' }} /> Admitir
+                            </button>
+                            <button onClick={() => updateStatus(a.id, 'rejected')} className="btn-action-primary" style={{ background: '#fef2f2', color: '#ef4444', border: '1px solid #fee2e2' }}>
+                              <XCircle size={14} style={{ marginRight: '6px' }} /> Rechazar
+                            </button>
+                          </>
+                        )}
+                        {a.status === 'approved' && (
+                          <button onClick={() => enrollApplicant(a)} className="btn-primary-premium" style={{ padding: '8px 16px', fontSize: '0.85rem', borderRadius: '12px' }}>
+                            Finalizar Matrícula
+                          </button>
+                        )}
+                        {a.status === 'enrolled' && (
+                          <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#7c3aed', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Briefcase size={16} /> Estudiante Activo
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {showModal && <NewApplicantModal onClose={() => setShowModal(false)} onSaved={fetchApplicants} />}
-    </div>
+    </DashboardLayout>
+  );
+};
   );
 };
 

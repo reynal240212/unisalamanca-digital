@@ -15,6 +15,7 @@ import {
   Activity, Database, Key, Menu, GraduationCap, Wallet, ClipboardList,
   Image as ImageIcon
 } from 'lucide-react';
+import DashboardLayout from '../components/layout/DashboardLayout';
 
 /* ─── MODAL USUARIO (CREAR/EDITAR) ─────────────────────────────────── */
 const UserFormModal = ({ student, onClose, onSave }) => {
@@ -422,14 +423,34 @@ const AdminDashboard = () => {
   const uniquePrograms = [...new Set(students.map(s => s.program).filter(Boolean))].sort();
 
   const navItems = [
-    { id: 'estudiantes', icon: <Users size={18} />, label: 'Inicio / Directorio' },
-    { id: 'validacion_fotos', icon: <ImageIcon size={18} />, label: 'Validación de Fotos' },
-    { id: 'reportes', icon: <BarChart2 size={18} />, label: 'Reportes' },
-    { id: 'seguridad', icon: <ShieldCheck size={18} />, label: 'Seguridad' },
+    {
+      title: 'Sistema Core',
+      items: [
+        { id: 'estudiantes', icon: <Users size={18} />, label: 'Inicio / Directorio' },
+        { id: 'validacion_fotos', icon: <ImageIcon size={18} />, label: 'Validación de Fotos' },
+        { id: 'reportes', icon: <BarChart2 size={18} />, label: 'Reportes' },
+        { id: 'seguridad', icon: <ShieldCheck size={18} />, label: 'Seguridad' },
+      ]
+    },
+    {
+      title: 'Módulos de Gestión',
+      items: [
+        { id: 'm_registro', icon: <GraduationCap size={18} />, label: 'Registro Académico', path: '/registro' },
+        { id: 'm_cartera', icon: <Wallet size={18} />, label: 'Cartera Financiera', path: '/cartera' },
+        { id: 'm_admisiones', icon: <ClipboardList size={18} />, label: 'Admisiones', path: '/admisiones' },
+      ]
+    }
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#F8FAFC' }}>
+    <DashboardLayout
+      user={user}
+      navItems={navItems}
+      activeNav={activeNav}
+      setActiveNav={setActiveNav}
+      logout={logout}
+      navigate={navigate}
+    >
       {/* MODALES */}
       {editingStudent && (
         <UserFormModal student={editingStudent} onClose={() => setEditingStudent(null)} onSave={handleSaveUser} />
@@ -438,249 +459,165 @@ const AdminDashboard = () => {
         <UserFormModal onClose={() => setShowCreateModal(false)} onSave={handleSaveUser} />
       )}
 
-      {/* MOBILE TOP BAR */}
-      <div className="mobile-top-bar">
-         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="/images/escudo.png" alt="US" style={{ height: '32px' }} />
-            <span style={{ fontWeight: 900, color: 'var(--primary)' }}>Admin</span>
-         </div>
-         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="menu-circle">
-            <Menu size={20} />
-         </button>
-      </div>
+      {activeNav === 'reportes' && <ReportesSection students={students} logs={logs} />}
+      {activeNav === 'validacion_fotos' && <PhotoValidationModule />}
+      {activeNav === 'seguridad' && <SeguridadSection students={students} logs={logs} />}
 
-      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
-
-      {/* SIDEBAR PREMIUM */}
-      <aside className={`admin-sidebar-premium ${isSidebarOpen ? 'open' : ''}`}>
-        <div style={{ padding: '32px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ 
-              width: '40px', height: '40px', background: 'rgba(255,255,255,0.1)', 
-              borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)'
-            }}>
-              <img src="/images/escudo.png" alt="Logo" style={{ width: '24px' }} />
-            </div>
-            <div>
-              <div style={{ fontWeight: 900, fontSize: '1.2rem', letterSpacing: '-0.5px' }}>
-                <span style={{ color: 'var(--secondary)' }}>Uni</span>Salamanca
+      {activeNav === 'estudiantes' && (
+        <div className="section-reveal">
+            <div className="responsive-stack-mobile" style={{ marginBottom: '40px' }}>
+              <div>
+                <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#1e293b', letterSpacing: '-1px' }}>Gestión de Identidad</h1>
+                <p style={{ color: '#64748b', fontSize: '1rem' }}>Administración central de credenciales digitales</p>
               </div>
-              <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '1px' }}>Portal de Identidad</p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={() => setShowCreateModal(true)} className="btn-primary-premium">
+                <UserPlus size={18} /> Nuevo Registro
+              </button>
+              <div style={{ position: 'relative' }}>
+                 <button className="btn-secondary-premium btn-export" onClick={handleExport}>
+                   <FileUp size={18} /> Exportar
+                 </button>
+              </div>
+              <label className="btn-primary-premium btn-import" style={{ cursor: 'pointer' }}>
+                {isUploading ? '⏳ Procesando' : <><Upload size={18} /> Importar</>}
+                <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} accept=".xlsx,.csv" disabled={isUploading} />
+              </label>
             </div>
           </div>
-        </div>
 
-        <nav style={{ flex: 1, padding: '24px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <p style={{ margin: '0 24px 10px', fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '1px' }}>Sistema Core</p>
-          {navItems.map(item => (
-            <button key={item.id} onClick={() => { setActiveNav(item.id); setIsSidebarOpen(false); }} 
-              className={`admin-nav-item ${activeNav === item.id ? 'active' : ''}`}>
-              {item.icon}
-              <span>{item.label}</span>
-            </button>
-          ))}
+          {/* FILTROS AVANZADOS */}
+          <div className="kpi-card" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', marginBottom: '32px', padding: '16px' }}>
+             <div style={{ flex: 1, position: 'relative' }}>
+                <Search style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
+                <input type="text" placeholder="Buscar por nombre, email o ID..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+                  style={{ padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '0.9rem', width: '100%', background: '#f8fafc' }} />
+             </div>
+             
+             <select className="input-premium" value={filterRole} onChange={e => setFilterRole(e.target.value)} style={{ width: 'auto', minWidth: '180px' }}>
+                <option value="ALL">Todos los Roles</option>
+                <optgroup label="Estudiantes">
+                  <option value="ESTUDIANTE">Estudiantes</option>
+                  <option value="EGRESADO">Egresados</option>
+                </optgroup>
+                <optgroup label="Academia">
+                  <option value="PROFESOR">Profesores</option>
+                  <option value="COORD_ACADEMICO">Coordinadores</option>
+                  <option value="DIRECTOR_PROGRAMA">Directores</option>
+                </optgroup>
+                <optgroup label="Administración">
+                  <option value="SECRETARIA_ACADEMICA">Secretaría</option>
+                  <option value="ADMISIONES">Admisiones</option>
+                  <option value="CARTERA">Cartera</option>
+                </optgroup>
+                <optgroup label="Seguridad">
+                  <option value="VALIDADOR">Validadores</option>
+                </optgroup>
+             </select>
 
-          <p style={{ margin: '24px 24px 10px', fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '1px' }}>Módulos de Gestión</p>
-          <button onClick={() => navigate('/registro')} className="admin-nav-item" style={{ borderLeft: '3px solid transparent' }}>
-            <GraduationCap size={18} />
-            <span>Registro Académico</span>
-          </button>
-          <button onClick={() => navigate('/cartera')} className="admin-nav-item" style={{ borderLeft: '3px solid transparent' }}>
-            <Wallet size={18} />
-            <span>Cartera Financiera</span>
-          </button>
-          <button onClick={() => navigate('/admisiones')} className="admin-nav-item" style={{ borderLeft: '3px solid transparent' }}>
-            <ClipboardList size={18} />
-            <span>Admisiones</span>
-          </button>
-        </nav>
+             <select className="input-premium" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 'auto' }}>
+                <option value="ALL">Estado: Todos</option>
+                <option value="Active">🟢 Activo</option>
+                <option value="Suspended">🔴 Suspendido</option>
+             </select>
 
-        <div style={{ padding: '24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ 
-            display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', 
-            background: 'rgba(255,255,255,0.03)', borderRadius: '16px', marginBottom: '16px' 
-          }}>
-            <div style={{ 
-              width: '38px', height: '38px', background: 'var(--secondary)', 
-              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-              fontWeight: 900, color: 'var(--primary-dark)'
-            }}>
-              {(user?.name || 'A').charAt(0)}
-            </div>
-            <div style={{ overflow: 'hidden' }}>
-              <p style={{ fontWeight: 800, fontSize: '0.85rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{user?.name || 'Admin'}</p>
-              <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)' }}>Director General</p>
-            </div>
+             <button className="btn-secondary-premium" onClick={() => { setSearchTerm(''); setFilterRole('ALL'); setFilterStatus('ALL'); setFilterProgram('ALL'); }}>Reestablecer</button>
           </div>
-          <button onClick={() => { logout(); navigate('/'); }} className="btn-logout-premium">
-            <LogOut size={18} /> <span>Cerrar Sesión</span>
-          </button>
-        </div>
-      </aside>
 
-      {/* MAIN CONTAINER */}
-      <main className="admin-main-container">
-        {activeNav === 'reportes' && <ReportesSection students={students} logs={logs} />}
-        {activeNav === 'validacion_fotos' && <PhotoValidationModule />}
-        {activeNav === 'seguridad' && <SeguridadSection students={students} logs={logs} />}
-
-        {activeNav === 'estudiantes' && (
-          <div className="section-reveal">
-              <div className="responsive-stack-mobile" style={{ marginBottom: '40px' }}>
-                <div>
-                  <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#1e293b', letterSpacing: '-1px' }}>Gestión de Identidad</h1>
-                  <p style={{ color: '#64748b', fontSize: '1rem' }}>Administración central de credenciales digitales</p>
+          {/* KPIs */}
+          <div className="responsive-grid-3" style={{ marginBottom: '32px' }}>
+            {[
+              { label: 'Total Identidades', value: stats.total, color: 'var(--primary)', bg: '#eef2ff', icon: <Users size={22} /> },
+              { label: 'Accesos Habilitados', value: stats.active, color: '#16A34A', bg: '#f0fdf4', icon: <Shield size={22} /> },
+              { label: 'Personal Administrativo', value: stats.staff, color: '#0891b2', bg: '#ecfeff', icon: <Wallet size={22} /> },
+              { label: 'Cuerpo Académico', value: stats.academia, color: '#8b5cf6', bg: '#f5f3ff', icon: <GraduationCap size={22} /> },
+              { label: 'Egresados / Alumni', value: stats.egresados, color: '#f59e0b', bg: '#fef9c3', icon: <TrendingUp size={22} /> },
+              { label: 'Agentes Seguridad', value: stats.validators, color: '#ef4444', bg: '#fef2f2', icon: <ShieldCheck size={22} /> },
+            ].map((s, i) => (
+              <div key={i} className="kpi-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                  <div className="kpi-icon-box" style={{ background: s.bg, color: s.color, marginBottom: 0 }}>{s.icon}</div>
+                  <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</span>
                 </div>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => setShowCreateModal(true)} className="btn-primary-premium">
-                  <UserPlus size={18} /> Nuevo Registro
-                </button>
-                <div style={{ position: 'relative' }}>
-                   <button className="btn-secondary-premium btn-export" onClick={handleExport}>
-                     <FileUp size={18} /> Exportar
-                   </button>
-                </div>
-                <label className="btn-primary-premium btn-import" style={{ cursor: 'pointer' }}>
-                  {isUploading ? '⏳ Procesando' : <><Upload size={18} /> Importar</>}
-                  <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} accept=".xlsx,.csv" disabled={isUploading} />
-                </label>
+                <h3 style={{ fontSize: '2.4rem', fontWeight: 900, color: '#1e293b', lineHeight: 1 }}>{s.value}</h3>
               </div>
+            ))}
+          </div>
+
+          {/* DIRECTORY TABLE */}
+          <div className="premium-table-container">
+            <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontWeight: 800, fontSize: '1.1rem', color: '#1e293b' }}>Directorio de Usuarios</h3>
+              <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>{filtered.length} coincidencias</span>
             </div>
-
-            {/* FILTROS AVANZADOS */}
-            <div className="kpi-card" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', marginBottom: '32px', padding: '16px' }}>
-               <div style={{ flex: 1, position: 'relative' }}>
-                  <Search style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
-                  <input type="text" placeholder="Buscar por nombre, email o ID..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                    style={{ padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '0.9rem', width: '100%', background: '#f8fafc' }} />
-               </div>
-               
-               <select className="input-premium" value={filterRole} onChange={e => setFilterRole(e.target.value)} style={{ width: 'auto', minWidth: '180px' }}>
-                  <option value="ALL">Todos los Roles</option>
-                  <optgroup label="Estudiantes">
-                    <option value="ESTUDIANTE">Estudiantes</option>
-                    <option value="EGRESADO">Egresados</option>
-                  </optgroup>
-                  <optgroup label="Academia">
-                    <option value="PROFESOR">Profesores</option>
-                    <option value="COORD_ACADEMICO">Coordinadores</option>
-                    <option value="DIRECTOR_PROGRAMA">Directores</option>
-                  </optgroup>
-                  <optgroup label="Administración">
-                    <option value="SECRETARIA_ACADEMICA">Secretaría</option>
-                    <option value="ADMISIONES">Admisiones</option>
-                    <option value="CARTERA">Cartera</option>
-                  </optgroup>
-                  <optgroup label="Seguridad">
-                    <option value="VALIDADOR">Validadores</option>
-                  </optgroup>
-               </select>
-
-               <select className="input-premium" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 'auto' }}>
-                  <option value="ALL">Estado: Todos</option>
-                  <option value="Active">🟢 Activo</option>
-                  <option value="Suspended">🔴 Suspendido</option>
-               </select>
-
-               <button className="btn-secondary-premium" onClick={() => { setSearchTerm(''); setFilterRole('ALL'); setFilterStatus('ALL'); setFilterProgram('ALL'); }}>Reestablecer</button>
-            </div>
-
-            {/* KPIs */}
-            <div className="responsive-grid-3" style={{ marginBottom: '32px' }}>
-              {[
-                { label: 'Total Identidades', value: stats.total, color: 'var(--primary)', bg: '#eef2ff', icon: <Users size={22} /> },
-                { label: 'Accesos Habilitados', value: stats.active, color: '#16A34A', bg: '#f0fdf4', icon: <Shield size={22} /> },
-                { label: 'Personal Administrativo', value: stats.staff, color: '#0891b2', bg: '#ecfeff', icon: <Wallet size={22} /> },
-                { label: 'Cuerpo Académico', value: stats.academia, color: '#8b5cf6', bg: '#f5f3ff', icon: <GraduationCap size={22} /> },
-                { label: 'Egresados / Alumni', value: stats.egresados, color: '#f59e0b', bg: '#fef9c3', icon: <TrendingUp size={22} /> },
-                { label: 'Agentes Seguridad', value: stats.validators, color: '#ef4444', bg: '#fef2f2', icon: <ShieldCheck size={22} /> },
-              ].map((s, i) => (
-                <div key={i} className="kpi-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                    <div className="kpi-icon-box" style={{ background: s.bg, color: s.color, marginBottom: 0 }}>{s.icon}</div>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</span>
-                  </div>
-                  <h3 style={{ fontSize: '2.4rem', fontWeight: 900, color: '#1e293b', lineHeight: 1 }}>{s.value}</h3>
-                </div>
-              ))}
-            </div>
-
-            {/* DIRECTORY TABLE */}
-            <div className="premium-table-container">
-              <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontWeight: 800, fontSize: '1.1rem', color: '#1e293b' }}>Directorio de Usuarios</h3>
-                <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>{filtered.length} coincidencias</span>
-              </div>
-              <table className="premium-table">
-                <thead>
-                  <tr>
-                    {['IDENTIDAD INTEGRAL', 'PROGRAMA ACADÉMICO', 'ROL', 'ESTADO', 'ACCIONES'].map(h => <th key={h}>{h}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.length === 0 ? (
-                    <tr><td colSpan={5} style={{ textAlign: 'center', padding: '80px', color: '#94a3b8' }}>No se encontraron registros en la base de datos.</td></tr>
-                  ) : filtered.map(s => (
-                    <tr key={s.id}>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                          <div style={{ 
-                            width: '42px', height: '42px', borderRadius: '14px', 
-                            background: `linear-gradient(135deg, hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 95%), #fff)`,
-                            color: `hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 30%)`,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900,
-                            border: '1px solid rgba(0,0,0,0.05)'
-                          }}>
-                            {(s.name || '?').charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <p style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1e293b' }}>{s.name}</p>
-                            <p style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{s.email}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>{s.program || 'N/A'}</td>
-                      <td>
-                        <span style={{ 
-                          padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 800,
-                          background: s.role === 'VALIDADOR' ? '#ecfeff' : s.role === 'EGRESADO' ? '#fffbeb' : '#f5f3ff',
-                          color: s.role === 'VALIDADOR' ? '#0891b2' : s.role === 'EGRESADO' ? '#b45309' : '#5b21b6',
-                          border: '1px solid currentColor', opacity: 0.9
+            <table className="premium-table">
+              <thead>
+                <tr>
+                  {['IDENTIDAD INTEGRAL', 'PROGRAMA ACADÉMICO', 'ROL', 'ESTADO', 'ACCIONES'].map(h => <th key={h}>{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: '80px', color: '#94a3b8' }}>No se encontraron registros en la base de datos.</td></tr>
+                ) : filtered.map(s => (
+                  <tr key={s.id}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        <div style={{ 
+                          width: '42px', height: '42px', borderRadius: '14px', 
+                          background: `linear-gradient(135deg, hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 95%), #fff)`,
+                          color: `hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 30%)`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900,
+                          border: '1px solid rgba(0,0,0,0.05)'
                         }}>
-                          {s.role}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`status-badge ${s.status === 'Active' ? 'status-active' : 'status-suspended'}`}>
-                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></span>
-                          {s.status === 'Active' ? 'Verificado' : 'Suspendido'}
-                        </span>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <button onClick={() => setEditingStudent(s)} className="btn-secondary-premium" style={{ padding: '6px 10px' }}>
-                            <Edit2 size={14} />
-                          </button>
-                          <button onClick={() => toggleStatus(s)} className="btn-secondary-premium" 
-                            style={{ 
-                              padding: '6px 10px', 
-                              color: s.status === 'Active' ? '#ef4444' : '#16a34a',
-                              borderColor: 'currentColor'
-                            }}>
-                            {s.status === 'Active' ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
-                          </button>
+                          {(s.name || '?').charAt(0).toUpperCase()}
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <div>
+                          <p style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1e293b' }}>{s.name}</p>
+                          <p style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{s.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>{s.program || 'N/A'}</td>
+                    <td>
+                      <span style={{ 
+                        padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 800,
+                        background: s.role === 'VALIDADOR' ? '#ecfeff' : s.role === 'EGRESADO' ? '#fffbeb' : '#f5f3ff',
+                        color: s.role === 'VALIDADOR' ? '#0891b2' : s.role === 'EGRESADO' ? '#b45309' : '#5b21b6',
+                        border: '1px solid currentColor', opacity: 0.9
+                      }}>
+                        {s.role}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`status-badge ${s.status === 'Active' ? 'status-active' : 'status-suspended'}`}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></span>
+                        {s.status === 'Active' ? 'Verificado' : 'Suspendido'}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button onClick={() => setEditingStudent(s)} className="btn-secondary-premium" style={{ padding: '6px 10px' }}>
+                          <Edit2 size={14} />
+                        </button>
+                        <button onClick={() => toggleStatus(s)} className="btn-secondary-premium" 
+                          style={{ 
+                            padding: '6px 10px', 
+                            color: s.status === 'Active' ? '#ef4444' : '#16a34a',
+                            borderColor: 'currentColor'
+                          }}>
+                          {s.status === 'Active' ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-      </main>
-    </div>
+        </div>
+      )}
+    </DashboardLayout>
   );
 };
 
