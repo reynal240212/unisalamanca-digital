@@ -1,53 +1,72 @@
-# Manual de Usuario - Identidad Digital UniSalamanca
+# Manual de Usuario y FAQ - UniSalamanca Digital
 
-Guía paso a paso para el uso de la plataforma de Identidad Digital Universitaria.
-
-## 1. Módulo Administrador (Admin Panel)
-URL: `/frontend/admin/index.html`
-
-### 1.1 Registro Manual de Estudiantes
-1.  Haz clic en el botón **"+ Registrar Estudiante"**.
-2.  Completa los campos obligatorios: Nombre, Email, Programa, Modalidad y Fecha de Vencimiento.
-    *   **Nota:** Si dejas la contraseña en blanco, se generará una automática.
-3.  Opcionalmente, agrega la **Placa del Vehículo** y el **Tag RFID**.
-4.  Haz clic en **"Guardar Estudiante"**.
-
-### 1.2 Carga Masiva desde Excel
-1.  Haz clic en el botón de **"Subida Masiva (Excel)"**.
-2.  Selecciona el archivo `.xlsx` o `.csv`.
-3.  El sistema procesará el listado automáticamente, asignando una contraseña temporal a cada estudiante.
-
-### 1.3 Reportes y Acceso
-*   **Dashboard de Accesos:** En la pestaña de reportes, puedes ver quién ha entrado al campus hoy.
-*   **Filtros:** Usa la barra de búsqueda para filtrar por nombre, modalidad o estado de cuenta.
+Este manual proporciona las instrucciones necesarias para interactuar con los diferentes módulos de la plataforma según su rol institucional.
 
 ---
 
-## 2. Módulo Estudiante (Student App)
-URL: `/frontend/student/index.html`
+## 1. Guía para Estudiantes
 
-### 2.1 Primer Ingreso y Onboarding
-1.  Inicia sesión con tu correo institucional y contraseña.
-2.  **Activación:** El sistema te pedirá una foto de rostro.
-3.  Acepta la **Política de Tratamiento de Datos (Ley 1581)** marcando la casilla.
-4.  Captura tu foto y haz clic en **"Guardar y Activar"**.
+### Acceso Inicial y Onboarding
+1.  **Ingreso:** Inicia sesión con tus credenciales institucionales.
+2.  **Tratamiento de Datos:** Debes leer y aceptar la política de Protección de Datos (Ley 1581) para continuar.
+3.  **Perfil:** Si es tu primera vez, el sistema te solicitará una fotografía de perfil para tu credencial digital.
 
-### 2.2 Uso del Carnet Digital
-*   Tu carnet mostrará tus datos y un **Código QR Dinámico**.
-*   **Importante:** El código cambia cada 30 segundos. No envíes capturas de pantalla, ya que el sistema de seguridad las rechazará.
+### Uso de la Credencial (QR)
+- Tu carnet digital está en la pantalla principal.
+- El código QR **cambia cada 30 segundos**. No utilices capturas de pantalla, ya que el validador las rechazará.
+- Muestra el código al lector en los puntos de acceso del campus.
+
+### Consulta de Servicios
+- **Académico:** Revisa tu horario y promedio en tiempo real.
+- **Finanzas:** Consulta tus recibos de pago y becas activas.
+- **Biblioteca:** Revisa libros prestados y fechas de devolución.
 
 ---
 
-## 3. Módulo de Seguridad (Validator App)
-URL: `/frontend/validator/index.html`
+## 2. Guía para Personal de Seguridad (Validador)
 
-### 3.1 Escaneo de QR
-1.  Apunta la cámara del dispositivo al QR del estudiante.
-2.  **Resultado Verde (✅):** Acceso permitido. Se muestra el nombre y foto del estudiante.
-3.  **Resultado Rojo (❌):** Acceso denegado. Puede deberse a:
-    *   Código QR expirado (el estudiante debe refrescar su pantalla).
-    *   Cuenta suspendida o revocada.
-    *   Ubicación fuera del campus autorizado.
+### Validación de Acceso
+1.  Abre el módulo de **Validador** en tu dispositivo.
+2.  Escanea el código QR del estudiante.
+3.  **Resultados posibles:**
+    *   🟢 **Acceso Autorizado:** Muestra la foto y nombre del estudiante activo.
+    *   🔴 **Denegado:** El QR ha expirado o el estudiante no está activo (Suspendido/Egresado).
+    *   🟡 **Error de Lectura:** Asegúrate de tener buena iluminación y enfocar bien el código.
 
-### 3.2 Trazabilidad
-*   Cada escaneo registra automáticamente la **Ubicación GPS** y la hora exacta en la base de datos central.
+---
+
+## 3. Guía Administrativa
+
+### Gestión de Estudiantes
+- Accede al panel de **Administración**.
+- Puedes buscar estudiantes por nombre, correo o ID.
+- **Carga Masiva:** Utiliza la opción "Importar desde Excel" para cargar nuevos listados. Asegúrate de seguir la plantilla descargable.
+
+---
+
+## 4. Preguntas Frecuentes (FAQ)
+
+**¿Qué pasa si no tengo internet en la entrada del campus?**
+> El sistema requiere conexión para validar el token. Sin embargo, la credencial visual permanece cargada en caché si la abriste anteriormente.
+
+**Mi código QR dice "Expirado" constantemente.**
+> Revisa que la hora de tu teléfono esté configurada en "Automático". Si los relojes del servidor y el cliente están muy desfasados, el token no será válido.
+
+**¿Puedo prestar mi cuenta a un compañero?**
+> No. La validación incluye tu foto de perfil que aparece en el dispositivo del guardia al escanear. El préstamo de identidad es una falta disciplinaria.
+
+**¿Cómo actualizo mi foto de perfil?**
+> Debes solicitarlo a través del módulo de "Soporte" o directamente en la oficina de Admisiones para que un administrador apruebe el cambio.
+
+---
+
+## 5. Solución de Problemas Comunes
+
+| Problema | Solución Sugerida |
+| :--- | :--- |
+| La cámara no abre en el validador. | Revisa los permisos de cámara en los ajustes del navegador (Chrome/Safari). |
+| Error al cargar el archivo Excel. | Verifica que las columnas coincidan exactamente con la plantilla: `nombre`, `email`, `programa`, `modalidad`. |
+| No veo mis notas actuales. | Asegúrate de haber completado la **Encuesta de Caracterización** inicial. |
+
+---
+[Volver al README](file:///c:/Users/reyna/Desktop/unisalamanca-digital/README.md)

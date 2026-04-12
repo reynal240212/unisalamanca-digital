@@ -27,7 +27,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
     status: student?.status || 'Active',
     entry_date: student?.entry_date || '',
     document_id: student?.document_id || '',
-    password: isEdit ? '' : 'Unisalamanca2026*',
+    password: isEdit ? '' : `Unisalamanca${new Date().getFullYear()}*`,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -268,36 +268,6 @@ const SeguridadSection = ({ students, logs = [] }) => {
   );
 };
 
-/* ─── SECCIÓN CONFIGURACIÓN ─────────────────────────────────────── */
-const ConfigSection = () => (
-  <div>
-    <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#1e293b', marginBottom: '6px' }}>Configuración del Sistema</h1>
-    <p style={{ color: '#64748b', marginBottom: '32px' }}>Parámetros globales de la plataforma de identidad digital</p>
-
-    <div className="responsive-grid-2">
-      {[
-        { icon: <Key size={22} />, title: 'Seguridad QR', desc: 'Ventana de tiempo para tokens QR dinámicos.', field: 'Expiración del QR', value: '30 segundos', color: '#2A2266', bg: '#eef2ff' },
-        { icon: <Bell size={22} />, title: 'Notificaciones', desc: 'Configurar alertas automáticas del sistema.', field: 'Email de alertas', value: 'admin@unisalamanca.edu.co', color: '#16B6D6', bg: '#ecfeff' },
-        { icon: <Database size={22} />, title: 'Base de Datos', desc: 'Estado de la conexión con Supabase.', field: 'Proyecto Supabase', value: 'znwpyikzhsldykwaqaoh', color: '#16A34A', bg: '#f0fdf4' },
-        { icon: <Lock size={22} />, title: 'Autenticación', desc: 'Nivel de seguridad del portal de acceso.', field: 'Google reCAPTCHA v2', value: 'Verificación Activa ✓', color: '#f59e0b', bg: '#fef9c3' },
-      ].map((c, i) => (
-        <div key={i} style={{ background: 'white', borderRadius: '20px', padding: '28px', border: '1px solid #f1f5f9' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <div style={{ width: '44px', height: '44px', background: c.bg, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: c.color }}>{c.icon}</div>
-            <div>
-              <h3 style={{ fontWeight: 800, fontSize: '1rem', color: '#1e293b' }}>{c.title}</h3>
-              <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{c.desc}</p>
-            </div>
-          </div>
-          <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '12px 16px' }}>
-            <p style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 700 }}>{c.field}</p>
-            <p style={{ fontWeight: 700, color: '#374151', marginTop: '3px' }}>{c.value}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
 
 /* ─── ADMIN DASHBOARD PRINCIPAL ─────────────────────────────────── */
 const AdminDashboard = () => {
@@ -417,8 +387,11 @@ const AdminDashboard = () => {
            alert("Error al actualizar: " + error.message);
          }
       } else {
-         // CREATE
-         const { error } = await supabase.from('user').insert([userData]);
+          // CREATE
+          const { error } = await supabase.from('user').insert([{
+            ...userData,
+            must_change_password: true
+          }]);
          if (!error) {
            setShowCreateModal(false);
            fetchStudents();
@@ -453,7 +426,6 @@ const AdminDashboard = () => {
     { id: 'validacion_fotos', icon: <ImageIcon size={18} />, label: 'Validación de Fotos' },
     { id: 'reportes', icon: <BarChart2 size={18} />, label: 'Reportes' },
     { id: 'seguridad', icon: <ShieldCheck size={18} />, label: 'Seguridad' },
-    { id: 'config', icon: <Settings size={18} />, label: 'Configuración' },
   ];
 
   return (
@@ -552,7 +524,6 @@ const AdminDashboard = () => {
         {activeNav === 'reportes' && <ReportesSection students={students} logs={logs} />}
         {activeNav === 'validacion_fotos' && <PhotoValidationModule />}
         {activeNav === 'seguridad' && <SeguridadSection students={students} logs={logs} />}
-        {activeNav === 'config' && <ConfigSection />}
 
         {activeNav === 'estudiantes' && (
           <div className="section-reveal">

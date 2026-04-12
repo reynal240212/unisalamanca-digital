@@ -13,6 +13,7 @@ import StudentCard from './pages/StudentCard';
 import Validator from './pages/Validator';
 import Home from './pages/Home';
 import Characterization from './pages/Characterization';
+import ChangePassword from './pages/ChangePassword';
 
 const ACADEMIC_ROLES = ['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA', 'ADMIN'];
 
@@ -104,6 +105,12 @@ function App() {
           <Route path="/validator" element={
             <ProtectedRoute allowedRoles={['VALIDADOR']}>
               <Validator />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/change-password" element={
+            <ProtectedRoute>
+              <ChangePassword />
             </ProtectedRoute>
           } />
 

@@ -20,6 +20,12 @@ const Login = () => {
   useEffect(() => {
     if (loading) return;
     if (!user) return;
+
+    if (user.must_change_password) {
+      navigate('/change-password', { replace: true });
+      return;
+    }
+
     const roleMap = {
       ADMIN: '/admin',
       COORD_ACADEMICO: '/academic',
@@ -47,6 +53,12 @@ const Login = () => {
     setIsLoading(true);
     try {
       const u = await login(email, password);
+      
+      if (u.must_change_password) {
+        navigate('/change-password', { replace: true });
+        return;
+      }
+
       // replace:true elimina /login del historial — el botón "atrás" NO regresará al login
       const roleMap = {
         ADMIN: '/admin',
