@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ShieldCheck, ScrollText, CheckCircle2, AlertTriangle, ExternalLink, X } from 'lucide-react';
 
 const DataPolicyModal = ({ onAccept, isOpen }) => {
@@ -113,7 +114,7 @@ const DataPolicyModal = ({ onAccept, isOpen }) => {
           <div style={{ marginTop: '30px', borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
             <p style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic' }}>
               Puedes consultar el documento legal completo en nuestra documentación oficial: 
-              <a href="#" style={{ color: 'var(--secondary)', fontWeight: 700, marginLeft: '5px' }}>POLITICA_TRATAMIENTO_DATOS.md</a>
+              <Link to="/data-policy" target="_blank" style={{ color: 'var(--secondary)', fontWeight: 700, marginLeft: '5px' }}>Ver política completa</Link>
             </p>
           </div>
         </div>
