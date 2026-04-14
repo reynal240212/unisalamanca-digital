@@ -142,12 +142,12 @@ const Login = () => {
         </div>
 
         <div className="profile-switcher-content section-reveal">
-          <h1 style={{ color: 'white', fontSize: '3.5rem', fontWeight: 900, marginBottom: '10px', letterSpacing: '-1px' }}>
-            ¡Bienvenido, <span style={{ color: 'var(--secondary)' }}>{user?.name.split(' ')[0]}</span>!
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.2rem', marginBottom: '60px', fontWeight: 500 }}>
-            ¿Con qué perfil deseas ingresar hoy?
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1.1rem', marginBottom: '10px', fontWeight: 500 }}>
+            ¡Bienvenido, <span style={{ color: 'var(--secondary)', fontWeight: 700 }}>{user?.name.split(' ')[0]}</span>!
           </p>
+          <h1 style={{ color: 'white', fontSize: '3.5rem', fontWeight: 900, marginBottom: '60px', letterSpacing: '-1px', lineHeight: 1.1 }}>
+            ¿Con qué perfil deseas ingresar hoy?
+          </h1>
           
           <div className="profiles-grid">
             {pendingProfiles.map(role => (
