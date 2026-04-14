@@ -143,10 +143,10 @@ const Login = () => {
 
         <div className="profile-switcher-content section-reveal">
           <h1 style={{ color: 'white', fontSize: '3.5rem', fontWeight: 900, marginBottom: '10px', letterSpacing: '-1px' }}>
-            Bienvenido, <span style={{ color: 'var(--secondary)' }}>{user?.name.split(' ')[0]}</span>
+            ¡Bienvenido, <span style={{ color: 'var(--secondary)' }}>{user?.name.split(' ')[0]}</span>!
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.2rem', marginBottom: '60px', fontWeight: 500 }}>
-            Selecciona tu perfil para ingresar.
+            ¿Con qué perfil deseas ingresar hoy?
           </p>
           
           <div className="profiles-grid">
