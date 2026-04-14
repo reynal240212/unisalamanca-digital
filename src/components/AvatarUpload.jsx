@@ -70,7 +70,7 @@ const AvatarUpload = ({ user, onUploadComplete }) => {
 
   return (
     <div className="avatar-upload-container">
-      <div className="avatar-preview-wrapper" onClick={() => fileInputRef.current.click()}>
+      <div className="avatar-preview-wrapper" onClick={(e) => { e.stopPropagation(); fileInputRef.current.click(); }}>
         <div className={`avatar-preview-circle ${status === 'pending' ? 'status-pending' : ''}`}>
           <img 
             src={previewUrl || user?.photo_url || '/images/default-avatar.png'} 
