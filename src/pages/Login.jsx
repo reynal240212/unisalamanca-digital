@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, ShieldCheck, Mail, Lock, GraduationCap, Briefcase, BookOpen, Shield, BookMarked, Award, FileText, CreditCard, UserPlus, Heart, Scan, UserCircle } from 'lucide-react';
+import { LogIn, LogOut, ShieldCheck, Mail, Lock, GraduationCap, Briefcase, BookOpen, Shield, BookMarked, Award, FileText, CreditCard, UserPlus, Heart, Scan, UserCircle } from 'lucide-react';
 import LoginBranding from '../components/LoginBranding';
 import ReCAPTCHA from 'react-google-recaptcha';
 
@@ -161,6 +161,24 @@ const Login = () => {
                 <div className="profile-label">{formatRoleName(role)}</div>
               </div>
             ))}
+          </div>
+
+          {/* Botón de cerrar sesión */}
+          <div style={{ marginTop: '50px' }}>
+            <button
+              onClick={() => { logout(); navigate('/login'); }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '10px 24px', borderRadius: '50px',
+                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)',
+                color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '0.85rem',
+                fontWeight: 600, transition: 'all 0.2s', margin: '0 auto'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
+            >
+              <LogOut size={16} /> Cerrar Sesión
+            </button>
           </div>
         </div>
 
