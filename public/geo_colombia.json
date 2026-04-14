@@ -1,0 +1,83 @@
+{
+  "BOGOTÁ, D.C.": {
+    "tipo": "Localidad",
+    "localidades": [
+      { "nombre": "Usaquén", "barrios": ["Canaima", "Cedritos", "Lijacá", "San Cristóbal Norte", "Santa Bárbara", "Verbenal", "La Floresta de la Sabana", "Toberín", "Usaquén Centro", "Santa Ana"] },
+      { "nombre": "Chapinero", "barrios": ["Antiguo Country", "Chicó Reservado", "El Retiro", "Lago Gaitán", "Quinta Camacho", "Pardo Rubio", "Siberia", "Rosales", "Chapinero Alto"] },
+      { "nombre": "Suba", "barrios": ["Aures", "Casa Blanca", "Guaymaral", "La Academia", "Lombardía", "Niza", "Pontevedra", "Suba Centro", "Tuna Alta", "Prado Veraniego", "Mazurén"] },
+      { "nombre": "Kennedy", "barrios": ["Castilla", "Ciudad Techo", "Patio Bonito", "Las Margaritas", "Marsella", "Mandalay", "Timiza", "Tintal", "Banderas", "Carvajal"] }
+    ]
+  },
+  "BARRANQUILLA": {
+    "tipo": "Localidad",
+    "localidades": [
+      { "nombre": "Riomar", "barrios": ["Adela de Char", "Altamira", "Altos de Riomar", "Altos del Limón", "Altos del Prado", "Andalucía", "Buenavista", "El Castillo I", "El Limoncito", "El Poblado", "La Castellana", "La Floresta", "Las Flores", "Las Tres Avemarías", "Miramar", "Paraíso", "Riomar", "San Marino", "San Salvador", "San Vicente", "Santa Mónica", "Siape", "Solaire", "Villa Campestre", "Villa Carolina", "Villa del Este", "Villa Santos", "Villamar", "Villas del Puerto", "La Playa"] },
+      { "nombre": "Norte-Centro Histórico", "barrios": ["Alameda del Río", "América", "Barlovento", "Barranquillita", "Barrio Abajo", "Bellavista", "Betania", "Boston", "Campo Alegre", "Centro", "Ciudad Jardín", "Colombia", "El Boliche", "El Castillo", "El Golf", "El Porvenir", "El Prado", "El Recreo", "El Rosario", "El Tabor", "Granadillo", "Zona Industrial Vía 40", "La Bendición de Dios", "La Campiña", "La Concepción", "La Cumbre", "La Felicidad", "La Loma", "Las Colinas", "Las Delicias", "Las Mercedes", "Los Alpes", "Los Nogales", "Modelo", "Montecristo", "Nuevo Horizonte", "San Francisco", "Santa Ana"] },
+      { "nombre": "Metropolitana", "barrios": ["La Sierra", "La Victoria", "Los Continentes", "Kennedy", "La Sierrita", "El Santuario", "Las Américas", "Carrizal", "Buenos Aires", "Santo Domingo de Guzmán", "Villa San Pedro", "San Luis", "Veinte de Julio", "Santa María", "Villa Sevilla", "Las Granjas", "Siete de Abril", "Los Girasoles", "Ciudadela Veinte de Julio", "Santa Helena", "San Roque"] },
+      { "nombre": "Suroccidente", "barrios": ["La Pradera", "Los Olivos", "El Pueblo", "Las Estrellas", "Pastoral Social", "Villa del Rosario", "Las Terrazas", "Mercedes Sur", "Por Fin", "La Paz", "Mequejo", "La Manga", "7 de agosto", "Evaristo Sourdis", "Lipaya", "Olaya", "El Silencio", "La Libertad", "Nueva Granada", "Santo Domingo", "Lucero", "Los Pinos", "Loma Fresca", "San Isidro", "Alfonso López", "Los Andes", "San Felipe", "Carlos Meisel", "Nueva Colombia", "Las Malvinas", "Los Rosales"] },
+      { "nombre": "Suroriente", "barrios": ["Rebolo", "San Roque", "La Chinita", "La Luz", "Las Nieves", "Simón Bolívar", "Tayrona", "Las Palmas", "El Ferry", "Primero de Mayo", "Bellarena", "José Antonio Galán", "Villa Blanca", "La Magdalena", "El Campito"] }
+    ]
+  },
+  "MEDELLÍN": {
+    "tipo": "Comuna",
+    "localidades": [
+      { "nombre": "El Poblado", "barrios": ["Castropol", "Astorga", "Patio Bonito", "Las Lomas", "El Diamante", "La Florida", "Manila", "Provenza"] },
+      { "nombre": "Laureles", "barrios": ["La Castellana", "San Joaquín", "Florida Nueva", "Loreto", "Las Acacias"] },
+      { "nombre": "Belén", "barrios": ["Fátima", "Rosales", "Granada", "San Bernardo", "Las Playas", "Loma de los Bernal"] },
+      { "nombre": "Robledo", "barrios": ["Aures", "Bello Horizonte", "Diamante", "El Volador", "Pilarica"] }
+    ]
+  },
+  "CALI": {
+    "tipo": "Comuna",
+    "localidades": [
+        { "nombre": "Comuna 2 (Norte)", "barrios": ["Santa Mónica", "Granada", "Vipasa", "Menga", "Versalles"] },
+        { "nombre": "Comuna 17 (Sur)", "barrios": ["Ciudad Jardín", "El Caney", "Pance", "Lili", "Mayapan"] },
+        { "nombre": "Comuna 19 (Oeste)", "barrios": ["El Peñón", "San Fernando", "Tequendama", "Imbanaco", "Cañaveralejo"] }
+    ]
+  },
+  "CARTAGENA": {
+    "tipo": "Localidad",
+    "localidades": [
+      { "nombre": "Histórica y del Caribe Norte", "barrios": ["Bocagrande", "Castillogrande", "El Cabrero", "Getsemaní", "Manga", "Marbella", "Crespo"] },
+      { "nombre": "De la Virgen y Turística", "barrios": ["Crespito", "Daniel Lemaitre", "El Líbano", "Fredonia", "Olaya Herrera"] },
+      { "nombre": "Industrial y de la Bahía", "barrios": ["Albornoz", "Arroz Barato", "Mamonal", "Pasacaballos", "Santa Clara"] }
+    ]
+  },
+  "BUCARAMANGA": {
+    "tipo": "Comuna",
+    "localidades": [
+      { "nombre": "Cabecera del Llano", "barrios": ["Cabecera", "Sotomayor", "Antiguo Campestre", "Pan de Azúcar", "Altos de Cabecera"] },
+      { "nombre": "Provenza", "barrios": ["Provenza", "El Cristal", "Fontana", "Diamante II"] },
+      { "nombre": "Centro", "barrios": ["Centro", "García Rovira", "La Concordia"] }
+    ]
+  },
+  "PEREIRA": {
+    "tipo": "Comuna",
+    "localidades": [
+      { "nombre": "Centro", "barrios": ["Centro", "Lago Uribe", "Victoria"] },
+      { "nombre": "Cuba", "barrios": ["Cuba", "El Oso", "Perla del Otún"] },
+      { "nombre": "El Poblado", "barrios": ["El Poblado", "Villa del Prado", "Samaria"] }
+    ]
+  },
+  "IBAGUÉ": {
+    "tipo": "Comuna",
+    "localidades": [
+      { "nombre": "Comuna 1 (Centro)", "barrios": ["Centro", "La Pola", "Belén"] },
+      { "nombre": "Comuna 9 (Picaleña)", "barrios": ["Picaleña", "Bello Horizonte", "Arboleda"] }
+    ]
+  },
+  "SANTA MARTA": {
+    "tipo": "Localidad",
+    "localidades": [
+      { "nombre": "Cultural Tayrona", "barrios": ["Mamatoco", "Bonda", "Once de Noviembre"] },
+      { "nombre": "Turística Perla del Caribe", "barrios": ["El Rodadero", "Gaira", "Bello Horizonte", "Pozos Colorados"] }
+    ]
+  },
+  "MANIZALES": {
+    "tipo": "Comuna",
+    "localidades": [
+      { "nombre": "Palogrande", "barrios": ["Palogrande", "Milan", "La Camelia"] },
+      { "nombre": "Universitaria", "barrios": ["La Sultana", "Alta Suiza", "San Marcel"] }
+    ]
+  }
+}
