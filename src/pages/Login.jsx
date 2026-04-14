@@ -13,7 +13,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const recaptchaRef = useRef();
 
-  const { login, user, activeRole, selectRole, loading } = useAuth();
+  const { login, logout, user, activeRole, selectRole, loading } = useAuth();
   const navigate = useNavigate();
   const [pendingProfiles, setPendingProfiles] = useState(null);
 
