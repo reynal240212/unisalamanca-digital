@@ -3,7 +3,8 @@ import {
   User, Mail, Calendar, BookOpen, Star, 
   MapPin, Phone, Heart, Users, Briefcase, 
   Shield, CreditCard, Clock, CheckCircle2, ChevronRight,
-  GraduationCap, Award, Landmark, Fingerprint
+  GraduationCap, Award, Landmark, Fingerprint,
+  Activity, Wifi, Monitor, Car, Smartphone, Map, FileText
 } from 'lucide-react';
 import AvatarUpload from './AvatarUpload';
 
@@ -147,12 +148,46 @@ const ProfileView = ({ user, characterization, onEditRequest }) => {
         {/* COLUMNA DERECHA: PERSONAL */}
         <div className="profile-column">
           <div className="glass-card profile-section">
+            <SectionTitle icon={<Activity size={20} />} title="Salud y Bienestar" />
+            <div className="info-items-grid">
+               <InfoCard icon={<Shield size={22} />} label="EPS Actual" value={characterization?.eps} color="#3b82f6" />
+               <InfoCard icon={<Heart size={22} />} label="Grupo Sanguíneo/RH" value={characterization?.blood_type} color="#ef4444" />
+               <InfoCard icon={<Activity size={22} />} label="Discapacidad" value={characterization?.disability && characterization.disability !== 'Ninguna' ? characterization.disability : 'No reporta'} color="#8b5cf6" />
+               {characterization?.health_notes && (
+                 <InfoCard icon={<FileText size={22} />} label="Notas de Salud" value={characterization.health_notes} color="#64748b" />
+               )}
+            </div>
+          </div>
+
+          <div className="glass-card profile-section">
+            <SectionTitle icon={<Landmark size={20} />} title="Entorno Socioeconómico" />
+            <div className="info-items-grid">
+               <InfoCard icon={<Landmark size={22} />} label="Estrato Social" value={characterization?.estrato ? `Estrato ${characterization.estrato}` : null} color="#f59e0b" />
+               <InfoCard icon={<Home size={22} />} label="Vive con" value={characterization?.lives_with} color="#10b981" />
+               <InfoCard icon={<Users size={22} />} label="Etnia / Población" value={characterization?.ethnicity && characterization.ethnicity !== 'Ninguna' ? characterization.ethnicity : 'No pertenece'} color="#f43f5e" />
+               <InfoCard icon={<Map size={22} />} label="Municipio Nacimiento" value={characterization?.lugar_nacimiento} color="#06b6d4" />
+            </div>
+          </div>
+
+          <div className="glass-card profile-section">
+            <SectionTitle icon={<Wifi size={20} />} title="Conectividad y Movilidad" />
+            <div className="info-items-grid">
+               <InfoCard icon={<Wifi size={22} />} label="Acceso a Internet" value={characterization?.has_internet === 'Si' ? 'Tiene acceso' : 'Sin acceso'} color="#0ea5e9" />
+               <InfoCard icon={<Monitor size={22} />} label="Computador Propio" value={characterization?.has_computer === 'Si' ? 'Dispone de uno' : 'No dispone'} color="#6366f1" />
+               <InfoCard icon={<Car size={22} />} label="Medio de Transporte" value={characterization?.transport_mode} color="#475569" />
+            </div>
+          </div>
+        </div>
+
+        {/* COLUMNA DERECHA: PERSONAL Y EMERGENCIA */}
+        <div className="profile-column">
+          <div className="glass-card profile-section">
             <SectionTitle icon={<User size={20} />} title="Información Personal" />
             <div className="info-items-grid">
                <InfoCard icon={<Phone size={22} />} label="Teléfono Celular" value={characterization?.phone} color="#f43f5e" />
                <InfoCard icon={<MapPin size={22} />} label="Dirección Residencia" value={characterization?.address} color="#3b82f6" />
-               <InfoCard icon={<Heart size={22} />} label="Grupo Sanguíneo/RH" value={characterization?.blood_type} color="#de1f26" />
                <InfoCard icon={<Users size={22} />} label="Estado Civil" value={characterization?.marital_status} color="#ec4899" />
+               <InfoCard icon={<Mail size={22} />} label="Email Personal" value={characterization?.correo} color="#8b5cf6" />
             </div>
           </div>
 
