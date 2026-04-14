@@ -66,6 +66,7 @@ export const AuthProvider = ({ children }) => {
       .eq('user_id', data.id)
       .single();
 
+    const semestre = calcularSemestre(data.entry_date);
     const sessionUser = {
       ...data,
       semester: semestre,

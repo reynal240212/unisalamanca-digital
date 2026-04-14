@@ -14,6 +14,7 @@ import Validator from './pages/Validator';
 import Home from './pages/Home';
 import Characterization from './pages/Characterization';
 import ChangePassword from './pages/ChangePassword';
+import DataPolicy from './pages/DataPolicy';
 
 const ACADEMIC_ROLES = ['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA', 'ADMIN'];
 
@@ -113,6 +114,8 @@ function App() {
               <ChangePassword />
             </ProtectedRoute>
           } />
+
+          <Route path="/data-policy" element={<DataPolicy />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

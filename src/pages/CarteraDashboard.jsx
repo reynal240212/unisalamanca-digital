@@ -310,7 +310,7 @@ const CarteraDashboard = () => {
                           </button>
                         )}
                         <button onClick={() => deleteObligation(o.id)}
-                          style={{ background: '#fef2f2', border: 'none', borderRadius: '12px', padding: '10px', cursor: 'pointer', color: '#ef4444', border: '1px solid #fee2e2' }}>
+                          style={{ background: '#fef2f2', borderRadius: '12px', padding: '10px', cursor: 'pointer', color: '#ef4444', border: '1px solid #fee2e2' }}>
                           <Trash2 size={18} />
                         </button>
                       </div>

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   User, Users, Home, GraduationCap, ArrowRight, ArrowLeft, 
   CheckCircle2, Info, Heart, Shield, Loader2, CreditCard, Mail,
   AlertCircle
 } from 'lucide-react';
 import { supabase } from '../services/supabase';
+import useColombiaGeo from '../hooks/useColombiaGeo';
 
 /* ─────────────────────────────────────────────────────────
    SALMI HINT — pequeño bloque de contexto por paso
@@ -12,14 +14,15 @@ import { supabase } from '../services/supabase';
 const SalmiHint = ({ text }) => (
   <div style={{ 
     display: 'flex', gap: '15px', alignItems: 'center', 
-    background: 'rgba(22, 182, 214, 0.06)', padding: '18px 20px', 
+    background: 'rgba(22, 182, 214, 0.06)', padding: '16px 20px', 
     borderLeft: '4px solid var(--secondary)', borderRadius: '16px',
-    marginBottom: '30px'
+    marginBottom: '20px',
+    flexWrap: 'wrap'
   }}>
-    <div style={{ width: '46px', height: '46px', flexShrink: 0, background: 'white', borderRadius: '50%', padding: '5px', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+    <div style={{ width: '42px', height: '42px', flexShrink: 0, background: 'white', borderRadius: '50%', padding: '5px', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
       <img src="/images/salmi-premium-v2.png" alt="Salmi" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
     </div>
-    <div style={{ fontSize: '0.88rem', color: '#1e3a8a', fontWeight: 600, lineHeight: '1.5' }}>{text}</div>
+    <div style={{ fontSize: '0.85rem', color: '#1e3a8a', fontWeight: 600, lineHeight: '1.4', flex: '1', minWidth: '200px' }}>{text}</div>
   </div>
 );
 
@@ -42,10 +45,10 @@ const FieldMsg = ({ type, text }) => {
 };
 
 /* ─────────────────────────────────────────────────────────
-   RADIO PILL GÉNERO
+   PILL SELECT — Selector tipo botón con estilo premium
 ───────────────────────────────────────────────────────── */
-const GenderPill = ({ value, selected, onChange }) => (
-  <label style={{
+const PillSelect = ({ name, value, selected, onChange, label }) => (
+  <label className="gender-pill-label" style={{
     display: 'flex', alignItems: 'center', gap: '8px',
     cursor: 'pointer',
     padding: '9px 16px',
@@ -60,7 +63,7 @@ const GenderPill = ({ value, selected, onChange }) => (
   }}>
     <input
       type="radio"
-      name="genero"
+      name={name}
       value={value}
       checked={selected}
       onChange={() => onChange(value)}
@@ -72,7 +75,7 @@ const GenderPill = ({ value, selected, onChange }) => (
       background: selected ? 'var(--secondary)' : 'transparent',
       flexShrink: 0, transition: 'all 0.2s'
     }} />
-    {value}
+    {label || value}
   </label>
 );
 
@@ -85,6 +88,11 @@ const CharacterizationForm = ({ user, onComplete }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [sisbenGroups, setSisbenGroups] = useState([]);
   const [sisbenStatus, setSisbenStatus] = useState('loading'); // loading | ok | fallback
+  const [geoData, setGeoData] = useState({});
+  const [healthData, setHealthData] = useState({ eps: [], cajas: [] });
+  const [institutions, setInstitutions] = useState([]);
+  const [daneSchools, setDaneSchools] = useState([]);
+  const [loadingSchools, setLoadingSchools] = useState(false);
 
   // ── Errores de validación ──────────────────────────────
   const [errors, setErrors] = useState({});
@@ -97,17 +105,53 @@ const CharacterizationForm = ({ user, onComplete }) => {
     correo: '',
     genero: '',
     grupoSisben: '',
-    // Personales
-    birthDate: '', address: '', phone: '', bloodType: '', healthNotes: '',
-    documentType: '', ethnicity: '', disability: '',
+    // Personales originarios
+    lugarNacimiento: '',
+    lugarExpedicion: '',
+    eps: '',
+    cajaCompensacion: '',
+    isVictim: 'No',
+    // Personales contacto
+    birthDate: '', 
+    deptoResidencia: '',
+    ciudadResidencia: '',
+    address: '', 
+    barrio: '', 
+    phone: '', 
+    bloodType: '', 
+    healthNotes: '',
+    documentType: '', 
+    ethnicity: '', 
+    disability: '',
     // Familiares
-    livesWith: '', emergencyContact: '', emergencyPhone: '', parentEducation: '', 
-    maritalStatus: '', hasChildren: 'No', emergencyRelationship: '',
+    livesWith: '', 
+    emergencyContact: '', 
+    emergencyPhone: '', 
+    parentEducation: '', 
+    maritalStatus: '', 
+    hasChildren: 'No', 
+    emergencyRelationship: '',
     // Socioeconómicos
-    estrato: '', incomeSource: '', isWorking: 'No',
+    estrato: '', 
+    incomeSource: '', 
+    isWorking: 'No',
+    hasComputer: 'No',
+    hasInternet: 'No',
+    transportMode: '',
     // Académicos
-    previousSchool: '', digitalSkills: '', interests: '',
-    workCompany: '', workRole: ''
+    previousSchool: '', 
+    digitalSkills: '', 
+    interests: '',
+    workCompany: '', 
+    workRole: '',
+    localidad: '',
+    // Académicos nuevos
+    lastDegree: '',
+    graduationYear: '',
+    lastInstitution: '',
+    diplomaUrl: '',
+    // Legal
+    policiesAccepted: false
   });
 
   // ── Cargar SISBEN desde archivo externo ───────────────
@@ -149,11 +193,67 @@ const CharacterizationForm = ({ user, onComplete }) => {
       }
     };
     loadSisben();
+
+    // Cargar Geodatos, Entidades de Salud e Instituciones
+    const loadExtraData = async () => {
+      try {
+        const [geoRes, healthRes, instRes] = await Promise.all([
+          fetch('/geo_colombia.json'),
+          fetch('/health_entities.json'),
+          fetch('/institutions.json')
+        ]);
+        if (geoRes.ok) setGeoData(await geoRes.json());
+        if (healthRes.ok) setHealthData(await healthRes.json());
+        if (instRes.ok) {
+          const data = await instRes.json();
+          setInstitutions(data.top_universities || []);
+        }
+      } catch (err) {
+        console.warn('Error cargando datos extra:', err);
+      }
+    };
+    loadExtraData();
   }, []);
 
-  // ── Prellenar datos existentes ─────────────────────────
+  // ── Cargar Colegios desde DANE según Ciudad ───────────
   useEffect(() => {
+    const fetchSchools = async () => {
+      const city = formData.ciudadResidencia;
+      if (!city || city === '-- Seleccione un municipio --') return;
+      
+      setLoadingSchools(true);
+      try {
+        // Normalizar nombre de ciudad para la API (usualmente en MAYÚSCULAS)
+        const normalizedCity = city.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const url = `https://www.datos.gov.co/resource/upkm-vdjb.json?nombremunicipio=${normalizedCity}&$limit=1500`;
+        
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          // Extraer nombres únicos
+          const names = [...new Set(data.map(item => item.nombreestablecimiento))].sort();
+          setDaneSchools(names);
+        }
+      } catch (err) {
+        console.warn('Error conectando con DANE API:', err);
+      } finally {
+        setLoadingSchools(false);
+      }
+    };
+
+    if (step >= 4) { // Cargar cuando el usuario se acerca al paso académico
+      fetchSchools();
+    }
+  }, [formData.ciudadResidencia, step]);
+
+  // ── Prellenar datos existentes ─────────────────────────
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (hasInitialized.current) return;
+    
     if (user?.characterization) {
+      hasInitialized.current = true;
       const d = user.characterization;
       setFormData(prev => ({
         ...prev,
@@ -162,8 +262,22 @@ const CharacterizationForm = ({ user, onComplete }) => {
         correo: d.correo || user?.email || '',
         genero: d.gender || '',
         grupoSisben: d.grupo_sisben || '',
+        // Nuevos
+        lugarNacimiento: d.lugar_nacimiento || '',
+        lugarExpedicion: d.lugar_expedicion || '',
+        eps: d.eps || '',
+        cajaCompensacion: d.caja_compensacion || '',
+        deptoResidencia: d.depto_residencia || '',
+        ciudadResidencia: d.ciudad_residencia || '',
+        isVictim: d.is_victim || 'No',
+        hasComputer: d.has_computer || 'No',
+        hasInternet: d.has_internet || 'No',
+        transportMode: d.transport_mode || '',
+        policiesAccepted: d.policies_accepted || false,
+        // Base
         birthDate: d.birth_date || '',
         address: d.address || '',
+        barrio: d.barrio || '',
         phone: d.phone || '',
         bloodType: d.blood_type || '',
         healthNotes: d.health_notes || '',
@@ -184,9 +298,15 @@ const CharacterizationForm = ({ user, onComplete }) => {
         digitalSkills: d.digital_skills || '',
         interests: d.interests || '',
         workCompany: d.work_company || '',
-        workRole: d.work_role || ''
+        workRole: d.work_role || '',
+        localidad: d.localidad || '',
+        lastDegree: d.last_degree || '',
+        graduationYear: d.graduation_year || '',
+        lastInstitution: d.last_institution || '',
+        diplomaUrl: d.diploma_url || ''
       }));
-    } else if (user) {
+    } else if (user && user.id && !hasInitialized.current) {
+      hasInitialized.current = true;
       // Pre-fill desde datos de sesión si no hay characterization
       setFormData(prev => ({
         ...prev,
@@ -195,9 +315,9 @@ const CharacterizationForm = ({ user, onComplete }) => {
         correo: user.email || ''
       }));
     }
-  }, [user]);
+  }, [user?.id]);
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 4));
+  const nextStep = () => setStep(s => Math.min(s + 1, 5));
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   const set = (key, value) => {
@@ -251,7 +371,8 @@ const CharacterizationForm = ({ user, onComplete }) => {
     { id: 1, label: 'Identidad', icon: <User size={18} /> },
     { id: 2, label: 'Entorno',   icon: <Users size={18} /> },
     { id: 3, label: 'Bienestar', icon: <Home size={18} /> },
-    { id: 4, label: 'Academia',  icon: <GraduationCap size={18} /> }
+    { id: 4, label: 'Académico', icon: <GraduationCap size={18} /> },
+    { id: 5, label: 'Expediente', icon: <Shield size={18} /> }
   ];
 
   const handleNext = () => {
@@ -271,10 +392,23 @@ const CharacterizationForm = ({ user, onComplete }) => {
         nombre_completo: formData.nombreCompleto,
         correo: formData.correo,
         grupo_sisben: formData.grupoSisben,
+        // Nuevos
+        lugar_nacimiento: formData.lugarNacimiento,
+        lugar_expedicion: formData.lugarExpedicion,
+        eps: formData.eps,
+        caja_compensacion: formData.cajaCompensacion,
+        depto_residencia: formData.deptoResidencia,
+        ciudad_residencia: formData.ciudadResidencia,
+        is_victim: formData.isVictim,
+        has_computer: formData.hasComputer,
+        has_internet: formData.hasInternet,
+        transport_mode: formData.transportMode,
+        policies_accepted: formData.policiesAccepted,
         // Campos existentes
         birth_date: formData.birthDate,
         blood_type: formData.bloodType,
         address: formData.address,
+        barrio: formData.barrio,
         phone: formData.phone,
         health_notes: formData.healthNotes,
         document_type: formData.documentType,
@@ -296,6 +430,11 @@ const CharacterizationForm = ({ user, onComplete }) => {
         previous_school: formData.previousSchool,
         digital_skills: formData.digitalSkills,
         interests: formData.interests,
+        localidad: formData.localidad,
+        last_degree: formData.lastDegree,
+        graduation_year: formData.graduationYear,
+        last_institution: formData.lastInstitution,
+        diploma_url: formData.diplomaUrl,
         completed_at: new Date().toISOString()
       };
 
@@ -338,6 +477,9 @@ const CharacterizationForm = ({ user, onComplete }) => {
     letterSpacing: '0.05em',
     marginBottom: '7px'
   };
+
+  // ── Hook de Geodatos (DANE) ──────────────────────────
+  const { departments, getCitiesByDept, allCities, loading: geoLoading } = useColombiaGeo();
 
   // ── Contenido por paso ────────────────────────────────
   const renderStepContent = () => {
@@ -426,13 +568,93 @@ const CharacterizationForm = ({ user, onComplete }) => {
                 <FieldMsg type="error" text={errors.birthDate} />
               </div>
 
+              {/* Lugar de Nacimiento */}
+              <div className="form-field-premium">
+                <label style={labelStyle}>Lugar de Nacimiento</label>
+                <input
+                  list="all-cities-list"
+                  className="input-premium"
+                  placeholder="Escribe tu municipio de nacimiento"
+                  value={formData.lugarNacimiento}
+                  onChange={e => set('lugarNacimiento', e.target.value)}
+                  style={inputStyle('lugarNacimiento')}
+                />
+                <datalist id="all-cities-list">
+                  {allCities.slice(0, 500).map(c => <option key={c} value={c} />)}
+                </datalist>
+              </div>
+
+              {/* Lugar de Expedición */}
+              <div className="form-field-premium">
+                <label style={labelStyle}>Lugar de Expedición del ID</label>
+                <input
+                  list="all-cities-list"
+                  className="input-premium"
+                  placeholder="Lugar donde expediste tu cédula"
+                  value={formData.lugarExpedicion}
+                  onChange={e => set('lugarExpedicion', e.target.value)}
+                  style={inputStyle('lugarExpedicion')}
+                />
+              </div>
+
+              <div className="form-field-premium">
+                <label style={labelStyle}>EPS Actual</label>
+                <input
+                  type="text"
+                  className="input-premium"
+                  placeholder="Ej: Sura, Sanitas, Coomeva..."
+                  value={formData.eps}
+                  onChange={e => set('eps', e.target.value)}
+                  style={inputStyle('eps')}
+                  list="eps-list"
+                />
+                <datalist id="eps-list">
+                  {healthData.eps.map(e => <option key={e} value={e} />)}
+                </datalist>
+              </div>
+
+              {/* Caja de Compensación */}
+              <div className="form-field-premium">
+                <label style={labelStyle}>Caja de Compensación</label>
+                <input
+                  type="text"
+                  className="input-premium"
+                  placeholder="Ej: Cafam, Colsubsidio..."
+                  value={formData.cajaCompensacion}
+                  onChange={e => set('cajaCompensacion', e.target.value)}
+                  style={inputStyle('cajaCompensacion')}
+                  list="cajas-list"
+                />
+                <datalist id="cajas-list">
+                  {healthData.cajas.map(c => <option key={c} value={c} />)}
+                </datalist>
+              </div>
+
+              {/* Víctima del conflicto */}
+              <div className="form-field-premium" style={{ gridColumn: 'span 2' }}>
+                <label style={labelStyle}>¿Es víctima del conflicto armado?</label>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+                  {['Si', 'No'].map(opt => (
+                    <PillSelect
+                      key={opt}
+                      name="isVictim"
+                      value={opt}
+                      label={opt === 'Si' ? 'Sí, soy víctima' : 'No reporto'}
+                      selected={formData.isVictim === opt}
+                      onChange={v => set('isVictim', v)}
+                    />
+                  ))}
+                </div>
+              </div>
+
               {/* Grupo SISBEN */}
               <div className="form-field-premium" style={{ gridColumn: 'span 2' }}>
                 <label style={labelStyle}>Grupo SISBEN *</label>
                 <select
+                  className="input-premium"
                   value={formData.grupoSisben}
                   onChange={e => set('grupoSisben', e.target.value)}
-                  style={{ ...inputStyle('grupoSisben'), cursor: 'pointer', appearance: 'auto' }}
+                  style={{ ...inputStyle('grupoSisben'), cursor: 'pointer', appearance: 'none' }}
                 >
                   <option value="">
                     {sisbenStatus === 'loading' ? 'Cargando grupos SISBEN…' : '-- Seleccione un grupo --'}
@@ -459,8 +681,9 @@ const CharacterizationForm = ({ user, onComplete }) => {
                 <label style={labelStyle}>Género *</label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '4px' }}>
                   {['Masculino', 'Femenino', 'No Binario', 'Transgénero', 'Cisgénero'].map(g => (
-                    <GenderPill
+                    <PillSelect
                       key={g}
+                      name="genero"
                       value={g}
                       selected={formData.genero === g}
                       onChange={v => set('genero', v)}
@@ -504,9 +727,84 @@ const CharacterizationForm = ({ user, onComplete }) => {
               </div>
 
               <div className="form-field-premium" style={{ gridColumn: 'span 2' }}>
-                <label style={labelStyle}>Dirección de Residencia Actual</label>
-                <input type="text" className="input-premium" placeholder="Ej: Calle 45 # 23-12, Barrio" value={formData.address} onChange={e => set('address', e.target.value)} />
+                <label style={labelStyle}>Departamento de Residencia</label>
+                <select 
+                  className="input-premium" 
+                  value={formData.deptoResidencia} 
+                  onChange={e => {
+                    set('deptoResidencia', e.target.value);
+                    set('ciudadResidencia', ''); // reset city on dept change
+                  }}
+                  style={inputStyle('deptoResidencia')}
+                >
+                  <option value="">{geoLoading ? 'Cargando departamentos...' : '-- Seleccionar --'}</option>
+                  {departments.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
               </div>
+
+              <div className="form-field-premium">
+                <label style={labelStyle}>Ciudad / Municipio</label>
+                <select 
+                  className="input-premium" 
+                  value={formData.ciudadResidencia} 
+                  onChange={e => set('ciudadResidencia', e.target.value)}
+                  disabled={!formData.deptoResidencia}
+                  style={inputStyle('ciudadResidencia')}
+                >
+                  <option value="">-- Seleccionar --</option>
+                  {getCitiesByDept(formData.deptoResidencia).map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+
+              <div className="form-field-premium" style={{ gridColumn: 'span 2' }}>
+                <label style={labelStyle}>Dirección de Residencia Actual</label>
+                <input type="text" className="input-premium" placeholder="Ej: Calle 45 # 23-12" value={formData.address} onChange={e => set('address', e.target.value)} />
+              </div>
+
+              <div className="form-field-premium">
+                <label style={labelStyle}>Barrio</label>
+                <input 
+                  type="text" 
+                  className="input-premium" 
+                  placeholder="Ej: Los Laureles" 
+                  value={formData.barrio} 
+                  onChange={e => set('barrio', e.target.value)}
+                  style={inputStyle('barrio')}
+                  list="barrios-list"
+                />
+                <datalist id="barrios-list">
+                  {(geoData[formData.ciudadResidencia] && formData.localidad) 
+                    ? geoData[formData.ciudadResidencia].localidades.find(l => l.nombre === formData.localidad)?.barrios.map(b => <option key={b} value={b} />)
+                    : (geoData[formData.ciudadResidencia]
+                        ? geoData[formData.ciudadResidencia].localidades.flatMap(l => l.barrios).slice(0, 200).map(b => <option key={b} value={b} />)
+                        : null
+                      )
+                  }
+                </datalist>
+                <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '4px' }}>
+                  {geoData[formData.ciudadResidencia] 
+                    ? `✨ Sugerencias oficiales para ${formData.ciudadResidencia} disponibles.`
+                    : `💡 Escribe tu barrio (entrada libre para ${formData.ciudadResidencia || 'tu ciudad'}).`
+                  }
+                </div>
+              </div>
+
+              {geoData[formData.ciudadResidencia] && (
+                <div className="form-field-premium" style={{ gridColumn: 'span 2' }}>
+                  <label style={labelStyle}>{geoData[formData.ciudadResidencia].tipo} ({formData.ciudadResidencia})</label>
+                  <select 
+                    className="input-premium" 
+                    value={formData.localidad} 
+                    onChange={e => set('localidad', e.target.value)}
+                    style={inputStyle('localidad')}
+                  >
+                    <option value="">-- Seleccionar {geoData[formData.ciudadResidencia].tipo} --</option>
+                    {geoData[formData.ciudadResidencia]?.localidades.map(l => (
+                      <option key={l.nombre} value={l.nombre}>{l.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="form-field-premium">
                 <label style={labelStyle}>Teléfono Celular Personal</label>
@@ -606,6 +904,44 @@ const CharacterizationForm = ({ user, onComplete }) => {
                   ))}
                 </div>
               </div>
+
+              <div className="form-field-premium">
+                <label className="label-premium">¿Posee Computador propio?</label>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+                  {['Si', 'No'].map(opt => (
+                    <PillSelect
+                      key={opt}
+                      name="hasComputer"
+                      value={opt}
+                      selected={formData.hasComputer === opt}
+                      onChange={v => set('hasComputer', v)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-field-premium">
+                <label className="label-premium">¿Cuenta con servicio de Internet?</label>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+                  {['Si', 'No'].map(opt => (
+                    <PillSelect
+                      key={opt}
+                      name="hasInternet"
+                      value={opt}
+                      selected={formData.hasInternet === opt}
+                      onChange={v => set('hasInternet', v)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-field-premium">
+                <label className="label-premium">Medio de Transporte Principal</label>
+                <select className="input-premium" value={formData.transportMode} onChange={e => set('transportMode', e.target.value)}>
+                  <option value="">Seleccionar...</option>
+                  {['Bus / Transporte Público', 'Moto', 'Bicicleta', 'Carro Propio', 'Caminando', 'Otro'].map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
               {formData.isWorking === 'Si' && (
                 <>
                   <div className="form-field-premium">
@@ -643,6 +979,84 @@ const CharacterizationForm = ({ user, onComplete }) => {
           </div>
         );
 
+      case 5:
+        return (
+          <div className="section-reveal">
+            <SalmiHint text="Paso final: Adjunta tu respaldo académico para validar tu perfil estudiantil." />
+            <div className="form-grid-premium">
+              <div className="form-field-premium" style={{ gridColumn: 'span 2' }}>
+                <label className="label-premium">Último Título o Grado Obtenido *</label>
+                <select className="input-premium" value={formData.lastDegree} onChange={e => set('lastDegree', e.target.value)}>
+                  <option value="">Seleccione...</option>
+                  <option value="Bachiller">Bachiller</option>
+                  <option value="Técnico">Técnico</option>
+                  <option value="Tecnólogo">Tecnólogo</option>
+                  <option value="Profesional">Profesional</option>
+                  <option value="Posgrado">Especialización / Maestría</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              
+              <div className="form-field-premium">
+                <label className="label-premium">Institución Educativa</label>
+                <input 
+                  type="text" 
+                  className="input-premium" 
+                  placeholder="Ej: Universidad Nacional" 
+                  value={formData.lastInstitution} 
+                  onChange={e => set('lastInstitution', e.target.value)} 
+                  list="inst-list"
+                />
+                <datalist id="inst-list">
+                  <optgroup label="Universidades Sugeridas">
+                    {institutions.map(i => <option key={`uni-${i}`} value={i} />)}
+                  </optgroup>
+                  <optgroup label={`Colegios en ${formData.ciudadResidencia}`}>
+                    {daneSchools.map(s => <option key={`sch-${s}`} value={s} />)}
+                  </optgroup>
+                </datalist>
+                {loadingSchools && (
+                  <div style={{ fontSize: '0.65rem', color: 'var(--secondary)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Loader2 size={10} className="animate-spin" /> Buscando colegios oficiales en {formData.ciudadResidencia}...
+                  </div>
+                )}
+              </div>
+
+              <div className="form-field-premium">
+                <label className="label-premium">Año de Graduación</label>
+                <input type="number" className="input-premium" placeholder="Ej: 2024" value={formData.graduationYear} onChange={e => set('graduationYear', e.target.value)} />
+              </div>
+
+              {/* Módulo de Carga Visual */}
+              <div className="form-field-premium" style={{ gridColumn: 'span 2' }}>
+                <label className="label-premium">Soporte Digital (Diploma / Acta de Grado)</label>
+                <div style={{ 
+                  border: '2px dashed #e2e8f0', 
+                  borderRadius: '16px', 
+                  padding: '40px 20px', 
+                  textAlign: 'center',
+                  background: 'rgba(248, 250, 252, 0.5)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}>
+                  <div style={{ background: '#f1f5f9', width: '50px', height: '50px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px' }}>
+                    <Shield size={24} color="var(--primary)" />
+                  </div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--primary-dark)' }}>
+                    Haz clic para subir o arrastra tu diploma
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '6px' }}>
+                    PDF, JPG o PNG (Max. 5MB)
+                  </div>
+                </div>
+                <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '0.75rem', fontStyle: 'italic' }}>
+                  <Info size={14} /> Tu documento será procesado bajo la Ley 1581 (Habeas Data) solo para fines de registro institucional.
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       default: return null;
     }
   };
@@ -672,7 +1086,7 @@ const CharacterizationForm = ({ user, onComplete }) => {
     );
 
     return (
-      <div className="section-reveal" style={{ maxWidth: '850px', margin: '0 auto' }}>
+      <div className="section-reveal" style={{ maxWidth: '1250px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
             <CheckCircle2 size={40} color="var(--success)" />
@@ -682,13 +1096,16 @@ const CharacterizationForm = ({ user, onComplete }) => {
         </div>
 
         <SummarySection icon={<User size={18} />} title="IDENTIFICACIÓN Y CONTACTO" stepTarget={1} fields={[
-          { label: 'No. Identificación', value: formData.identificacion },
+           {label: 'No. Identificación', value: formData.identificacion },
           { label: 'Nombre Completo', value: formData.nombreCompleto },
           { label: 'Correo', value: formData.correo },
           { label: 'Género', value: formData.genero },
-          { label: 'SISBEN', value: formData.grupoSisben },
-          { label: 'Nacimiento', value: formData.birthDate },
-          { label: 'RH', value: formData.bloodType },
+          { label: 'Nacimiento', value: `${formData.birthDate} - ${formData.lugarNacimiento}` },
+          { label: 'Expedición ID', value: formData.lugarExpedicion },
+          { label: 'EPS / Caja', value: `${formData.eps} / ${formData.cajaCompensacion}` },
+          { label: 'SISBEN / Víctima', value: `${formData.grupoSisben} / ${formData.isVictim}` },
+          { label: 'Ubicación', value: `${formData.deptoResidencia}, ${formData.ciudadResidencia}` },
+          { label: 'Dirección', value: `${formData.address} (${formData.barrio})` },
           { label: 'Celular', value: formData.phone },
         ]} />
 
@@ -702,11 +1119,13 @@ const CharacterizationForm = ({ user, onComplete }) => {
         ]} />
 
         <SummarySection icon={<Heart size={18} />} title="BIENESTAR Y SOCIOECONOMÍA" stepTarget={3} fields={[
-          { label: 'Estrato', value: formData.estrato },
+           {label: 'Estrato', value: formData.estrato },
           { label: 'Ingresos', value: formData.incomeSource },
           { label: 'Labora', value: formData.isWorking },
           { label: 'Empresa', value: formData.workCompany },
           { label: 'Cargo', value: formData.workRole },
+          { label: 'Conectividad', value: `PC: ${formData.hasComputer} | Internet: ${formData.hasInternet}` },
+          { label: 'Transporte', value: formData.transportMode },
         ]} />
 
         <SummarySection icon={<GraduationCap size={18} />} title="ACADEMIA E INTERESES" stepTarget={4} fields={[
@@ -714,12 +1133,47 @@ const CharacterizationForm = ({ user, onComplete }) => {
           { label: 'Habilidades', value: formData.digitalSkills },
         ]} />
 
-        <div style={{ marginTop: '30px' }}>
-          <SalmiHint text="¡Excelente trabajo! Si crees que todo está en orden, presiona el botón inferior para finalizar el proceso y activar tu carnet." />
+        <SummarySection icon={<Shield size={18} />} title="EXPEDIENTE ACADÉMICO" stepTarget={5} fields={[
+          { label: 'Grado', value: formData.lastDegree },
+          { label: 'Institución', value: formData.lastInstitution },
+          { label: 'Año', value: formData.graduationYear },
+          { label: 'Diploma', value: formData.diplomaUrl ? 'Cargado ✅' : 'Pendiente 📄' },
+        ]} />
+
+         <div style={{ marginTop: '30px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <SalmiHint text="¡Excelente trabajo! Si crees que todo está en orden, acepta la política de datos para finalizar el proceso y activar tu carnet." />
+          
+          <div className="glass-card" style={{ padding: '20px', border: '1px solid rgba(22,182,214,0.2)', borderRadius: '15px', background: 'white' }}>
+            <label style={{ display: 'flex', gap: '15px', cursor: 'pointer' }}>
+              <input 
+                type="checkbox" 
+                checked={formData.policiesAccepted} 
+                onChange={e => set('policiesAccepted', e.target.checked)}
+                style={{ width: '22px', height: '22px', marginTop: '3px', cursor: 'pointer' }}
+              />
+              <div style={{ fontSize: '0.85rem', color: '#1e3a8a', lineHeight: '1.5', fontWeight: 600 }}>
+                He leído y acepto la <strong style={{ color: 'var(--secondary)' }}>Política de Tratamiento de Datos Personales</strong> (Habeas Data) 
+                de la Universidad UniSalamanca. Entiendo que mi fotografía y datos serán tratados 
+                con fines académicos, de seguridad e identificación institucional. 
+                <Link to="/data-policy" target="_blank" style={{ color: 'var(--secondary)', marginLeft: '6px', textDecoration: 'underline' }}>Ver política completa</Link>
+              </div>
+            </label>
+          </div>
         </div>
 
-        <button onClick={handleFinalize} className="btn-primary-premium" disabled={isSaving}
-          style={{ width: '100%', padding: '20px', background: 'var(--primary)', marginTop: '20px', boxShadow: '0 20px 40px rgba(42,34,102,0.2)' }}>
+        <button 
+          onClick={handleFinalize} 
+          className="btn-primary-premium" 
+          disabled={isSaving || !formData.policiesAccepted}
+          style={{ 
+            width: '100%', 
+            padding: '20px', 
+            background: formData.policiesAccepted ? 'var(--primary)' : '#cbd5e1', 
+            marginTop: '20px', 
+            boxShadow: formData.policiesAccepted ? '0 20px 40px rgba(42,34,102,0.2)' : 'none',
+            cursor: formData.policiesAccepted ? 'pointer' : 'not-allowed'
+          }}
+        >
           {isSaving
             ? <><Loader2 size={18} className="animate-spin" /> Guardando en la nube…</>
             : <>CONFIRMAR Y ACTIVAR MI CARNET <ArrowRight size={20} /></>}
@@ -731,10 +1185,9 @@ const CharacterizationForm = ({ user, onComplete }) => {
   // ── Vista principal del stepper ───────────────────────
   return (
     <div className="glass-card" style={{ 
-      maxWidth: '850px', 
+      maxWidth: '1250px', 
       margin: '0 auto', 
-      boxShadow: '0 40px 100px rgba(0,0,0,0.1)',
-      padding: window.innerWidth < 768 ? '20px' : '40px'
+      boxShadow: '0 40px 100px rgba(0,0,0,0.1)'
     }}>
       {/* STEPPER */}
       <div className="characterization-stepper" style={{ marginBottom: '48px' }}>
@@ -769,30 +1222,27 @@ const CharacterizationForm = ({ user, onComplete }) => {
         flexWrap: 'wrap',
         gap: '15px' 
       }}>
-        <button onClick={prevStep} className="btn-secondary-premium" disabled={step === 1 || isSaving}
+        <button onClick={prevStep} className="btn-secondary-premium nav-btn-mobile" disabled={step === 1 || isSaving}
           style={{ 
             opacity: (step === 1 || isSaving) ? 0.3 : 1, 
-            padding: '14px 28px',
-            flex: window.innerWidth < 480 ? '1' : 'none'
+            padding: '14px 28px'
           }}>
           <ArrowLeft size={18} /> Anterior
         </button>
 
-        {step < 4 ? (
-          <button onClick={handleNext} className="btn-primary-premium" disabled={isSaving}
+        {step < 5 ? (
+          <button onClick={handleNext} className="btn-primary-premium nav-btn-mobile" disabled={isSaving}
             style={{ 
               padding: '14px 28px', 
-              background: 'var(--primary)',
-              flex: window.innerWidth < 480 ? '1' : 'none'
+              background: 'var(--primary)'
             }}>
             Continuar <ArrowRight size={18} />
           </button>
         ) : (
-          <button onClick={() => setShowSuccess(true)} className="btn-primary-premium"
+          <button onClick={() => setShowSuccess(true)} className="btn-primary-premium nav-btn-mobile"
             style={{ 
               background: 'linear-gradient(135deg, var(--secondary), #0e94ad)', 
-              padding: '14px 32px',
-              flex: window.innerWidth < 480 ? '1' : 'none'
+              padding: '14px 32px'
             }}
             disabled={isSaving}>
             {isSaving
