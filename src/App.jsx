@@ -19,7 +19,7 @@ import DataPolicy from './pages/DataPolicy';
 const ACADEMIC_ROLES = ['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA', 'ADMIN'];
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, loading } = useAuth();
+  const { user, activeRole, loading } = useAuth();
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f8fafc' }}>
       <div style={{ textAlign: 'center' }}>
@@ -29,7 +29,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     </div>
   );
   if (!user) return <Navigate to="/login" replace />;
-  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/login" replace />;
+  const roleToCheck = activeRole || user.role;
+  if (allowedRoles && !allowedRoles.includes(roleToCheck)) return <Navigate to="/login" replace />;
   return children;
 };
 

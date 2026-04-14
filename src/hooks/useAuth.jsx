@@ -23,16 +23,20 @@ const calcularSemestre = (entryDate) => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [activeRole, setActiveRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Al arrancar, restaurar sesión desde localStorage
   useEffect(() => {
-    const cached = localStorage.getItem('auth_user');
-    if (cached) {
+    const cachedUser = localStorage.getItem('auth_user');
+    const cachedRole = localStorage.getItem('auth_active_role');
+    if (cachedUser) {
       try {
-        setUser(JSON.parse(cached));
+        setUser(JSON.parse(cachedUser));
+        if (cachedRole) setActiveRole(cachedRole);
       } catch (_) {
         localStorage.removeItem('auth_user');
+        localStorage.removeItem('auth_active_role');
       }
     }
     setLoading(false);
@@ -75,12 +79,32 @@ export const AuthProvider = ({ children }) => {
 
     setUser(sessionUser);
     localStorage.setItem('auth_user', JSON.stringify(sessionUser));
+    
+    // Configurar rol activo. Si solo hay 1 rol, asignarlo automáticamente
+    const rolesArray = sessionUser.roles || [sessionUser.role];
+    if (rolesArray.length === 1) {
+      setActiveRole(rolesArray[0]);
+      localStorage.setItem('auth_active_role', rolesArray[0]);
+    } else {
+      // Si tiene múltiples y arranca sesión de nuevo, limpiamos rol activo
+      // para forzar al selector siempre en el login
+      setActiveRole(null);
+      localStorage.removeItem('auth_active_role');
+    }
+    
     return sessionUser;
+  };
+
+  const selectRole = (role) => {
+    setActiveRole(role);
+    localStorage.setItem('auth_active_role', role);
   };
 
   const logout = () => {
     setUser(null);
+    setActiveRole(null);
     localStorage.removeItem('auth_user');
+    localStorage.removeItem('auth_active_role');
     window.location.replace('/');
   };
 
@@ -105,7 +129,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, acceptPolicy, loading }}>
+    <AuthContext.Provider value={{ user, activeRole, selectRole, login, logout, acceptPolicy, loading }}>
       {children}
     </AuthContext.Provider>
   );
