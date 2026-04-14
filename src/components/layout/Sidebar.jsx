@@ -141,12 +141,25 @@ const Sidebar = ({ user: externalUser, navItems, activeNav, setActiveNav, isSide
           onMouseOver={(e) => { if(userRoles.length > 1) e.currentTarget.style.background = 'rgba(255,255,255,0.06)' }}
           onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
         >
-          <div style={{ 
-            width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-            fontWeight: 900, flexShrink: 0, ...(isStudent ? studentIndicatorStyles : institutionalIndicatorStyles)
-          }}>
-            {(user?.name || 'U').charAt(0)}
-          </div>
+          {user?.photo_url ? (
+            <img
+              src={user.photo_url}
+              alt={user.name}
+              style={{
+                width: '38px', height: '38px', borderRadius: '10px',
+                objectFit: 'cover', flexShrink: 0,
+                border: '2px solid rgba(255,255,255,0.15)',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
+              }}
+            />
+          ) : (
+            <div style={{ 
+              width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              fontWeight: 900, flexShrink: 0, ...(isStudent ? studentIndicatorStyles : institutionalIndicatorStyles)
+            }}>
+              {(user?.name || 'U').charAt(0)}
+            </div>
+          )}
           <div style={{ overflow: 'hidden', flex: 1 }}>
             <p style={{ fontWeight: 800, fontSize: '0.85rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis', color: 'white' }}>
                 {user?.name || 'Usuario'}
