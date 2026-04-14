@@ -60,12 +60,16 @@ export const AuthProvider = ({ children }) => {
       throw new Error('Correo o contraseña incorrectos');
     }
 
-    // Calcular semestre real desde entry_date
-    const semestre = calcularSemestre(data.entry_date);
+    const { data: charData } = await supabase
+      .from('characterization')
+      .select('completed_at')
+      .eq('user_id', data.id)
+      .single();
 
     const sessionUser = {
       ...data,
       semester: semestre,
+      characterization_completed: !!charData,
     };
 
     setUser(sessionUser);
@@ -76,13 +80,31 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('auth_user');
-    // Reemplaza la entrada actual del historial con '/' para que
-    // el botón "atrás" NO regrese a páginas protegidas tras cerrar sesión
     window.location.replace('/');
   };
 
+  const acceptPolicy = async () => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from('user')
+        .update({ policy_accepted: true })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      const updatedUser = { ...user, policy_accepted: true };
+      setUser(updatedUser);
+      localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+      return true;
+    } catch (err) {
+      console.error('Error accepting policy:', err);
+      return false;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, acceptPolicy, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -145,7 +145,6 @@ const AdmisionesDashboard = () => {
 
   const counts = Object.keys(STATUS_CONFIG).reduce((acc, k) => ({ ...acc, [k]: applicants.filter(a => a.status === k).length }), {});
 
-  return (
   const navItems = [
     ...(user?.role === 'ADMIN' ? [{
       title: 'Administración',
@@ -312,8 +311,6 @@ const AdmisionesDashboard = () => {
 
       {showModal && <NewApplicantModal onClose={() => setShowModal(false)} onSaved={fetchApplicants} />}
     </DashboardLayout>
-  );
-};
   );
 };
 

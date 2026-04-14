@@ -369,7 +369,12 @@ const StudentDashboard = () => {
             <FinanceView user={studentData} />
           </div>
         );
-      default: return   const navItems = [
+      default:
+        return null;
+    }
+  };
+
+  const navItems = [
     {
       title: 'Experiencia',
       items: [
@@ -415,10 +420,6 @@ const StudentDashboard = () => {
       <SalmiChatbot />
     </DashboardLayout>
   );
-};
-</div>
-  </div>
-);
 };
 
 export default StudentDashboard;

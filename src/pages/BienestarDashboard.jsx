@@ -39,13 +39,6 @@ const BienestarDashboard = () => {
   };
 
   const navItems = [
-    { id: 'validacion', icon: <ImageIcon size={18} />, label: 'Validación de Fotos' },
-    { id: 'estudiantes', icon: <Users size={18} />, label: 'Directorio Estudiantil' },
-    { id: 'reportes', icon: <BarChart2 size={18} />, label: 'Reportes de Bienestar' },
-  ];
-
-  return (
-  const navItems = [
     ...(user?.role === 'ADMIN' ? [{
       title: 'Administración',
       items: [
@@ -147,8 +140,6 @@ const BienestarDashboard = () => {
         </div>
       </div>
     </DashboardLayout>
-  );
-};
   );
 };
 

@@ -4,7 +4,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useQR } from '../hooks/useQR';
 import { useNavigate } from 'react-router-dom';
 import StudentCardComponent from '../components/StudentCardComponent';
-import { LogOut, Camera, Check, RotateCcw, ShieldCheck } from 'lucide-react';
+import { LogOut, Camera, Check, RotateCcw, ShieldCheck, Lock } from 'lucide-react';
+import DataPolicyModal from '../components/DataPolicyModal';
 
 const StudentCard = () => {
   const [student, setStudent] = useState(null);
@@ -14,10 +15,12 @@ const StudentCard = () => {
   const progress = (timeLeft / 30) * 100;
   
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [capturedImg, setCapturedImg] = useState(null);
   const [privacyChecked, setPrivacyChecked] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const { acceptPolicy } = useAuth();
   
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -40,6 +43,17 @@ const StudentCard = () => {
     if (!error) {
       setStudent(data);
       if (!data.photo_url) setShowOnboarding(true);
+      if (!data.policy_accepted) setShowPolicyModal(true);
+    }
+  };
+
+  const handleAcceptPolicy = async () => {
+    const success = await acceptPolicy();
+    if (success) {
+      setShowPolicyModal(false);
+      setPrivacyChecked(true); // Para compatibilidad con savePhoto si no se ha capturado
+    } else {
+      alert('Error al registrar la aceptación. Intenta nuevamente.');
     }
   };
 
@@ -135,11 +149,9 @@ const StudentCard = () => {
 
               <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
 
-              <div style={{ marginBottom: '24px' }}>
-                 <label style={{ fontSize: '0.75rem', display: 'flex', gap: '12px', alignItems: 'center', textAlign: 'left', color: '#475569', lineHeight: '1.4' }}>
-                    <input type="checkbox" checked={privacyChecked} onChange={e => setPrivacyChecked(e.target.checked)} style={{ width: '18px', height: '18px' }} />
-                    Autorizo el tratamiento de mis datos personales según la Ley 1581 de 2012 para fines de identificación institucional.
-                 </label>
+              <div style={{ marginBottom: '24px', padding: '15px', background: '#f0fdf4', borderRadius: '12px', border: '1px solid #dcfce7', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Check size={18} color="#22c55e" />
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#166534' }}>Política de Datos y Biometría Aceptada</span>
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
@@ -158,6 +170,11 @@ const StudentCard = () => {
       {showPrintModal && (
         <PrintIDModal student={student} onClose={() => setShowPrintModal(false)} />
       )}
+
+      <DataPolicyModal 
+        isOpen={showPolicyModal} 
+        onAccept={handleAcceptPolicy} 
+      />
 
       <style>{styles}</style>
     </div>

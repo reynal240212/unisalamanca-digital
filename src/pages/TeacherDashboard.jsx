@@ -78,7 +78,6 @@ const TeacherDashboard = () => {
   const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   const dayColors = { Lunes: '#4f46e5', Martes: '#16a34a', Miércoles: '#ea580c', Jueves: '#a21caf', Viernes: '#0891b2', Sábado: '#ca8a04' };
 
-  return (
   const navItems = [
     {
       title: 'Gestión de Aula',
@@ -262,8 +261,6 @@ const TeacherDashboard = () => {
         )}
       </div>
     </DashboardLayout>
-  );
-};
   );
 };
 

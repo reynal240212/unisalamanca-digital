@@ -51,7 +51,6 @@ const RegistroDashboard = () => {
   const labelStyle = { fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '4px', display: 'block' };
   const valueStyle = { fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' };
 
-  return (
   const navItems = [
     ...(user?.role === 'ADMIN' ? [{
       title: 'Administración',
@@ -299,8 +298,6 @@ const RegistroDashboard = () => {
         <CharacterizationReport student={selected} charData={charData} />
       </div>
     </DashboardLayout>
-  );
-};
   );
 };
 

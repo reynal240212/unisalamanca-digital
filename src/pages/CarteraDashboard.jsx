@@ -79,7 +79,6 @@ const CarteraDashboard = () => {
   const totalDebt = obligations.filter(o => o.status === 'pending' || o.status === 'overdue').reduce((acc, o) => acc + (o.amount || 0), 0);
   const isPazYSalvo = totalDebt === 0;
 
-  return (
   const navItems = [
     ...(user?.role === 'ADMIN' ? [{
       title: 'Administración',
@@ -324,8 +323,6 @@ const CarteraDashboard = () => {
         )}
       </div>
     </DashboardLayout>
-  );
-};
   );
 };
 
