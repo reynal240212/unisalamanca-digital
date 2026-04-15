@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     // Buscar usuario en Supabase por email
     const { data, error } = await supabase
       .from('user')
-      .select('*')
+      .select('*, academic_program_info:academic_programs(name)')
       .ilike('email', email.trim())
       .single();
 
@@ -68,11 +68,12 @@ export const AuthProvider = ({ children }) => {
       .from('characterization')
       .select('completed_at')
       .eq('user_id', data.id)
-      .single();
+      .maybeSingle();
 
     const semestre = calcularSemestre(data.entry_date);
     const sessionUser = {
       ...data,
+      program: data.academic_program_info?.name || data.program, // Normalizar a string
       semester: semestre,
       characterization_completed: !!charData,
     };
