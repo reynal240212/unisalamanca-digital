@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import StudentSchedule from '../components/StudentSchedule';
 import ProfileView from '../components/ProfileView';
 import PhotoValidationModule from '../components/PhotoValidationModule';
+import CurriculumView from '../components/CurriculumView';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -13,13 +14,14 @@ import {
   CheckCircle2, XCircle, ShieldCheck, BarChart2, Settings,
   Upload, Edit2, X, Save, AlertTriangle, Lock, Bell, Shield,
   Activity, Database, Key, Menu, GraduationCap, Wallet, ClipboardList,
-  Image as ImageIcon
+  Image as ImageIcon, BookOpen
 } from 'lucide-react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 
 /* ─── MODAL USUARIO (CREAR/EDITAR) ─────────────────────────────────── */
 const UserFormModal = ({ student, onClose, onSave }) => {
   const isEdit = !!student?.id;
+  const [dbPrograms, setDbPrograms] = useState([]);
   const [form, setForm] = useState({
     name: student?.name || '',
     email: student?.email || '',
@@ -33,24 +35,28 @@ const UserFormModal = ({ student, onClose, onSave }) => {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      const { data, error } = await supabase
+        .from('academic_programs')
+        .select('name, program_type')
+        .order('name');
+      if (!error && data) {
+        // Group by type
+        const grouped = data.reduce((acc, curr) => {
+          if (!acc[curr.program_type]) acc[curr.program_type] = [];
+          acc[curr.program_type].push(curr.name);
+          return acc;
+        }, {});
+        setDbPrograms(grouped);
+      }
+    };
+    fetchPrograms();
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(student?.id, form);
-  };
-
-  const programs = {
-    "Programas Profesionales": [
-      "Ingeniería de Sistemas de Información", "Finanzas y Comercio Internacional",
-      "Administración de Empresas", "Contaduría Pública"
-    ],
-    "Programas Tecnólogos": [
-      "Gestión de Comercio Exterior", "Gestión Bancaria y Financiera", "Desarrollo de Software"
-    ],
-    "Técnicos Laborales": [
-      "Auxiliar Administrativo", "Auxiliar de Seguridad en el Trabajo", "Bodega y Distribución",
-      "Auxiliar de Servicios Estadísticos y Financieros", "Auxiliar de Primera Infancia",
-      "Auxiliar de Servicio Social y Apoyo Comunitario", "Mecánica Automotriz", "Inglés"
-    ]
   };
 
   return (
@@ -87,7 +93,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
               <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>Programa Académico</label>
               <select className="input-premium" value={form.program} onChange={e => setForm(p => ({ ...p, program: e.target.value }))} style={{ width: '100%', background: 'white' }}>
                 <option value="">Seleccionar programa</option>
-                {Object.entries(programs).map(([cat, items]) => (
+                {Object.entries(dbPrograms).map(([cat, items]) => (
                   <optgroup key={cat} label={cat}>
                     {items.map(it => <option key={it} value={it}>{it}</option>)}
                   </optgroup>
@@ -428,6 +434,7 @@ const AdminDashboard = () => {
       items: [
         { id: 'estudiantes', icon: <Users size={18} />, label: 'Inicio / Directorio' },
         { id: 'validacion_fotos', icon: <ImageIcon size={18} />, label: 'Validación de Fotos' },
+        { id: 'curriculum', icon: <BookOpen size={18} />, label: 'Pénsum Institucional' },
         { id: 'reportes', icon: <BarChart2 size={18} />, label: 'Reportes' },
         { id: 'seguridad', icon: <ShieldCheck size={18} />, label: 'Seguridad' },
       ]
@@ -462,6 +469,7 @@ const AdminDashboard = () => {
       {activeNav === 'reportes' && <ReportesSection students={students} logs={logs} />}
       {activeNav === 'validacion_fotos' && <PhotoValidationModule />}
       {activeNav === 'seguridad' && <SeguridadSection students={students} logs={logs} />}
+      {activeNav === 'curriculum' && <CurriculumView />}
 
       {activeNav === 'estudiantes' && (
         <div className="section-reveal">

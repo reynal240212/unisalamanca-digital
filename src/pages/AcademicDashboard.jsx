@@ -2,65 +2,179 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import CurriculumView from '../components/CurriculumView';
 import {
   Users, Calendar, BarChart2, LogOut, Search,
   Plus, Trash2, X, Save, Clock, MapPin, BookOpen, Menu, ArrowLeft, GraduationCap, Briefcase
 } from 'lucide-react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 
+/* ─── COMPONENTE SALMI IA ALERTS ────────────────────────────────── */
+const SalmiExamAlerts = ({ schedules, periodConfig }) => {
+  // Simulación de detección de parciales basada en el cronograma estándar (Semanas 6, 12, 18)
+  // En una fase posterior esto usará la tabla academic_config
+  const examWeeks = periodConfig?.exam_weeks || [6, 12, 18];
+  
+  return (
+    <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', borderRadius: '20px', padding: '20px', color: 'white', marginBottom: '24px', position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+      <div style={{ position: 'absolute', right: '-20px', top: '-20px', width: '120px', height: '120px', background: 'var(--primary)', filter: 'blur(60px)', opacity: 0.3 }}></div>
+      
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <BarChart2 size={18} color="var(--primary)" />
+        </div>
+        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1rem', letterSpacing: '0.5px' }}>SALMI IA: INSIGHTS ACADÉMICOS</h4>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 800 }}>Próximo Parcial</p>
+          <p style={{ margin: '4px 0 0', fontWeight: 900, fontSize: '1.1rem' }}>Semana {examWeeks[0]}</p>
+          <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: '#64748b' }}>Preparando alertas de estudio...</p>
+        </div>
+        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 800 }}>Carga Académica</p>
+          <p style={{ margin: '4px 0 0', fontWeight: 900, fontSize: '1.1rem' }}>{schedules.length} Materias</p>
+          <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: '#64748b' }}>{schedules.reduce((acc, s) => acc + (s.credits || 0), 0)} créditos activos</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* ─── MODAL HORARIO ────────────────────────────────────────────── */
-const ScheduleModal = ({ student, onClose, onSaved }) => {
-  const [form, setForm] = useState({
-    subject: '', teacher: '', credits: 3, period: '2026-1',
-    blocks: [{ day_of_week: 'Lunes', start_time: '06:00', end_time: '08:00', classroom: '' }]
-  });
+const ScheduleModal = ({ student, onClose, onSaved, existingSchedules = [] }) => {
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [curriculum, setCurriculum] = useState([]);
+  const [activePeriod, setActivePeriod] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [availableSections, setAvailableSections] = useState([]);
+  const [selectedSection, setSelectedSection] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
-  const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  useEffect(() => {
+    fetchInitialData();
+  }, [student]);
 
-  const addBlock = () => setForm(f => ({
-    ...f, blocks: [...f.blocks, { day_of_week: 'Lunes', start_time: '06:00', end_time: '08:00', classroom: '' }]
-  }));
+  const fetchInitialData = async () => {
+    setLoadingInitial(true);
+    try {
+      // 1. Obtener periodo activo
+      const { data: period } = await supabase
+        .from('academic_periods')
+        .select('*')
+        .eq('is_active', true)
+        .maybeSingle();
+      setActivePeriod(period);
 
-  const removeBlock = (i) => setForm(f => ({ ...f, blocks: f.blocks.filter((_, idx) => idx !== i) }));
+      // 2. Obtener pénsum del programa del estudiante
+      const { data: subs } = await supabase
+        .from('subjects')
+        .select('*')
+        .eq('program_id', student.program_id)
+        .order('semester');
+      
+      setCurriculum(subs || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingInitial(false);
+    }
+  };
 
-  const updateBlock = (i, field, val) => setForm(f => ({
-    ...f, blocks: f.blocks.map((b, idx) => idx === i ? { ...b, [field]: val } : b)
-  }));
+  const handleSubjectChange = async (subjectId) => {
+    const sub = curriculum.find(s => s.id === subjectId);
+    setSelectedSubject(sub);
+    setSelectedSection(null);
+    setAvailableSections([]);
+    setError(null);
+
+    if (sub && activePeriod) {
+      const { data: sections } = await supabase
+        .from('academic_sections')
+        .select(`
+          *,
+          teacher:user(id, name),
+          blocks:schedule_blocks(*)
+        `)
+        .eq('subject_id', sub.id)
+        .eq('period_id', activePeriod.id);
+      
+      setAvailableSections(sections || []);
+    }
+  };
+
+  const checkConflict = (section) => {
+    if (!section || !section.blocks) return false;
+    
+    for (const newBlock of section.blocks) {
+      for (const enrolled of existingSchedules) {
+        for (const existingBlock of enrolled.schedule_blocks) {
+          if (newBlock.day_of_week === existingBlock.day_of_week) {
+            const start1 = newBlock.start_time;
+            const end1 = newBlock.end_time;
+            const start2 = existingBlock.start_time;
+            const end2 = existingBlock.end_time;
+
+            if (start1 < end2 && end1 > start2) {
+              return `Conflicto el ${newBlock.day_of_week} con la materia "${enrolled.subject}"`;
+            }
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  const handleSectionSelect = (sectionId) => {
+    const sec = availableSections.find(s => s.id === sectionId);
+    const conflict = checkConflict(sec);
+    if (conflict) {
+      setError(conflict);
+    } else {
+      setError(null);
+    }
+    setSelectedSection(sec);
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!form.subject.trim()) return;
+    if (!selectedSection) return;
     setSaving(true);
     try {
-      const { data: schedule, error: sErr } = await supabase
-        .from('schedules')
-        .insert({ user_id: student.id, program: student.program, subject: form.subject, teacher: form.teacher, credits: form.credits, period: form.period })
-        .select().single();
-      if (sErr) throw sErr;
+      const { error: enrollErr } = await supabase
+        .from('academic_enrollments')
+        .insert({ 
+          student_id: student.id, 
+          section_id: selectedSection.id,
+          status: 'ACTIVE'
+        });
 
-      if (form.blocks.length > 0) {
-        const blocks = form.blocks.map(b => ({ schedule_id: schedule.id, ...b }));
-        const { error: bErr } = await supabase.from('schedule_blocks').insert(blocks);
-        if (bErr) throw bErr;
-      }
+      if (enrollErr) throw enrollErr;
+      
       onSaved();
       onClose();
     } catch (err) {
-      alert('Error al guardar: ' + err.message);
+      alert('Error: ' + err.message);
     } finally {
       setSaving(false);
     }
   };
 
+  // Agrupar materias por categoría inteligente
+  const suggested = curriculum.filter(s => s.semester === student.semester);
+  const advance = curriculum.filter(s => s.semester > student.semester);
+  const pending = curriculum.filter(s => s.semester < student.semester);
+
   return (
     <div className="premium-modal-overlay">
-      <div className="premium-modal-content" style={{ maxWidth: '580px' }}>
+      <div className="premium-modal-content" style={{ maxWidth: '600px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
-            <h2 style={{ fontWeight: 900, fontSize: '1.3rem', color: '#1e293b', margin: 0 }}>Agregar Materia</h2>
+            <h2 style={{ fontWeight: 900, fontSize: '1.3rem', color: '#1e293b', margin: 0 }}>Asignación Inteligente</h2>
             <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' }}>
-              Para: <strong>{student.name}</strong> · {student.program}
+              Estudiante: <strong>{student.name}</strong> · Semestre {student.semester}
             </p>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}>
@@ -68,82 +182,93 @@ const ScheduleModal = ({ student, onClose, onSaved }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSave}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
-                Nombre de la Materia *
+        {loadingInitial ? <p style={{ textAlign: 'center', padding: '40px' }}>Cargando pénsum...</p> : (
+          <form onSubmit={handleSave}>
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                1. Seleccionar Materia del Pénsum
               </label>
-              <input className="input-premium" style={{ width: '100%' }} required
-                value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                placeholder="Ej: Programación Orientada a Objetos" />
+              <select 
+                className="input-premium" 
+                style={{ width: '100%' }}
+                onChange={e => handleSubjectChange(e.target.value)}
+                value={selectedSubject?.id || ''}
+                required
+              >
+                <option value="">-- Buscar materia --</option>
+                <optgroup label="✨ Semestre Sugerido">
+                  {suggested.map(s => <option key={s.id} value={s.id}>{s.name} ({s.credits} cred)</option>)}
+                </optgroup>
+                <optgroup label="⚠️ Materias Pendientes">
+                  {pending.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </optgroup>
+                <optgroup label="🚀 Adelanto de Materias">
+                  {advance.map(s => <option key={s.id} value={s.id}>{s.name} (Semestre {s.semester})</option>)}
+                </optgroup>
+              </select>
             </div>
-            <div>
-              <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Docente</label>
-              <input className="input-premium" style={{ width: '100%' }}
-                value={form.teacher} onChange={e => setForm(f => ({ ...f, teacher: e.target.value }))}
-                placeholder="Nombre del profesor" />
-            </div>
-            <div>
-              <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Créditos</label>
-              <input className="input-premium" style={{ width: '100%' }} type="number" min={1} max={6}
-                value={form.credits} onChange={e => setForm(f => ({ ...f, credits: Number(e.target.value) }))} />
-            </div>
-          </div>
 
-          {/* BLOQUES HORARIOS */}
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>
-                Bloques Horarios
-              </label>
-              <button type="button" onClick={addBlock}
-                style={{ background: 'var(--secondary)', color: 'white', border: 'none', borderRadius: '8px', padding: '4px 12px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Plus size={14} /> Añadir día
+            {selectedSubject && (
+              <div className="section-reveal" style={{ background: '#f8fafc', borderRadius: '16px', padding: '20px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+                <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '12px' }}>
+                  2. Seleccionar Sección y Horario
+                </label>
+                
+                {availableSections.length === 0 ? (
+                  <p style={{ fontSize: '0.85rem', color: '#ef4444', fontWeight: 600, margin: 0 }}>
+                    No hay secciones abiertas para esta materia en el periodo actual.
+                  </p>
+                ) : (
+                  <div style={{ display: 'grid', gap: '10px' }}>
+                    {availableSections.map(sec => (
+                      <button 
+                        key={sec.id}
+                        type="button"
+                        onClick={() => handleSectionSelect(sec.id)}
+                        style={{
+                          width: '100%', padding: '12px', borderRadius: '12px', textAlign: 'left',
+                          background: selectedSection?.id === sec.id ? 'white' : 'transparent',
+                          border: selectedSection?.id === sec.id ? '2px solid var(--primary)' : '1px solid #e2e8f0',
+                          cursor: 'pointer', transition: 'all 0.2s'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontWeight: 800, color: '#1e293b', fontSize: '0.85rem' }}>DOCENTE: {sec.teacher?.name || 'Por asignar'}</span>
+                          <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>ID: {sec.id.slice(0,8)}</span>
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+                          {(sec.blocks || []).map((b, idx) => (
+                            <span key={idx} style={{ background: '#fff', border: '1px solid #e2e8f0', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>
+                              {b.day_of_week} ({b.start_time?.slice(0,5)} - {b.end_time?.slice(0,5)})
+                            </span>
+                          ))}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {error && (
+              <div style={{ background: '#fef2f2', color: '#b91c1c', padding: '12px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 600, marginBottom: '20px', border: '1px solid #fee2e2', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <X size={16} /> {error}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button type="button" onClick={onClose} className="btn-secondary-premium" style={{ flex: 1 }}>Cancelar</button>
+              <button 
+                type="submit" 
+                className="btn-primary-premium" 
+                style={{ flex: 2 }} 
+                disabled={saving || !selectedSection || !!error}
+              >
+                <Save size={16} /> {saving ? 'Matriculando...' : 'Confirmar Matrícula'}
               </button>
             </div>
-
-            {form.blocks.map((block, i) => (
-              <div key={i} style={{ background: '#f8fafc', borderRadius: '12px', padding: '12px', marginBottom: '10px', border: '1px solid #e2e8f0' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '8px', alignItems: 'end' }}>
-                  <div>
-                    <label style={{ fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Día</label>
-                    <select className="input-premium" style={{ background: 'white', padding: '8px' }}
-                      value={block.day_of_week} onChange={e => updateBlock(i, 'day_of_week', e.target.value)}>
-                      {days.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Inicio</label>
-                    <input className="input-premium" type="time" style={{ padding: '8px' }}
-                      value={block.start_time} onChange={e => updateBlock(i, 'start_time', e.target.value)} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Fin</label>
-                    <input className="input-premium" type="time" style={{ padding: '8px' }}
-                      value={block.end_time} onChange={e => updateBlock(i, 'end_time', e.target.value)} />
-                  </div>
-                  <button type="button" onClick={() => removeBlock(i)} disabled={form.blocks.length === 1}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: '#ef4444', opacity: form.blocks.length === 1 ? 0.3 : 1 }}>
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-                <div style={{ marginTop: '8px' }}>
-                  <label style={{ fontSize: '0.65rem', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Salón</label>
-                  <input className="input-premium" style={{ width: '100%', padding: '8px' }} placeholder="Ej: Aula 201"
-                    value={block.classroom} onChange={e => updateBlock(i, 'classroom', e.target.value)} />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button type="button" onClick={onClose} className="btn-secondary-premium" style={{ flex: 1 }}>Cancelar</button>
-            <button type="submit" className="btn-primary-premium" style={{ flex: 2 }} disabled={saving}>
-              <Save size={16} /> {saving ? 'Guardando...' : 'Guardar Materia'}
-            </button>
-          </div>
-        </form>
+          </form>
+        )}
       </div>
     </div>
   );
@@ -153,35 +278,46 @@ const ScheduleModal = ({ student, onClose, onSaved }) => {
 const TeacherAssignmentModal = ({ teacher, programs, onClose, onSaved }) => {
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('');
+  const [activePeriod, setActivePeriod] = useState(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchAvailableSubjects();
-  }, []);
+    fetchInitialData();
+  }, [programs]);
 
-  const fetchAvailableSubjects = async () => {
+  const fetchInitialData = async () => {
+    // 1. Obtener periodo activo
+    const { data: period } = await supabase
+      .from('academic_periods')
+      .select('*')
+      .eq('is_active', true)
+      .maybeSingle();
+    setActivePeriod(period);
+
+    // 2. Obtener materias de los programas
     const { data } = await supabase
-      .from('program_curriculum')
-      .select('subjects')
-      .in('program_id', programs.map(p => p.id));
+      .from('subjects')
+      .select('*, program:academic_programs(name)')
+      .in('program_id', programs.map(p => p.id))
+      .order('name');
     
-    // Parsear materias de los strings separados por coma
-    const allSubjects = data.flatMap(d => d.subjects.split(',').map(s => s.trim()));
-    setSubjects([...new Set(allSubjects)].sort());
+    setSubjects(data || []);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!selectedSubject) return;
+    if (!selectedSubject || !activePeriod) return;
     setSaving(true);
     try {
+      // 3NF: Crear la sección para el profesor y materia
       const { error } = await supabase
-        .from('teacher_assignments')
+        .from('academic_sections')
         .insert({ 
           teacher_id: teacher.id, 
-          subject: selectedSubject,
-          period: '2026-1'
+          subject_id: selectedSubject,
+          period_id: activePeriod.id
         });
+
       if (error) throw error;
       onSaved();
       onClose();
@@ -194,11 +330,11 @@ const TeacherAssignmentModal = ({ teacher, programs, onClose, onSaved }) => {
 
   return (
     <div className="premium-modal-overlay">
-      <div className="premium-modal-content" style={{ maxWidth: '450px' }}>
+      <div className="premium-modal-content" style={{ maxWidth: '480px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
-            <h2 style={{ fontWeight: 900, fontSize: '1.3rem', color: '#1e293b', margin: 0 }}>Asignar Materia</h2>
-            <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' }}>Docente: {teacher.name}</p>
+            <h2 style={{ fontWeight: 900, fontSize: '1.3rem', color: '#1e293b', margin: 0 }}>Asignar Carga Docente</h2>
+            <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' }}>Profesor: {teacher.name}</p>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
             <X size={20} color="#94a3b8" />
@@ -206,9 +342,9 @@ const TeacherAssignmentModal = ({ teacher, programs, onClose, onSaved }) => {
         </div>
 
         <form onSubmit={handleSave}>
-          <div style={{ marginBottom: '20px' }}>
+          <div style={{ marginBottom: '24px' }}>
             <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
-              Seleccionar Materia del Programa
+              Seleccionar Materia (Mis Programas)
             </label>
             <select 
               className="input-premium" 
@@ -217,15 +353,25 @@ const TeacherAssignmentModal = ({ teacher, programs, onClose, onSaved }) => {
               onChange={e => setSelectedSubject(e.target.value)}
               required
             >
-              <option value="">-- Seleccionar materia --</option>
-              {subjects.map(s => <option key={s} value={s}>{s}</option>)}
+              <option value="">-- Materias disponibles --</option>
+              {subjects.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.name} - Semestre {s.semester} ({s.program?.name})
+                </option>
+              ))}
             </select>
+          </div>
+
+          <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+            <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Clock size={14} /> Periodo Académico: <strong>{activePeriod?.name || 'Cargando...'}</strong>
+            </p>
           </div>
 
           <div style={{ display: 'flex', gap: '12px' }}>
             <button type="button" onClick={onClose} className="btn-secondary-premium" style={{ flex: 1 }}>Cancelar</button>
-            <button type="submit" className="btn-primary-premium" style={{ flex: 2 }} disabled={saving}>
-              <Save size={16} /> {saving ? 'Asignando...' : 'Confirmar Asignación'}
+            <button type="submit" className="btn-primary-premium" style={{ flex: 2 }} disabled={saving || !activePeriod}>
+              <Save size={16} /> {saving ? 'Asignando...' : 'Confirmar Carga'}
             </button>
           </div>
         </form>
@@ -250,18 +396,52 @@ const HorariosSection = ({ students }) => {
   const loadSchedules = async (student) => {
     setSelectedStudent(student);
     setLoading(true);
-    const { data } = await supabase
-      .from('schedules')
-      .select('*, schedule_blocks(*)')
-      .eq('user_id', student.id)
-      .order('subject');
-    setSchedules(data || []);
+    // 3NF Join query
+    const { data, error } = await supabase
+      .from('academic_enrollments')
+      .select(`
+        id,
+        academic_sections (
+          id,
+          subjects (name, credits),
+          user (name),
+          academic_periods (name),
+          schedule_blocks (*)
+        )
+      `)
+      .eq('student_id', student.id);
+    
+    if (error) {
+      console.error('Error cargando horario:', error);
+      setSchedules([]);
+    } else {
+      const formatted = (data || []).map(e => {
+        const sec = Array.isArray(e.academic_sections) ? e.academic_sections[0] : e.academic_sections;
+        if (!sec) return null;
+        
+        const subjectData = Array.isArray(sec.subjects) ? sec.subjects[0] : sec.subjects;
+        const teacherData = Array.isArray(sec.user) ? sec.user[0] : sec.user;
+        const periodData = Array.isArray(sec.academic_periods) ? sec.academic_periods[0] : sec.academic_periods;
+
+        return {
+          id: e.id,
+          subject: subjectData?.name || 'Materia desconocida',
+          credits: subjectData?.credits || 0,
+          period: periodData?.name || 'N/A',
+          teacher: teacherData?.name || 'Sin asignar',
+          schedule_blocks: sec.schedule_blocks || []
+        };
+      }).filter(Boolean);
+
+      setSchedules(formatted);
+    }
     setLoading(false);
   };
 
   const deleteSchedule = async (scheduleId) => {
     if (!confirm('¿Eliminar esta materia del horario?')) return;
-    await supabase.from('schedules').delete().eq('id', scheduleId);
+    const { error } = await supabase.from('academic_enrollments').delete().eq('id', scheduleId);
+    if (error) alert('Error al eliminar: ' + error.message);
     loadSchedules(selectedStudent);
   };
 
@@ -307,7 +487,9 @@ const HorariosSection = ({ students }) => {
                 </div>
                 <div style={{ overflow: 'hidden' }}>
                   <p style={{ margin: 0, fontWeight: 700, fontSize: '0.85rem', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{s.name}</p>
-                  <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.7, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{s.program || 'Sin programa'}</p>
+                  <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.7, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                    {typeof s.program === 'object' ? s.program?.name : (s.program || 'Sin programa')}
+                  </p>
                 </div>
               </button>
             ))}
@@ -322,11 +504,16 @@ const HorariosSection = ({ students }) => {
               <p style={{ color: '#94a3b8', fontWeight: 600 }}>Selecciona un estudiante para ver o editar su horario</p>
             </div>
           ) : (
-            <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <SalmiExamAlerts schedules={schedules} />
+              
+              <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
               <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h3 style={{ margin: 0, fontWeight: 900, color: '#1e293b' }}>{selectedStudent.name}</h3>
-                  <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>{selectedStudent.program} · {selectedStudent.semester}</p>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                    {typeof selectedStudent.program === 'object' ? selectedStudent.program?.name : selectedStudent.program} · {selectedStudent.semester}
+                  </p>
                 </div>
                 <button onClick={() => setShowModal(true)} className="btn-primary-premium">
                   <Plus size={16} /> Agregar Materia
@@ -377,13 +564,15 @@ const HorariosSection = ({ students }) => {
                 )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
+    </div>
 
       {showModal && selectedStudent && (
         <ScheduleModal
           student={selectedStudent}
+          existingSchedules={schedules}
           onClose={() => setShowModal(false)}
           onSaved={() => loadSchedules(selectedStudent)}
         />
@@ -405,11 +594,19 @@ const DocentesSection = ({ teachers, directorPrograms }) => {
 
   const fetchAssignments = async () => {
     setLoading(true);
-    const { data } = await supabase.from('teacher_assignments').select('*');
+    const { data } = await supabase
+      .from('academic_sections')
+      .select(`
+        *,
+        subject:subjects(name)
+      `);
     const mapping = {};
     data?.forEach(asg => {
       if (!mapping[asg.teacher_id]) mapping[asg.teacher_id] = [];
-      mapping[asg.teacher_id].push(asg);
+      mapping[asg.teacher_id].push({
+        id: asg.id,
+        subject: asg.subject.name
+      });
     });
     setAssignments(mapping);
     setLoading(false);
@@ -417,7 +614,7 @@ const DocentesSection = ({ teachers, directorPrograms }) => {
 
   const removeAssignment = async (id) => {
     if (!confirm('¿Quitar esta asignación?')) return;
-    await supabase.from('teacher_assignments').delete().eq('id', id);
+    await supabase.from('academic_sections').delete().eq('id', id);
     fetchAssignments();
   };
 
@@ -524,7 +721,7 @@ const AcademicDashboard = () => {
   const fetchStudents = async () => {
     let query = supabase
       .from('user')
-      .select('*')
+      .select('*, program:academic_programs(id, name)')
       .eq('role', 'ESTUDIANTE')
       .eq('status', 'Active')
       .order('name');
@@ -571,6 +768,7 @@ const AcademicDashboard = () => {
         { id: 'horarios', icon: <Calendar size={18} />, label: 'Horarios Estudiantiles' },
         { id: 'docentes', icon: <GraduationCap size={18} />, label: 'Gestión Docente' },
         { id: 'estudiantes', icon: <Users size={18} />, label: 'Listado Estudiantes' },
+        { id: 'curriculum', icon: <BookOpen size={18} />, label: 'Pénsum Institucional' },
       ]
     }
   ];
@@ -586,6 +784,7 @@ const AcademicDashboard = () => {
     >
       {activeNav === 'horarios' && <HorariosSection students={students} />}
       {activeNav === 'docentes' && <DocentesSection teachers={teachers} directorPrograms={academicPrograms} />}
+      {activeNav === 'curriculum' && <CurriculumView />}
       {activeNav === 'estudiantes' && (
         <div className="section-reveal">
           <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b', marginBottom: '8px' }}>
@@ -621,7 +820,7 @@ const AcademicDashboard = () => {
                         </div>
                       </div>
                     </td>
-                    <td style={{ fontSize: '0.85rem', color: '#475569' }}>{s.program || 'N/A'}</td>
+                    <td style={{ fontSize: '0.85rem', color: '#475569' }}>{s.program?.name || 'N/A'}</td>
                     <td><span style={{ background: '#eef2ff', color: 'var(--primary)', padding: '4px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 800 }}>{s.semester}</span></td>
                     <td><span className={`status-badge ${s.status === 'Active' ? 'status-active' : 'status-suspended'}`}>{s.status === 'Active' ? 'Activo' : 'Suspendido'}</span></td>
                   </tr>

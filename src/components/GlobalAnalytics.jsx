@@ -14,6 +14,7 @@ const GlobalAnalytics = () => {
     users: [],
     applicants: [],
     financials: [],
+    characterization: [],
     stats: {
       totalStudents: 0,
       activeStudents: 0,
@@ -275,7 +276,7 @@ const GlobalAnalytics = () => {
           <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Users size={28} /> Perfil Socioeconómico y Bienestar
           </h2>
-          <p style={{ color: '#64748b' }}>Análisis profundo de la población estudiantil basado en fichas de caracterización ({((characterization?.length / (data.stats.totalStudents || 1)) * 100).toFixed(1)}% completado).</p>
+          <p style={{ color: '#64748b' }}>Análisis profundo de la población estudiantil basado en fichas de caracterización ({((data.characterization?.length / (data.stats.totalStudents || 1)) * 100).toFixed(1)}% completado).</p>
         </div>
 
         <div className="responsive-grid-3" style={{ gap: '24px' }}>

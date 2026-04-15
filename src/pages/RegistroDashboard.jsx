@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import CharacterizationReport from '../components/CharacterizationReport';
 import PhotoValidationModule from '../components/PhotoValidationModule';
+import CurriculumView from '../components/CurriculumView';
 import DashboardLayout from '../components/layout/DashboardLayout';
 
 const RegistroDashboard = () => {
@@ -62,6 +63,7 @@ const RegistroDashboard = () => {
       title: 'Registro y Control',
       items: [
         { id: 'estudiantes', icon: <Users size={18} />, label: 'Estudiantes' },
+        { id: 'curriculum', icon: <BookOpen size={18} />, label: 'Pénsum Institucional' },
         { id: 'documentos', icon: <FileText size={18} />, label: 'Fichas de Caracterización' },
         { id: 'validacion', icon: <ImageIcon size={18} />, label: 'Validación de Fotos' },
       ]
@@ -99,6 +101,8 @@ const RegistroDashboard = () => {
 
         {activeNav === 'validacion' ? (
           <PhotoValidationModule />
+        ) : activeNav === 'curriculum' ? (
+          <CurriculumView />
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1.6fr' : '1fr', gap: '32px' }}>
             {/* STUDENT LIST */}
