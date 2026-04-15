@@ -4,7 +4,7 @@ import {
   MapPin, Phone, Heart, Users, Briefcase, 
   Shield, CreditCard, Clock, CheckCircle2, ChevronRight,
   GraduationCap, Award, Landmark, Fingerprint,
-  Activity, Wifi, Monitor, Car, Smartphone, Map, FileText
+  Activity, Wifi, Monitor, Car, Smartphone, Map, FileText, Home
 } from 'lucide-react';
 import AvatarUpload from './AvatarUpload';
 

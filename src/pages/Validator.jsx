@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Html5Qrcode } from 'html5-qrcode';
 import { LogOut, ShieldAlert, CheckCircle, XCircle, Scan, AlertTriangle, UserCheck, Camera, RotateCcw, Activity, Clock, Users, Check, RefreshCw, History, Search, Ban, Unlock, FileText, Bell, MapPin, Filter, Download, Calendar, AlertCircle, Building } from 'lucide-react';
+import { getCurrentPosition } from '../utils/geoUtils';
 
 const Validator = () => {
   const [scanResult, setScanResult] = useState(null);
@@ -297,11 +298,14 @@ const Validator = () => {
         setScanResult({ success: false, message: `ACCESO DENEGADO`, sub: `Estado de la cuenta: ${student.status}` });
         setStudentData(student);
 
+        const pos = await getCurrentPosition().catch(() => null);
         await supabase.from('access_logs').insert({
           user_id: studentId,
           status: 'DENIED',
           location: selectedZone,
-          reason: 'INACTIVE_STATUS'
+          reason: 'INACTIVE_STATUS',
+          latitude: pos?.lat,
+          longitude: pos?.lng
         });
         return;
       }
@@ -310,10 +314,13 @@ const Validator = () => {
       setScanResult({ success: true, message: "ACCESO PERMITIDO", sub: "Verificación de identidad exitosa" });
       setStudentData(student);
 
-await supabase.from('access_logs').insert({
+      const pos = await getCurrentPosition().catch(() => null);
+      await supabase.from('access_logs').insert({
           user_id: studentId,
           status: 'GRANTED',
-          location: selectedZone
+          location: selectedZone,
+          latitude: pos?.lat,
+          longitude: pos?.lng
         });
 
       setRecentScans(prev => {
@@ -333,11 +340,14 @@ await supabase.from('access_logs').insert({
       playSound('error');
       setScanResult({ success: false, message: "ACCESO DENEGADO", sub: err.message });
       
+      const pos = await getCurrentPosition().catch(() => null);
       await supabase.from('access_logs').insert({
         user_id: 'unknown',
         status: 'DENIED',
         location: selectedZone,
-        reason: err.message
+        reason: err.message,
+        latitude: pos?.lat,
+        longitude: pos?.lng
       });
     }
   };
