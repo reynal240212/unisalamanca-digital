@@ -14,7 +14,7 @@ import {
   CheckCircle2, XCircle, ShieldCheck, BarChart2, Settings,
   Upload, Edit2, X, Save, AlertTriangle, Lock, Bell, Shield,
   Activity, Database, Key, Menu, GraduationCap, Wallet, ClipboardList,
-  Image as ImageIcon, BookOpen
+  Image as ImageIcon, BookOpen, Layers, Clock, ArrowUpRight, Filter
 } from 'lucide-react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 
@@ -473,155 +473,308 @@ const AdminDashboard = () => {
 
       {activeNav === 'estudiantes' && (
         <div className="section-reveal">
-            <div className="responsive-stack-mobile" style={{ marginBottom: '40px' }}>
-              <div>
-                <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#1e293b', letterSpacing: '-1px' }}>Gestión de Identidad</h1>
-                <p style={{ color: '#64748b', fontSize: '1rem' }}>Administración central de credenciales digitales</p>
-              </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setShowCreateModal(true)} className="btn-primary-premium">
-                <UserPlus size={18} /> Nuevo Registro
+          {/* HEADER SECTION - PREMIUM LOOK */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'flex-end', 
+            marginBottom: '48px', 
+            padding: '0 8px',
+            flexWrap: 'wrap',
+            gap: '20px'
+          }}>
+            <div>
+              <span style={{ 
+                background: 'rgba(7, 137, 178, 0.1)', 
+                color: 'var(--primary)', 
+                padding: '6px 14px', 
+                borderRadius: '100px', 
+                fontSize: '0.75rem', 
+                fontWeight: 800, 
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                marginBottom: '12px',
+                display: 'inline-block'
+              }}>
+                Panel de Control Central
+              </span>
+              <h1 style={{ 
+                fontSize: '2.8rem', 
+                fontWeight: 900, 
+                color: '#0f172a', 
+                margin: 0, 
+                letterSpacing: '-1.5px',
+                lineHeight: 1
+              }}>
+                Administración <span style={{ color: 'var(--primary)' }}>Digital</span>
+              </h1>
+              <p style={{ color: '#64748b', fontSize: '1.1rem', marginTop: '8px', fontWeight: 500 }}>
+                Bienvenido, gestiona identidades y recursos académicos.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '14px' }}>
+              <button onClick={() => setShowCreateModal(true)} className="btn-primary-premium" style={{ 
+                padding: '16px 28px', 
+                borderRadius: '18px', 
+                fontSize: '0.95rem',
+                boxShadow: '0 10px 25px -5px rgba(7, 137, 178, 0.3)'
+              }}>
+                <UserPlus size={20} style={{ marginRight: '8px' }} /> Nuevo Registro
               </button>
-              <div style={{ position: 'relative' }}>
-                 <button className="btn-secondary-premium btn-export" onClick={handleExport}>
-                   <FileUp size={18} /> Exportar
+              
+              <div style={{ display: 'flex', background: 'white', padding: '6px', borderRadius: '18px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                 <button className="btn-secondary-premium" onClick={handleExport} style={{ border: 'none', background: 'transparent' }}>
+                   <FileUp size={18} />
                  </button>
+                 <div style={{ width: '1px', background: '#e2e8f0', margin: '8px 4px' }} />
+                 <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0 12px' }}>
+                    <Upload size={18} color="#64748b" />
+                    <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} accept=".xlsx,.csv" disabled={isUploading} />
+                 </label>
               </div>
-              <label className="btn-primary-premium btn-import" style={{ cursor: 'pointer' }}>
-                {isUploading ? '⏳ Procesando' : <><Upload size={18} /> Importar</>}
-                <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} accept=".xlsx,.csv" disabled={isUploading} />
-              </label>
             </div>
           </div>
 
-          {/* FILTROS AVANZADOS */}
-          <div className="kpi-card" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', marginBottom: '32px', padding: '16px' }}>
-             <div style={{ flex: 1, position: 'relative' }}>
-                <Search style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={18} />
-                <input type="text" placeholder="Buscar por nombre, email o ID..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                  style={{ padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '0.9rem', width: '100%', background: '#f8fafc' }} />
-             </div>
-             
-             <select className="input-premium" value={filterRole} onChange={e => setFilterRole(e.target.value)} style={{ width: 'auto', minWidth: '180px' }}>
-                <option value="ALL">Todos los Roles</option>
-                <optgroup label="Estudiantes">
-                  <option value="ESTUDIANTE">Estudiantes</option>
-                  <option value="EGRESADO">Egresados</option>
-                </optgroup>
-                <optgroup label="Academia">
-                  <option value="PROFESOR">Profesores</option>
-                  <option value="COORD_ACADEMICO">Coordinadores</option>
-                  <option value="DIRECTOR_PROGRAMA">Directores</option>
-                </optgroup>
-                <optgroup label="Administración">
-                  <option value="SECRETARIA_ACADEMICA">Secretaría</option>
-                  <option value="ADMISIONES">Admisiones</option>
-                  <option value="CARTERA">Cartera</option>
-                </optgroup>
-                <optgroup label="Seguridad">
-                  <option value="VALIDADOR">Validadores</option>
-                </optgroup>
-             </select>
-
-             <select className="input-premium" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 'auto' }}>
-                <option value="ALL">Estado: Todos</option>
-                <option value="Active">🟢 Activo</option>
-                <option value="Suspended">🔴 Suspendido</option>
-             </select>
-
-             <button className="btn-secondary-premium" onClick={() => { setSearchTerm(''); setFilterRole('ALL'); setFilterStatus('ALL'); setFilterProgram('ALL'); }}>Reestablecer</button>
-          </div>
-
-          {/* KPIs */}
-          <div className="responsive-grid-3" style={{ marginBottom: '32px' }}>
+          {/* QUICK STATS - GLASSMORPHISM CARDS */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+            gap: '24px', 
+            marginBottom: '48px' 
+          }}>
             {[
-              { label: 'Total Identidades', value: stats.total, color: 'var(--primary)', bg: '#eef2ff', icon: <Users size={22} /> },
-              { label: 'Accesos Habilitados', value: stats.active, color: '#16A34A', bg: '#f0fdf4', icon: <Shield size={22} /> },
-              { label: 'Personal Administrativo', value: stats.staff, color: '#0891b2', bg: '#ecfeff', icon: <Wallet size={22} /> },
-              { label: 'Cuerpo Académico', value: stats.academia, color: '#8b5cf6', bg: '#f5f3ff', icon: <GraduationCap size={22} /> },
-              { label: 'Egresados / Alumni', value: stats.egresados, color: '#f59e0b', bg: '#fef9c3', icon: <TrendingUp size={22} /> },
-              { label: 'Agentes Seguridad', value: stats.validators, color: '#ef4444', bg: '#fef2f2', icon: <ShieldCheck size={22} /> },
+              { label: 'Total de Identidades', value: stats.total, sub: 'Usuarios en DB', icon: <Users size={24} />, color: '#0f172a', trend: '+12%' },
+              { label: 'Cuerpo Académico', value: stats.academia, sub: 'Docentes y Coords', icon: <GraduationCap size={24} />, color: '#7c3aed', trend: 'Activos' },
+              { label: 'Seguridad Campus', value: stats.validators, sub: 'Puntos de Acceso', icon: <Shield size={24} />, color: '#0891b2', trend: 'Online' },
             ].map((s, i) => (
-              <div key={i} className="kpi-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                  <div className="kpi-icon-box" style={{ background: s.bg, color: s.color, marginBottom: 0 }}>{s.icon}</div>
-                  <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</span>
+              <div key={i} className="premium-card" style={{ 
+                padding: '32px', 
+                background: 'white',
+                borderRadius: '24px',
+                border: '1px solid #f1f5f9',
+                boxShadow: '0 20px 25px -5px rgba(0,0,0,0.02), 0 10px 10px -5px rgba(0,0,0,0.01)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '-10px', 
+                  right: '-10px', 
+                  width: '100px', 
+                  height: '100px', 
+                  background: `radial-gradient(circle, ${s.color}10 0%, transparent 70%)`,
+                  borderRadius: '50%'
+                }} />
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                  <div style={{ 
+                    width: '56px', 
+                    height: '56px', 
+                    borderRadius: '16px', 
+                    background: `${s.color}10`, 
+                    color: s.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {s.icon}
+                  </div>
+                  <span style={{ 
+                    fontSize: '0.75rem', 
+                    fontWeight: 800, 
+                    color: s.color === '#0f172a' ? '#16a34a' : s.color,
+                    background: `${s.color}08`,
+                    padding: '4px 10px',
+                    borderRadius: '8px'
+                  }}>
+                    {s.trend}
+                  </span>
                 </div>
-                <h3 style={{ fontSize: '2.4rem', fontWeight: 900, color: '#1e293b', lineHeight: 1 }}>{s.value}</h3>
+                
+                <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
+                <h2 style={{ margin: '4px 0', fontSize: '2.6rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-1px' }}>{s.value}</h2>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>{s.sub}</p>
               </div>
             ))}
           </div>
 
-          {/* DIRECTORY TABLE */}
-          <div className="premium-table-container">
-            <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontWeight: 800, fontSize: '1.1rem', color: '#1e293b' }}>Directorio de Usuarios</h3>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>{filtered.length} coincidencias</span>
+          {/* SEARCH & FILTERS SECTION */}
+          <div style={{ 
+            background: 'white', 
+            padding: '24px', 
+            borderRadius: '24px', 
+            border: '1px solid #f1f5f9', 
+            marginBottom: '32px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '16px',
+            alignItems: 'center',
+            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)'
+          }}>
+            <div style={{ flex: 1, position: 'relative', minWidth: '300px' }}>
+              <Search style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={20} />
+              <input 
+                type="text" 
+                placeholder="Buscar por nombre, correo o ID..." 
+                value={searchTerm} 
+                onChange={e => setSearchTerm(e.target.value)}
+                style={{ 
+                  width: '100%',
+                  padding: '16px 16px 16px 52px', 
+                  borderRadius: '16px', 
+                  border: '1px solid #e2e8f0', 
+                  outline: 'none', 
+                  fontSize: '1rem',
+                  background: '#f8fafc',
+                  transition: 'all 0.2s'
+                }}
+                className="search-input-focus"
+              />
             </div>
-            <table className="premium-table">
-              <thead>
-                <tr>
-                  {['IDENTIDAD INTEGRAL', 'PROGRAMA ACADÉMICO', 'ROL', 'ESTADO', 'ACCIONES'].map(h => <th key={h}>{h}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: '80px', color: '#94a3b8' }}>No se encontraron registros en la base de datos.</td></tr>
-                ) : filtered.map(s => (
-                  <tr key={s.id}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                        <div style={{ 
-                          width: '42px', height: '42px', borderRadius: '14px', 
-                          background: `linear-gradient(135deg, hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 95%), #fff)`,
-                          color: `hsl(${(s.name || 'A').charCodeAt(0) * 12}, 70%, 30%)`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900,
-                          border: '1px solid rgba(0,0,0,0.05)'
-                        }}>
-                          {(s.name || '?').charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1e293b' }}>{s.name}</p>
-                          <p style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{s.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>{s.program || 'N/A'}</td>
-                    <td>
-                      <span style={{ 
-                        padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 800,
-                        background: s.role === 'VALIDADOR' ? '#ecfeff' : s.role === 'EGRESADO' ? '#fffbeb' : '#f5f3ff',
-                        color: s.role === 'VALIDADOR' ? '#0891b2' : s.role === 'EGRESADO' ? '#b45309' : '#5b21b6',
-                        border: '1px solid currentColor', opacity: 0.9
-                      }}>
-                        {s.role}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`status-badge ${s.status === 'Active' ? 'status-active' : 'status-suspended'}`}>
-                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></span>
-                        {s.status === 'Active' ? 'Verificado' : 'Suspendido'}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button onClick={() => setEditingStudent(s)} className="btn-secondary-premium" style={{ padding: '6px 10px' }}>
-                          <Edit2 size={14} />
-                        </button>
-                        <button onClick={() => toggleStatus(s)} className="btn-secondary-premium" 
-                          style={{ 
-                            padding: '6px 10px', 
-                            color: s.status === 'Active' ? '#ef4444' : '#16a34a',
-                            borderColor: 'currentColor'
-                          }}>
-                          {s.status === 'Active' ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
-                        </button>
-                      </div>
-                    </td>
+
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', background: '#f8fafc', padding: '6px 16px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                <Filter size={16} color="#64748b" style={{ marginRight: '10px' }} />
+                <select 
+                  value={filterRole} 
+                  onChange={e => setFilterRole(e.target.value)}
+                  style={{ background: 'transparent', border: 'none', fontWeight: 700, fontSize: '0.9rem', color: '#475569', outline: 'none', cursor: 'pointer' }}
+                >
+                  <option value="ALL">Todos los Roles</option>
+                  <option value="ESTUDIANTE">Estudiantes</option>
+                  <option value="PROFESOR">Docentes</option>
+                  <option value="ADMIN">Administradores</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', background: '#f8fafc', padding: '6px 16px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                <Layers size={16} color="#64748b" style={{ marginRight: '10px' }} />
+                <select 
+                  value={filterStatus} 
+                  onChange={e => setFilterStatus(e.target.value)}
+                  style={{ background: 'transparent', border: 'none', fontWeight: 700, fontSize: '0.9rem', color: '#475569', outline: 'none', cursor: 'pointer' }}
+                >
+                  <option value="ALL">Estado: Todos</option>
+                  <option value="Active">🟢 Activos</option>
+                  <option value="Suspended">🔴 Suspendidos</option>
+                </select>
+              </div>
+
+              <button 
+                className="btn-secondary-premium" 
+                onClick={() => { setSearchTerm(''); setFilterRole('ALL'); setFilterStatus('ALL'); }}
+                style={{ padding: '0 20px', borderRadius: '16px' }}
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          {/* DIRECTORY TABLE - PREMIUM STYLE */}
+          <div className="premium-table-container" style={{ 
+            background: 'white', 
+            borderRadius: '24px', 
+            border: '1px solid #f1f5f9',
+            overflow: 'hidden',
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)'
+          }}>
+            <div style={{ 
+              padding: '24px 32px', 
+              borderBottom: '1px solid #f1f5f9', 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center' 
+            }}>
+              <div>
+                <h3 style={{ fontWeight: 900, fontSize: '1.1rem', color: '#0f172a', margin: 0 }}>Directorio Maestro</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8', fontWeight: 500 }}>{filtered.length} usuarios encontrados</p>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                 <button className="admin-nav-item" style={{ width: '36px', height: '36px', padding: 0, justifyContent: 'center' }}>
+                   <Settings size={18} />
+                 </button>
+              </div>
+            </div>
+            
+            <div style={{ overflowX: 'auto' }}>
+              <table className="premium-table">
+                <thead>
+                  <tr>
+                    {['USUARIO / IDENTIDAD', 'PROGRAMA / ÁREA', 'ROL', 'ESTADO', 'GESTIÓN'].map(h => <th key={h} style={{ padding: '16px 32px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: '#94a3b8' }}>{h}</th>)}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filtered.map(s => (
+                    <tr key={s.id} style={{ transition: 'background 0.2s' }}>
+                      <td style={{ padding: '20px 32px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                          <div style={{ 
+                            width: '46px', 
+                            height: '46px', 
+                            borderRadius: '16px', 
+                            background: `linear-gradient(135deg, ${s.role === 'PROFESOR' ? '#7c3aed' : '#0ea5e9'}20, #fff)`,
+                            color: s.role === 'PROFESOR' ? '#7c3aed' : '#0ea5e9',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 900,
+                            fontSize: '1.1rem',
+                            border: '1px solid rgba(0,0,0,0.03)'
+                          }}>
+                            {(s.name || '?').charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p style={{ fontWeight: 800, fontSize: '1rem', color: '#0f172a', margin: 0 }}>{s.name}</p>
+                            <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0, fontWeight: 500 }}>{s.email}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '20px 32px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#e2e8f0' }} />
+                          <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#475569' }}>{s.program || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '20px 32px' }}>
+                        <span style={{ 
+                          padding: '6px 12px', 
+                          borderRadius: '10px', 
+                          fontSize: '0.75rem', 
+                          fontWeight: 800,
+                          background: s.role === 'ADMIN' ? '#fef2f2' : s.role === 'PROFESOR' ? '#f5f3ff' : '#eff6ff',
+                          color: s.role === 'ADMIN' ? '#ef4444' : s.role === 'PROFESOR' ? '#7c3aed' : '#3b82f6',
+                        }}>
+                          {s.role}
+                        </span>
+                      </td>
+                      <td style={{ padding: '20px 32px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div className="pulse-dot" style={{ 
+                            width: '8px', 
+                            height: '8px', 
+                            background: s.status === 'Active' ? '#16a34a' : '#ef4444',
+                            borderRadius: '50%',
+                            boxShadow: `0 0 0 4px ${s.status === 'Active' ? '#16a34a' : '#ef4444'}20`
+                          }} />
+                          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{s.status === 'Active' ? 'Activo' : 'Suspendido'}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '20px 32px' }}>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button onClick={() => setEditingStudent(s)} className="admin-nav-item" style={{ width: '36px', height: '36px', padding: 0, justifyContent: 'center' }}>
+                            <Edit2 size={16} />
+                          </button>
+                          <button onClick={() => toggleStatus(s)} className="admin-nav-item" style={{ width: '36px', height: '36px', padding: 0, justifyContent: 'center', color: s.status === 'Active' ? '#ef4444' : '#16a34a' }}>
+                            {s.status === 'Active' ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
