@@ -229,84 +229,89 @@ const ProfileView = ({
         </p>
       </Modal>
 
-      {/* 5. PROFILE SECTIONS GRID */}
-      <div className="profile-grid">
-        {/* COLUMNA 1: ACADÉMICO E IDENTIDAD */}
-        <div className="profile-column">
-          <div className="glass-card profile-section">
-            <SectionTitle icon={<Award size={20} />} title="Información Académica" />
-            <div className="info-items-grid">
+      {/* 5. UNIFIED STUDENT RECORD */}
+      <div className="glass-card profile-unified-card section-reveal">
+        <div className="unified-card-header">
+           <FileText size={22} color="var(--primary)" />
+           <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 900, color: 'var(--primary-dark)' }}>Expediente Único Estudiantil</h3>
+        </div>
+
+        <div className="unified-sections-grid">
+          {/* SECCIÓN 1: ACADÉMICO */}
+          <section className="unified-section">
+            <SectionTitle icon={<Award size={18} />} title="Académico" />
+            <div className="unified-items-list">
                <InfoCard icon={<Calendar />} label="Semestre Actual" value={user?.semester ? `${user?.semester}° Semestre` : null} />
                <InfoCard icon={<Clock />} label="Fecha de Ingreso" value={user?.entry_date} />
-               <InfoCard icon={<Landmark />} label="Sede Institucional" value={characterization?.university_branch || 'Sede Principal'} />
-               <InfoCard icon={<BookOpen />} label="Modalidad Estudio" value={user?.study_modality || 'Presencial'} />
+               <InfoCard icon={<Landmark />} label="Sede" value={characterization?.university_branch || 'Sede Principal'} />
+               <InfoCard icon={<BookOpen />} label="Modalidad" value={user?.study_modality || 'Presencial'} />
             </div>
-          </div>
+          </section>
 
-          <div className="glass-card profile-section">
-            <SectionTitle icon={<Fingerprint size={20} />} title="Identidad Institucional" />
-            <div className="info-items-grid">
-               <InfoCard icon={<Shield />} label="Tipo de Documento" value={characterization?.document_type} />
-               <InfoCard icon={<CreditCard />} label="Número Documento" value={user?.document_id} />
-               <InfoCard icon={<Mail />} label="Email Institucional" value={user?.email} />
+          {/* SECCIÓN 2: IDENTIDAD */}
+          <section className="unified-section">
+            <SectionTitle icon={<Fingerprint size={18} />} title="Identidad" />
+            <div className="unified-items-list">
+               <InfoCard icon={<Shield />} label="Documento" value={characterization?.document_type} />
+               <InfoCard icon={<CreditCard />} label="Número" value={user?.document_id} />
+               <InfoCard icon={<Mail />} label="Email" value={user?.email} />
             </div>
-          </div>
-        </div>
+          </section>
 
-        {/* COLUMNA 2: SALUD Y SOCIOECONÓMICO */}
-        <div className="profile-column">
-          <div className="glass-card profile-section">
-            <SectionTitle icon={<Activity size={20} />} title="Salud y Bienestar" />
-            <div className="info-items-grid">
-               <InfoCard icon={<Shield />} label="EPS Actual" value={characterization?.eps} />
-               <InfoCard icon={<Heart />} label="Grupo Sanguíneo/RH" value={characterization?.blood_type} />
+          {/* SECCIÓN 3: SALUD */}
+          <section className="unified-section">
+            <SectionTitle icon={<Activity size={18} />} title="Salud" />
+            <div className="unified-items-list">
+               <InfoCard icon={<Shield />} label="EPS" value={characterization?.eps} />
+               <InfoCard icon={<Heart />} label="Grupo Sanguíneo" value={characterization?.blood_type} />
                <InfoCard icon={<Activity />} label="Discapacidad" value={characterization?.disability && characterization.disability !== 'Ninguna' ? characterization.disability : 'No reporta'} />
                {characterization?.health_notes && (
-                 <InfoCard icon={<FileText />} label="Notas de Salud" value={characterization.health_notes} />
+                 <InfoCard icon={<FileText />} label="Notas Médicas" value={characterization.health_notes} />
                )}
             </div>
-          </div>
+          </section>
 
-          <div className="glass-card profile-section">
-            <SectionTitle icon={<Landmark size={20} />} title="Entorno Socioeconómico" />
-            <div className="info-items-grid">
-               <InfoCard icon={<Landmark />} label="Estrato Social" value={characterization?.estrato ? `Estrato ${characterization.estrato}` : null} />
+          {/* SECCIÓN 4: SOCIOECONÓMICO */}
+          <section className="unified-section">
+            <SectionTitle icon={<Landmark size={18} />} title="Entorno" />
+            <div className="unified-items-list">
+               <InfoCard icon={<Landmark />} label="Estrato" value={characterization?.estrato ? `Estrato ${characterization.estrato}` : null} />
                <InfoCard icon={<Home />} label="Vive con" value={characterization?.lives_with} />
-               <InfoCard icon={<Users />} label="Etnia / Población" value={characterization?.ethnicity && characterization.ethnicity !== 'Ninguna' ? characterization.ethnicity : 'No pertenece'} />
-               <InfoCard icon={<Map />} label="Municipio Nacimiento" value={characterization?.lugar_nacimiento} />
+               <InfoCard icon={<Users />} label="Población" value={characterization?.ethnicity && characterization.ethnicity !== 'Ninguna' ? characterization.ethnicity : 'No pertenece'} />
+               <InfoCard icon={<Map />} label="Origen" value={characterization?.lugar_nacimiento} />
             </div>
-          </div>
-        </div>
+          </section>
 
-        {/* COLUMNA 3: PERSONAL Y EMERGENCIA */}
-        <div className="profile-column">
-          <div className="glass-card profile-section">
-            <SectionTitle icon={<User size={20} />} title="Información Personal" />
-            <div className="info-items-grid">
-               <InfoCard icon={<Phone />} label="Teléfono Celular" value={characterization?.phone} />
-               <InfoCard icon={<MapPin />} label="Dirección Residencia" value={characterization?.address} />
+          {/* SECCIÓN 5: PERSONAL */}
+          <section className="unified-section">
+            <SectionTitle icon={<User size={18} />} title="Personal" />
+            <div className="unified-items-list">
                <InfoCard icon={<Users />} label="Estado Civil" value={characterization?.marital_status} />
+               <InfoCard icon={<Phone />} label="Celular" value={characterization?.phone} />
+               <InfoCard icon={<MapPin />} label="Dirección" value={characterization?.address} />
                <InfoCard icon={<Mail />} label="Email Personal" value={characterization?.correo} />
             </div>
-          </div>
+          </section>
 
-          <div className="glass-card profile-section">
-            <SectionTitle icon={<Phone size={20} />} title="Contacto de Emergencia" />
-            <div className="info-items-grid">
-               <InfoCard icon={<User />} label="Nombre Contacto" value={characterization?.emergency_contact} />
-               <InfoCard icon={<Phone />} label="Teléfono Contacto" value={characterization?.emergency_phone} />
-               <InfoCard icon={<Heart />} label="Vínculo/Parentesco" value={characterization?.emergency_relationship} />
+          {/* SECCIÓN 6: EMERGENCIA */}
+          <section className="unified-section">
+            <SectionTitle icon={<Phone size={18} />} title="Emergencia" />
+            <div className="unified-items-list">
+               <InfoCard icon={<User />} label="Contacto" value={characterization?.emergency_contact} />
+               <InfoCard icon={<Phone />} label="Teléfono" value={characterization?.emergency_phone} />
+               <InfoCard icon={<Heart />} label="Parentesco" value={characterization?.emergency_relationship} />
             </div>
-          </div>
-          
+          </section>
+
+          {/* SECCIÓN 7: LABORAL (SI APLICA) */}
           {(characterization?.is_working === 'Si' || characterization?.work_company) && (
-            <div className="glass-card profile-section">
-              <SectionTitle icon={<Briefcase size={20} />} title="Información Laboral" />
-              <div className="info-items-grid">
-                <InfoCard icon={<Landmark />} label="Empresa/Organización" value={characterization?.work_company} />
-                <InfoCard icon={<Briefcase />} label="Cargo Desempeñado" value={characterization?.work_role} />
+            <section className="unified-section">
+              <SectionTitle icon={<Briefcase size={18} />} title="Laboral" />
+              <div className="unified-items-list">
+                <InfoCard icon={<Landmark />} label="Empresa" value={characterization?.work_company} />
+                <InfoCard icon={<Briefcase />} label="Cargo" value={characterization?.work_role} />
               </div>
-            </div>
+            </section>
           )}
         </div>
       </div>
