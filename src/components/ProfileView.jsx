@@ -151,7 +151,7 @@ const ProfileView = ({
       </div>
 
       {/* 3. DASHBOARD QUICK INSIGHTS GRID */}
-      <div className="dashboard-grid-premium" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '30px' }}>
+      <div className="dashboard-grid-premium">
          {/* NEXT CLASS WIDGET */}
          <div className="glass-card" style={{ padding: '30px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
