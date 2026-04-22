@@ -24,6 +24,62 @@ const SalmiChatbot = () => {
     return () => window.removeEventListener('open-salmi-chat', handleOpenChat);
   }, []);
 
+  // AGITAR PARA ACTIVAR (Shake to Activate)
+  useEffect(() => {
+    let lastX, lastY, lastZ;
+    let lastUpdate = 0;
+    const SHAKE_THRESHOLD = 15;
+
+    const onDeviceMotion = (event) => {
+      const acceleration = event.accelerationIncludingGravity;
+      if (!acceleration) return;
+
+      const currentTime = Date.now();
+      if ((currentTime - lastUpdate) > 100) {
+        const diffTime = currentTime - lastUpdate;
+        lastUpdate = currentTime;
+
+        const { x, y, z } = acceleration;
+
+        if (lastX !== undefined) {
+          const speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+
+          if (speed > 800) { // Umbral de velocidad para agitar
+            setIsOpen(true);
+            // Feedback vibración si está disponible
+            if (navigator.vibrate) navigator.vibrate(200);
+          }
+        }
+
+        lastX = x;
+        lastY = y;
+        lastZ = z;
+      }
+    };
+
+    // Solicitar permiso en iOS si es necesario
+    const requestPermission = async () => {
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+        try {
+          const response = await DeviceMotionEvent.requestPermission();
+          if (response === 'granted') {
+            window.addEventListener('devicemotion', onDeviceMotion);
+          }
+        } catch (e) {
+          console.error("DeviceMotion permission denied");
+        }
+      } else {
+        window.addEventListener('devicemotion', onDeviceMotion);
+      }
+    };
+
+    requestPermission();
+
+    return () => {
+      window.removeEventListener('devicemotion', onDeviceMotion);
+    };
+  }, []);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputText.trim()) return;
@@ -89,7 +145,10 @@ const SalmiChatbot = () => {
         >
           <div className="salmi-toggle-badge">1</div>
           <img src="/images/salmi-premium-v2.png" alt="Salmi" className="salmi-toggle-avatar" />
-          <span className="salmi-toggle-text">¿Dudas? Pregúntame</span>
+          <span className="salmi-toggle-text">
+            ¿Dudas? Pregúntame <br/>
+            <small style={{ fontSize: '0.6rem', opacity: 0.8, fontWeight: 500 }}>Agita tu celular</small>
+          </span>
         </button>
       )}
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -6,72 +6,101 @@ import {
    ShieldCheck,
    QrCode,
    UserCheck,
-   ChevronRight
+   ChevronRight,
+   GraduationCap,
+   Users,
+   BookOpen,
+   Briefcase
 } from 'lucide-react';
 
 const Home = () => {
    const navigate = useNavigate();
+   const [currentBg, setCurrentBg] = useState(0);
+
+   const heroImages = [
+      'https://newsite.unisalamanca.edu.co/api/uploads/imgs/hero/71bf71e3a8d2b8cd_DIPLOMADOS_Mesa-de-trabajo-1-copia-3.webp',
+      'https://newsite.unisalamanca.edu.co/api/uploads/imgs/hero/e05e6905a9ddf7b0_Preguntas-frecuentes---US.jpg',
+      'https://newsite.unisalamanca.edu.co/api/uploads/imgs/hero/ab34c35de0acc7af_Banner-Emprendimientos---US.jpg'
+   ];
+
+   useEffect(() => {
+      const interval = setInterval(() => {
+         setCurrentBg((prev) => (prev + 1) % heroImages.length);
+      }, 6000);
+      return () => clearInterval(interval);
+   }, []);
 
    return (
       <div className="official-presentation">
          <Header />
 
+         {/* Sub-Header Bar */}
+         <div className="sub-header-bar">
+            <div className="sub-header-content-premium">
+               <div className="sub-header-text">
+                  <span className="id-badge-small">NUEVO SIAU {new Date().getFullYear()}</span>
+                  <h1 className="sub-header-title">Ecosistema Digital <span className="siau-acronym"><span className="si">SI</span><span className="au">AU</span></span></h1>
+                  <p className="sub-header-desc">
+                     <b>Sistema Integral de Administración Universitaria</b> — La plataforma líder de identidad y servicios para toda la comunidad UniSalamanca.
+                  </p>
+               </div>
+               <div className="sub-header-actions">
+                  <button onClick={() => navigate('/login')} className="btn-id-primary-small">
+                     INGRESAR AL PORTAL <ChevronRight size={16} />
+                  </button>
+                  <button 
+                     className="btn-id-secondary-small"
+                     onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
+                  >
+                     EXPLORAR
+                  </button>
+               </div>
+            </div>
+         </div>
+
          {/* Presentation Hero */}
          <section className="id-hero" style={{ 
-            backgroundImage: 'url(https://newsite.unisalamanca.edu.co/api/uploads/imgs/hero/71bf71e3a8d2b8cd_DIPLOMADOS_Mesa-de-trabajo-1-copia-3.webp)', 
-            backgroundSize: 'cover', 
+            backgroundImage: `url(${heroImages[currentBg]})`, 
+            backgroundSize: '100% 100%', 
+            backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center', 
             position: 'relative', 
-            overflow: 'hidden' 
+            overflow: 'hidden',
+            transition: 'background-image 0.5s ease-in-out'
          }}>
             <div className="hero-overlay"></div>
             
             <div className="hero-grid">
-               <div className="hero-text-side" style={{ position: 'relative', zIndex: 1, animation: 'fadeInLeft 1s ease-out' }}>
-                  <span className="id-badge">IDENTIDAD 2026</span>
-                  <h1 style={{ fontWeight: 900 }}>Tu Identidad, <br />Ahora es <span className="text-cyan">Premium</span></h1>
-                  <p className="hero-desc">
-                     Vive la evolución digital de UniSalamanca. Acceso inteligente, 
-                     encriptación de grado militar y diseño institucional de vanguardia.
-                  </p>
-                  <div className="cta-group">
-                     <button onClick={() => navigate('/login')} className="btn-id-primary">
-                        ACTIVAR MI CARNET <ChevronRight size={18} />
-                     </button>
-                     <button 
-                        className="btn-id-secondary"
-                        onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
-                     >
-                        EXPLORAR FUNCIONES
-                     </button>
-                  </div>
-               </div>
-               <div className="hero-image-side" style={{ position: 'relative', zIndex: 1, animation: 'fadeInRight 1.2s ease-out' }}>
-                  <div className="phone-mockup" style={{ transform: 'rotate(-5deg)' }}>
-                     <div className="mockup-screen" style={{ background: 'linear-gradient(135deg, #1e293b, #0f172a)' }}>
-                        <div className="card-preview" style={{ 
-                          background: 'rgba(255,255,255,0.15)', 
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255,255,255,0.2)',
-                          color: 'white'
-                        }}>
-                           <div className="card-top">
-                              <span style={{ color: 'var(--secondary)', fontWeight: 900 }}>Uni</span><span>Salamanca</span>
-                           </div>
-                           <img 
-                              src="/images/salmi-hoodie-final.png" 
-                              alt="Salmi" 
-                              className="floating-mascot"
-                              style={{ width: '150px', marginBottom: '8px' }} 
-                           />
-                           <div className="card-qr" style={{ background: 'white', padding: '10px', borderRadius: '12px', marginTop: '10px' }}>
-                              <QrCode size={100} color="#2A2266" />
-                           </div>
-                           <p style={{ fontSize: '0.6rem', letterSpacing: '2px', fontWeight: 800, marginTop: '15px' }}>ESTUDIANTE DIGITAL</p>
-                        </div>
-                     </div>
-                  </div>
-               </div>
+               {/* El contenido se movió al Sub-Header para evitar superposiciones */}
+               {/* Eliminamos el mockup del teléfono para evitar sobrecarga con los banners */}
+            </div>
+
+            {/* Slider Dots */}
+            <div className="hero-dots" style={{
+               position: 'absolute',
+               bottom: '40px',
+               left: '50%',
+               transform: 'translateX(-50%)',
+               display: 'flex',
+               gap: '12px',
+               zIndex: 10
+            }}>
+               {heroImages.map((_, index) => (
+                  <button
+                     key={index}
+                     onClick={() => setCurrentBg(index)}
+                     style={{
+                        width: currentBg === index ? '30px' : '10px',
+                        height: '10px',
+                        borderRadius: '50px',
+                        border: 'none',
+                        background: currentBg === index ? 'var(--secondary)' : 'rgba(255,255,255,0.5)',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                     }}
+                     title={`Slide ${index + 1}`}
+                  />
+               ))}
             </div>
          </section>
 
@@ -101,6 +130,36 @@ const Home = () => {
             </div>
          </section>
 
+         {/* Roles Section */}
+         <section className="id-roles">
+            <div className="roles-intro">
+               <h2>Un Espacio para Todos</h2>
+               <p>Nuestra identidad digital se adapta a cada miembro de la familia UniSalamanca.</p>
+            </div>
+            <div className="roles-grid">
+               <div className="role-card">
+                  <div className="role-icon-box"><GraduationCap size={40} /></div>
+                  <h4>Estudiantes</h4>
+                  <p>Acceso rápido al campus, carnet digital siempre a mano y servicios de bienestar.</p>
+               </div>
+               <div className="role-card">
+                  <div className="role-icon-box"><BookOpen size={40} /></div>
+                  <h4>Docentes</h4>
+                  <p>Gestión académica simplificada y validación de identidad en procesos institucionales.</p>
+               </div>
+               <div className="role-card">
+                  <div className="role-icon-box"><Briefcase size={40} /></div>
+                  <h4>Administrativos</h4>
+                  <p>Herramientas de control eficientes y entorno digital seguro para la gestión diaria.</p>
+               </div>
+               <div className="role-card">
+                  <div className="role-icon-box"><Users size={40} /></div>
+                  <h4>Egresados</h4>
+                  <p>Mantén tu vínculo con la universidad y accede a beneficios exclusivos post-grado.</p>
+               </div>
+            </div>
+         </section>
+
          {/* Steps Section */}
          <section className="id-steps">
             <div className="steps-container">
@@ -111,8 +170,8 @@ const Home = () => {
                </div>
                <div className="step-item">
                   <div className="step-num">02</div>
-                  <h4>Captura tu Foto</h4>
-                  <p>Activa tu perfil con una selfie de seguridad.</p>
+                  <h4>Completa tu Perfil</h4>
+                  <p>Sube tu foto y verifica tus datos institucionales.</p>
                </div>
                <div className="step-item">
                   <div className="step-num">03</div>

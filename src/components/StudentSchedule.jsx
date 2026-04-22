@@ -51,12 +51,12 @@ const StudentSchedule = ({ student }) => {
   const pdfPath = getPdfPath(student?.program);
 
   const dayColors = {
-    'Lunes':      { bg: '#eef2ff', accent: '#4f46e5', light: '#c7d2fe' },
-    'Martes':     { bg: '#f0fdf4', accent: '#16a34a', light: '#bbf7d0' },
-    'Miércoles':  { bg: '#fff7ed', accent: '#ea580c', light: '#fed7aa' },
-    'Jueves':     { bg: '#fdf4ff', accent: '#a21caf', light: '#e879f9' },
-    'Viernes':    { bg: '#ecfeff', accent: '#0891b2', light: '#a5f3fc' },
-    'Sábado':     { bg: '#fef9c3', accent: '#ca8a04', light: '#fde68a' },
+    'Lunes':      { bg: '#f8fafc', accent: 'var(--primary)', light: '#e2e8f0' },
+    'Martes':     { bg: '#f0f9ff', accent: 'var(--secondary)', light: '#bae6fd' },
+    'Miércoles':  { bg: '#f8fafc', accent: 'var(--primary)', light: '#e2e8f0' },
+    'Jueves':     { bg: '#f0f9ff', accent: 'var(--secondary)', light: '#bae6fd' },
+    'Viernes':    { bg: '#f8fafc', accent: 'var(--primary)', light: '#e2e8f0' },
+    'Sábado':     { bg: '#f0f9ff', accent: 'var(--secondary)', light: '#bae6fd' },
   };
 
   return (
@@ -170,8 +170,9 @@ const StudentSchedule = ({ student }) => {
                 <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '100px' }}>
                   {daySubjects.length > 0 ? daySubjects.map((item, idx) => (
                     <div key={idx} style={{
-                      background: colors.bg, borderRadius: '14px',
-                      padding: '14px', border: `1px solid ${colors.light}`
+                      background: 'white', borderRadius: '14px',
+                      padding: '14px', border: `1px solid ${colors.light}`,
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
                     }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '10px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

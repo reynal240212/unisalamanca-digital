@@ -9,7 +9,9 @@ const LoginBranding = () => {
     <div className="login-info">
       <div className="login-info-header">
         <img src="/images/escudo.png" alt="Logo" className="login-info-logo" />
-        <span className="login-info-title">UNISALAMANCA</span>
+        <span className="siau-acronym light" title="Sistema Integral de Administración Universitaria" style={{ fontSize: '1.2rem', letterSpacing: '1px' }}>
+          <span className="si">SI</span><span className="au">AU</span>
+        </span>
       </div>
 
       <div className="login-info-content">

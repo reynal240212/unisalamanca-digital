@@ -15,6 +15,8 @@ import Home from './pages/Home';
 import Characterization from './pages/Characterization';
 import ChangePassword from './pages/ChangePassword';
 import DataPolicy from './pages/DataPolicy';
+import Biblioteca from './pages/Biblioteca';
+
 
 const ACADEMIC_ROLES = ['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA', 'ADMIN'];
 
@@ -117,6 +119,9 @@ function App() {
           } />
 
           <Route path="/data-policy" element={<DataPolicy />} />
+
+          <Route path="/biblioteca" element={<Biblioteca />} />
+
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -103,7 +103,7 @@ const Characterization = () => {
             textAlign: 'center', marginTop: '60px', padding: '30px 0', 
             borderTop: '1px solid #e2e8f0', color: '#94a3b8', fontSize: '0.8rem' 
         }}>
-            <p>© 2026 Universidad UniSalamanca - Ecosistema Digital de Alta Fidelidad</p>
+            <p>© {new Date().getFullYear()} Universidad UniSalamanca - Ecosistema Digital de Alta Fidelidad</p>
             <p style={{ marginTop: '5px' }}>Protección de Datos Personales conforme a la Ley 1581 de 2012</p>
         </footer>
       </main>

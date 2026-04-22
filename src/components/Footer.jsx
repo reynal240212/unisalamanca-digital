@@ -60,7 +60,7 @@ const Footer = () => {
                 </div>
             </div>
             <div className="footer-bottom-official">
-                <p>© 2026 CORPORACIÓN UNIVERSITARIA EMPRESARIAL DE SALAMANCA (CUES). NIT: 802.011.011-1. TODOS LOS DERECHOS RESERVADOS.</p>
+                <p>© {new Date().getFullYear()} CORPORACIÓN UNIVERSITARIA EMPRESARIAL DE SALAMANCA (CUES). NIT: 802.011.011-1. TODOS LOS DERECHOS RESERVADOS.</p>
             </div>
         </footer>
     );

@@ -18,14 +18,23 @@ const Header = () => {
             <div className="header-container">
                 <div className="branding" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <img src="/images/escudo.png" alt="UniSalamanca" style={{ height: '40px' }} />
-                    <span className="branding-text">
-                        <span style={{ color: 'var(--secondary)' }}>Uni</span><span style={{ color: 'var(--primary)' }}>Salamanca</span>
+                    <span className="branding-text" style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+                        <span className="siau-acronym" title="Sistema Integral de Administración Universitaria" style={{ fontSize: '1.4rem', letterSpacing: '1px', cursor: 'help' }}>
+                            <span className="si">SI</span><span className="au">AU</span>
+                        </span>
+                        <span style={{ color: 'var(--primary)', fontSize: '0.7rem', fontWeight: 700, opacity: 0.8 }}>UniSalamanca</span>
                     </span>
                 </div>
 
                 <div className={`search-bar-container ${isSearchOpen ? 'active' : ''}`}>
                     <input type="text" placeholder="Buscar servicios, trámites..." className="header-search-input" />
                     <button className="search-close" onClick={() => setIsSearchOpen(false)}><X size={18} /></button>
+                </div>
+
+                <div className="header-links-desktop">
+                    <a href="https://www.office.com/" target="_blank" className="nav-service-link">Correo</a>
+                    <a href="#" className="nav-service-link">SIAU</a>
+                    <span onClick={() => navigate('/biblioteca')} className="nav-service-link" style={{ cursor: 'pointer' }}>Biblioteca</span>
                 </div>
 
                 <div className="header-actions">

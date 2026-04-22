@@ -324,9 +324,9 @@ const Login = () => {
                   <div style={{ width: '40px', height: '40px', background: 'rgba(42, 34, 102, 0.05)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <ShieldCheck size={24} color="var(--primary)" />
                   </div>
-                  <h1 className="form-title">Iniciar Sesión</h1>
+                  <h1 className="form-title">Ingreso al <span className="siau-acronym"><span className="si">SI</span><span className="au">AU</span></span></h1>
                 </div>
-                <p className="form-subtitle">Ingresa tus credenciales institucionales para continuar.</p>
+                <p className="form-subtitle">Bienvenido al <b>Sistema Integral de Administración Universitaria</b>. Ingresa tus credenciales para continuar.</p>
               </div>
 
               <form onSubmit={handleLogin}>

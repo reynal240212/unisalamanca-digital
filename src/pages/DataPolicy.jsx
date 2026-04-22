@@ -167,7 +167,7 @@ const DataPolicy = () => {
             <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Última actualización: 14 de Abril, 2026</span>
           </div>
           <p style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: 500 }}>
-            © 2026 Corporación Universitaria Empresarial de Salamanca. NIT 890.003.405-4.
+            © {new Date().getFullYear()} Corporación Universitaria Empresarial de Salamanca. NIT 890.003.405-4.
           </p>
         </footer>
       </main>
