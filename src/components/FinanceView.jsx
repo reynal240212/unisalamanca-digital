@@ -60,30 +60,93 @@ const FinanceView = ({ user }) => {
         </div>
       </div>
 
-      {/* CONTENIDO PRINCIPAL: ESTADO VACÍO */}
-      <div className="glass-card" style={{ padding: '80px 40px', textAlign: 'center', marginTop: '24px' }}>
-        <div style={{ 
-          width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(22, 182, 214, 0.05)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--secondary)',
-          margin: '0 auto 20px'
-        }}>
-          <Database size={40} />
-        </div>
-        <div>
-          <h3 style={{ margin: 0, fontWeight: 800, color: 'var(--primary-dark)' }}>Sincronización de Cartera Pendiente</h3>
-          <p style={{ color: '#64748b', maxWidth: '450px', margin: '8px auto' }}>
-            Estamos vinculando tu estado de cuenta con **Q10 Finanzas**. Pronto podrás ver tus recibos, realizar pagos en línea y descargar certificados.
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', marginTop: '10px', justifyContent: 'center' }}>
-          <span className="status-tag en-curso">
-            <Clock size={14} /> Esperando Datos de Tesorería
-          </span>
+      {/* CONTENIDO PRINCIPAL: PLATAFORMA DE PAGOS */}
+      <div className="finance-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '24px', marginTop: '24px' }}>
+        
+        {/* Lado Izquierdo: Estado de Cuenta (Simulado) */}
+        <div className="glass-card" style={{ padding: '40px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '30px' }}>
+            <h3 style={{ margin: 0, fontWeight: 900, color: 'var(--primary-dark)', fontSize: '1.4rem' }}>Detalle de Cartera</h3>
+            <span className="status-tag en-curso" style={{ background: '#fef3c7', color: '#92400e' }}>
+              <Clock size={14} /> Sincronizando con Q10
+            </span>
+          </div>
+
+          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            <div style={{ 
+              width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(22, 182, 214, 0.05)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--secondary)',
+              margin: '0 auto 20px'
+            }}>
+              <Database size={32} />
+            </div>
+            <p style={{ color: '#64748b', maxWidth: '400px', margin: '0 auto', fontSize: '0.95rem' }}>
+              Estamos vinculando tus recibos pendientes. Si conoces el valor a pagar, puedes usar los canales digitales a la derecha.
+            </p>
+          </div>
+
+          <div className="table-footer-info" style={{ marginTop: '40px' }}>
+            <Info size={16} /> 
+            <p>Dudas sobre tu saldo: <strong>tesoreria@unisalamanca.edu.co</strong></p>
+          </div>
         </div>
 
-        <div className="table-footer-info" style={{ marginTop: '50px' }}>
-          <Info size={16} /> 
-          <p>Cualquier duda sobre tu saldo actual puede ser resuelta en la oficina de Tesorería o mediante los canales de atención oficiales.</p>
+        {/* Lado Derecho: Pasarela de Pagos (NUEVO) */}
+        <div className="payment-gateways-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="glass-card" style={{ padding: '25px', background: 'var(--primary)', color: 'white', border: 'none' }}>
+            <h4 style={{ margin: '0 0 15px', fontSize: '1.1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <CreditCard size={20} /> Pasarela Digital
+            </h4>
+            
+            <div className="payment-options" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <a 
+                href="https://solicitud.bancofinandina.com:8443/pagos-pse/recargar" 
+                target="_blank" 
+                className="payment-btn pse"
+                style={{ 
+                  background: 'white', color: '#004b93', padding: '12px', borderRadius: '12px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', textDecoration: 'none',
+                  fontWeight: 800, fontSize: '0.9rem', transition: 'all 0.3s'
+                }}
+              >
+                <span>Pagar con PSE</span>
+                <ArrowRightCircle size={18} />
+              </a>
+
+              <a 
+                href="https://checkout.bold.co/payment/LNK_LWCAK2UEGD" 
+                target="_blank" 
+                className="payment-btn bold"
+                style={{ 
+                  background: 'rgba(255,255,255,0.1)', color: 'white', padding: '12px', borderRadius: '12px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', textDecoration: 'none',
+                  fontWeight: 800, fontSize: '0.9rem', border: '1px solid rgba(255,255,255,0.2)', transition: 'all 0.3s'
+                }}
+              >
+                <span>Pago con Bold</span>
+                <ArrowRightCircle size={18} />
+              </a>
+            </div>
+
+            <button 
+              onClick={() => window.open('/pagos', '_blank')}
+              style={{ 
+                marginTop: '20px', width: '100%', background: 'var(--secondary)', color: 'white',
+                border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 900,
+                fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+              }}
+            >
+              MÁS OPCIONES DE PAGO <Info size={14} />
+            </button>
+          </div>
+
+          <div className="glass-card" style={{ padding: '20px' }}>
+            <h4 style={{ margin: '0 0 10px', fontSize: '1rem', fontWeight: 800, color: 'var(--primary)' }}>Soporte Físico</h4>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '15px' }}>¿Pagaste en banco? Sube tu recibo aquí.</p>
+            <button className="btn-id-secondary-small" style={{ width: '100%', justifyContent: 'center', gap: '8px' }}>
+              <Download size={16} /> CARGAR SOPORTE
+            </button>
+          </div>
         </div>
       </div>
     </div>

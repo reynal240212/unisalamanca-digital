@@ -16,6 +16,7 @@ const Login = () => {
   const { login, logout, user, activeRole, selectRole, loading } = useAuth();
   const navigate = useNavigate();
   const [pendingProfiles, setPendingProfiles] = useState(null);
+  const [selectedPortal, setSelectedPortal] = useState('ESTUDIANTE'); // ESTUDIANTE, PROFESOR, ADMIN
 
   // Si ya hay sesión activa, redirigir al dashboard correspondiente
   useEffect(() => {
@@ -29,14 +30,32 @@ const Login = () => {
 
     const userRoles = user.roles || [user.role];
     
+    // VALIDACIÓN CRÍTICA: Si el usuario entró por un portal específico (PROFESOR, ADMIN, etc.)
+    // debemos verificar que posea ese rol. Si no, lo expulsamos por seguridad.
+    if (selectedPortal !== 'ESTUDIANTE' && !userRoles.includes(selectedPortal)) {
+        setError(`No tienes permisos para ingresar como ${selectedPortal.toLowerCase()}.`);
+        setTimeout(() => {
+            logout();
+            navigate('/login');
+        }, 3000);
+        return;
+    }
+
     // Si tiene múltiples roles y no ha seleccionado uno, mostramos el selector
     if (userRoles.length > 1 && !activeRole) {
       setPendingProfiles(userRoles);
       return;
     }
 
-    // Usar el rol activo o el primero disponible
-    const currentRole = activeRole || userRoles[0];
+    // Priorizar el rol que coincide con el portal seleccionado si el usuario lo tiene
+    let currentRole = activeRole;
+    if (!currentRole) {
+        if (userRoles.includes(selectedPortal)) {
+            currentRole = selectedPortal;
+        } else {
+            currentRole = userRoles[0];
+        }
+    }
 
     const roleMap = {
       ADMIN: '/admin',
@@ -49,10 +68,10 @@ const Login = () => {
       BIENESTAR: '/bienestar',
       VALIDADOR: '/validator',
       ESTUDIANTE: '/student',
-      EGRESADO: '/student',
+      EGRESADO: '/graduate',
     };
     navigate(roleMap[currentRole] || '/student', { replace: true });
-  }, [user, activeRole, loading, navigate]);
+  }, [user, activeRole, loading, navigate, selectedPortal]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -64,14 +83,8 @@ const Login = () => {
     setError('');
     setIsLoading(true);
     try {
-      const u = await login(email, password);
-      
-      if (u.must_change_password) {
-        navigate('/change-password', { replace: true });
-        return;
-      }
-
-      // La navegación ahora la maneja el useEffect basado en activeRole
+      await login(email, password);
+      // Redirection logic is handled by useEffect
     } catch (err) {
       setError('Credenciales inválidas o cuenta suspendida');
       setCaptchaToken(null);
@@ -123,6 +136,24 @@ const Login = () => {
       case 'VALIDADOR':        return '/images/salmi-validador.png';
       default:                 return '/images/salmi-admin.png';
     }
+  };
+
+  const portalClasses = {
+      ESTUDIANTE: '',
+      PROFESOR: 'portal-teacher',
+      ADMIN: 'portal-admin'
+  };
+
+  const portalIcons = {
+      ESTUDIANTE: <GraduationCap size={24} />,
+      PROFESOR: <BookOpen size={24} />,
+      ADMIN: <Shield size={24} />
+  };
+
+  const portalTitles = {
+      ESTUDIANTE: 'Portal Estudiantes',
+      PROFESOR: 'Portal Docentes',
+      ADMIN: 'Portal Administrativo'
   };
 
   if (pendingProfiles) {
@@ -297,7 +328,7 @@ const Login = () => {
   }
 
   return (
-    <div className="login-page">
+    <div className={`login-page ${portalClasses[selectedPortal]}`}>
       <div className="identity-overlay">
         <div className="identity-mesh" style={{ transform: `translate(${mousePos.x * -15}px, ${mousePos.y * -15}px)` }}></div>
 
@@ -320,11 +351,27 @@ const Login = () => {
         {/* LADO DERECHO: Formulario */}
         <div className="login-form-side">
           <div className="form-header">
+                {/* PORTAL SWITCHER */}
+                <div className="portal-switcher-container">
+                    {Object.keys(portalTitles).map(portal => (
+                        <button 
+                            key={portal}
+                            className={`portal-tab ${selectedPortal === portal ? 'active' : ''}`}
+                            onClick={() => setSelectedPortal(portal)}
+                        >
+                            {portal === 'ESTUDIANTE' && <GraduationCap size={14} />}
+                            {portal === 'PROFESOR' && <BookOpen size={14} />}
+                            {portal === 'ADMIN' && <Shield size={14} />}
+                            {portal.charAt(0) + portal.slice(1).toLowerCase()}
+                        </button>
+                    ))}
+                </div>
+
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                  <div style={{ width: '40px', height: '40px', background: 'rgba(42, 34, 102, 0.05)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <ShieldCheck size={24} color="var(--primary)" />
+                  <div className="text-portal-color" style={{ width: '40px', height: '40px', background: 'var(--portal-bg-glow)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s' }}>
+                    {portalIcons[selectedPortal]}
                   </div>
-                  <h1 className="form-title">Ingreso al <span className="siau-acronym"><span className="si">SI</span><span className="au">AU</span></span></h1>
+                  <h1 className="form-title">{portalTitles[selectedPortal]} <span className="siau-acronym"><span className="si">SI</span><span className="au">AU</span></span></h1>
                 </div>
                 <p className="form-subtitle">Bienvenido al <b>Sistema Integral de Administración Universitaria</b>. Ingresa tus credenciales para continuar.</p>
               </div>
@@ -368,7 +415,7 @@ const Login = () => {
             )}
 
             <button 
-              className="login-button" 
+              className="login-button portal-dynamic" 
               style={{ width: '100%', opacity: (!captchaToken || isLoading) ? 0.7 : 1, cursor: (!captchaToken || isLoading) ? 'not-allowed' : 'pointer' }} 
               disabled={!captchaToken || isLoading}
             >
@@ -382,7 +429,7 @@ const Login = () => {
 
               <footer style={{ marginTop: '40px', textAlign: 'center' }}>
                 <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                  ¿Olvidaste tu acceso? <a href="#" style={{ color: 'var(--secondary)', fontWeight: 700, textDecoration: 'none' }}>Solicitar Ayuda</a>
+                  ¿Olvidaste tu acceso? <a href="#" style={{ color: 'var(--portal-color)', fontWeight: 700, textDecoration: 'none', transition: 'all 0.3s' }}>Solicitar Ayuda</a>
                 </p>
               </footer>
         </div>
@@ -392,7 +439,7 @@ const Login = () => {
         <div className="footer-line"></div>
         <div className="footer-content">
           <div className="login-footer-text">
-            <span className="text-secondary">Uni</span><span className="text-white">Salamanca</span>
+            <span className="text-portal-color" style={{ transition: 'all 0.3s' }}>Uni</span><span className="text-white">Salamanca</span>
           </div>
           <div className="login-footer-subtext">Corporación Universitaria Empresarial de Salamanca</div>
         </div>
@@ -401,5 +448,4 @@ const Login = () => {
     </div>
   );
 };
-
 export default Login;

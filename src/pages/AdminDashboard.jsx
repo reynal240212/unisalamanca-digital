@@ -180,6 +180,64 @@ const UserFormModal = ({ student, onClose, onSave }) => {
   );
 };
 
+/* ─── MODAL DE CONFIRMACIÓN PREMIUM ──────────────────────────────── */
+const ConfirmationModal = ({ isOpen, config, onConfirm, onCancel }) => {
+  if (!isOpen) return null;
+
+  const { title, message, type = 'warning', confirmText = 'Confirmar', cancelText = 'Cancelar', icon } = config;
+
+  const themes = {
+    warning: { color: '#f59e0b', bg: '#fffbeb', btn: '#f59e0b' },
+    success: { color: '#16a34a', bg: '#f0fdf4', btn: '#16a34a' },
+    danger: { color: '#ef4444', bg: '#fef2f2', btn: '#ef4444' },
+    info: { color: 'var(--primary)', bg: 'rgba(7, 137, 178, 0.1)', btn: 'var(--primary)' }
+  };
+
+  const theme = themes[type];
+
+  return (
+    <div className="premium-modal-overlay" style={{ zIndex: 9999 }}>
+      <div className="premium-modal-content" style={{ maxWidth: '450px', textAlign: 'center', padding: '40px' }}>
+        <div style={{ 
+          width: '80px', 
+          height: '80px', 
+          borderRadius: '30px', 
+          background: theme.bg, 
+          color: theme.color, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          margin: '0 auto 24px' 
+        }}>
+          {icon || <AlertTriangle size={40} />}
+        </div>
+        
+        <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{title}</h2>
+        <div style={{ fontSize: '1rem', color: '#64748b', lineHeight: '1.6', marginBottom: '32px', whiteSpace: 'pre-line' }}>
+          {message}
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button 
+            onClick={onCancel} 
+            className="btn-secondary-premium" 
+            style={{ flex: 1, padding: '14px' }}
+          >
+            {cancelText}
+          </button>
+          <button 
+            onClick={onConfirm} 
+            className="btn-primary-premium" 
+            style={{ flex: 1, padding: '14px', background: theme.btn, border: 'none' }}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* ─── SECCIÓN REPORTES ──────────────────────────────────────────── */
 /* ─── SECCIÓN REPORTES (ANALYTICS) ──────────────────────────────── */
 const ReportesSection = () => {
@@ -297,6 +355,39 @@ const AdminDashboard = () => {
   const [editingStudent, setEditingStudent] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  
+  /* ─── ESTADO DE CONFIRMACIÓN PREMIUM ────────────────────────────── */
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, config: {} });
+
+  const showConfirm = (config) => {
+    return new Promise((resolve) => {
+      setConfirmConfig({
+        isOpen: true,
+        config: {
+          ...config,
+          onConfirm: () => {
+            setConfirmConfig({ isOpen: false, config: {} });
+            resolve(true);
+          },
+          onCancel: () => {
+            setConfirmConfig({ isOpen: false, config: {} });
+            resolve(false);
+          }
+        }
+      });
+    });
+  };
+
+  /* ─── PAGINACIÓN ────────────────────────────────────────────────── */
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Resetear página al filtrar o buscar
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterRole, filterStatus]);
+
+  const fetchStudents = fetchUsers; // Alias por si acaso
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -361,14 +452,68 @@ const AdminDashboard = () => {
     XLSX.writeFile(wb, `UniSalamanca_Directorio_Premium_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
+  const handleResetPassword = async (student) => {
+    const tempPass = `Unisalamanca${new Date().getFullYear()}*`;
+    
+    const confirmed = await showConfirm({
+      title: 'Resetear Contraseña',
+      message: `¿Estás seguro de resetear la contraseña de ${student.name}?\n\nLa clave temporal será: ${tempPass}\n(Se obligará al usuario a cambiarla en su próximo ingreso)`,
+      type: 'warning',
+      icon: <Key size={40} />,
+      confirmText: 'Sí, Resetear',
+      cancelText: 'Cancelar'
+    });
+    
+    if (confirmed) {
+      try {
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(tempPass, salt);
+        
+        const { error } = await supabase
+          .from('user')
+          .update({ 
+            password_hash, 
+            must_change_password: true 
+          })
+          .eq('id', student.id);
+          
+        if (error) throw error;
+
+        await showConfirm({
+          title: '✅ Éxito',
+          message: `Contraseña reseteada correctamente.\n\nUsuario: ${student.email}\nNueva Clave: ${tempPass}`,
+          type: 'success',
+          icon: <CheckCircle2 size={40} />,
+          confirmText: 'Entendido',
+          cancelText: 'Cerrar'
+        });
+
+      } catch (err) {
+        alert("❌ Error al resetear contraseña: " + err.message);
+      }
+    }
+  };
+
   const handleSaveUser = async (id, form) => {
     try {
       const userData = { ...form };
       delete userData.password;
 
+      // 1. Sincronizar campo roles (Array) con el rol principal
+      userData.roles = [form.role];
+
+      // 2. Manejar contraseña
       if (form.password) {
         const salt = await bcrypt.genSalt(10);
         userData.password_hash = await bcrypt.hash(form.password, salt);
+      } else {
+        // En edición, si no hay pass nueva, no tocamos el hash
+        delete userData.password_hash;
+      }
+
+      // 3. Limpiar campos de fecha para evitar errores de casteo en Postgres
+      if (!userData.entry_date || userData.entry_date === '') {
+        userData.entry_date = null;
       }
 
       if (id) {
@@ -376,9 +521,10 @@ const AdminDashboard = () => {
          const { error } = await supabase.from('user').update(userData).eq('id', id);
          if (!error) {
            setEditingStudent(null);
-           fetchStudents();
+           fetchUsers(); // Usar directamente la función del hook
          } else {
-           alert("Error al actualizar: " + error.message);
+           console.error("Error Supabase Update:", error);
+           alert(`Error al actualizar: ${error.message} (${error.code})`);
          }
       } else {
           // CREATE
@@ -388,19 +534,33 @@ const AdminDashboard = () => {
           }]);
          if (!error) {
            setShowCreateModal(false);
-           fetchStudents();
+           fetchUsers();
          } else {
-           alert("Error al crear: " + error.message);
+           console.error("Error Supabase Insert:", error);
+           alert(`Error al crear: ${error.message} (${error.code})`);
          }
       }
     } catch (err) {
-      alert("Error en el proceso de seguridad: " + err.message);
+      console.error("Error Catch handleSaveUser:", err);
+      alert("Error crítico en el proceso: " + err.message);
     }
   };
 
   const toggleStatus = async (student) => {
     const newStatus = student.status === 'Active' ? 'Suspended' : 'Active';
-    await updateUser(student.id, { status: newStatus });
+    
+    const confirmed = await showConfirm({
+      title: newStatus === 'Active' ? 'Activar Usuario' : 'Suspender Usuario',
+      message: `¿Estás seguro de ${newStatus === 'Active' ? 'activar' : 'suspender'} el acceso de ${student.name}?`,
+      type: newStatus === 'Active' ? 'info' : 'danger',
+      icon: newStatus === 'Active' ? <CheckCircle2 size={40} /> : <XCircle size={40} />,
+      confirmText: newStatus === 'Active' ? 'Activar' : 'Suspender',
+      cancelText: 'Cancelar'
+    });
+
+    if (confirmed) {
+      await updateUser(student.id, { status: newStatus });
+    }
   };
 
   const filtered = users.filter(s => {
@@ -411,6 +571,11 @@ const AdminDashboard = () => {
     const matchesStatus = filterStatus === 'ALL' || s.status === filterStatus;
     return matchesSearch && matchesRole && matchesStatus;
   });
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
 
   const navItems = [
     {
@@ -447,6 +612,13 @@ const AdminDashboard = () => {
       {showCreateModal && (
         <UserFormModal onClose={() => setShowCreateModal(false)} onSave={handleSaveUser} />
       )}
+
+      <ConfirmationModal 
+        isOpen={confirmConfig.isOpen}
+        config={confirmConfig.config}
+        onConfirm={confirmConfig.config.onConfirm}
+        onCancel={confirmConfig.config.onCancel}
+      />
 
       {activeNav === 'reportes' && <ReportesSection users={users} logs={logs} />}
       {activeNav === 'validacion_fotos' && <PhotoValidationModule />}
@@ -527,8 +699,9 @@ const AdminDashboard = () => {
           }}>
             {[
               { label: 'Total de Identidades', value: stats.total, sub: 'Usuarios en DB', icon: <Users size={24} />, color: '#0f172a', trend: '+12%' },
-              { label: 'Cuerpo Académico', value: stats.academia, sub: 'Docentes y Coords', icon: <GraduationCap size={24} />, color: '#7c3aed', trend: 'Activos' },
-              { label: 'Seguridad Campus', value: stats.validators, sub: 'Puntos de Acceso', icon: <Shield size={24} />, color: '#0891b2', trend: 'Online' },
+              { label: 'Cuerpo Académico', value: stats.academia || stats.teachers, sub: 'Docentes y Coords', icon: <GraduationCap size={24} />, color: '#7c3aed', trend: 'Activos' },
+              { label: 'Egresados / Alumni', value: stats.graduates || 0, sub: 'Comunidad Graduada', icon: <ShieldCheck size={24} />, color: '#16a34a', trend: 'Global' },
+              { label: 'Seguridad Campus', value: stats.validators || stats.admins, sub: 'Puntos de Acceso', icon: <Shield size={24} />, color: '#0891b2', trend: 'Online' },
             ].map((s, i) => (
               <div key={i} className="premium-card" style={{ 
                 padding: '32px', 
@@ -625,6 +798,7 @@ const AdminDashboard = () => {
                 >
                   <option value="ALL">Todos los Roles</option>
                   <option value="ESTUDIANTE">Estudiantes</option>
+                  <option value="EGRESADO">Egresados</option>
                   <option value="PROFESOR">Docentes</option>
                   <option value="ADMIN">Administradores</option>
                 </select>
@@ -672,23 +846,68 @@ const AdminDashboard = () => {
                 <h3 style={{ fontWeight: 900, fontSize: '1.1rem', color: '#0f172a', margin: 0 }}>Directorio Maestro</h3>
                 <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8', fontWeight: 500 }}>{filtered.length} usuarios encontrados</p>
               </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                 {/* Mobile Scroll Hint */}
+                 <div className="mobile-scroll-hint" style={{ 
+                   display: 'flex', 
+                   alignItems: 'center', 
+                   gap: '8px', 
+                   background: '#eff6ff', 
+                   padding: '6px 12px', 
+                   borderRadius: '100px',
+                   color: '#3b82f6',
+                   fontSize: '0.75rem',
+                   fontWeight: 800
+                 }}>
+                   <ArrowUpRight size={14} style={{ transform: 'rotate(90deg)' }} />
+                   <span>Desliza para ver más</span>
+                 </div>
                  <button className="admin-nav-item" style={{ width: '36px', height: '36px', padding: 0, justifyContent: 'center' }}>
                    <Settings size={18} />
                  </button>
               </div>
             </div>
             
-            <div style={{ overflowX: 'auto' }}>
-              <table className="premium-table">
+            <div style={{ 
+              overflowX: 'auto',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#cbd5e1 #f8fafc'
+            }} className="custom-scrollbar">
+              <table className="premium-table" style={{ width: '100%', minWidth: '1100px', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr>
-                    {['USUARIO / IDENTIDAD', 'PROGRAMA / ÁREA', 'ROL', 'ESTADO', 'GESTIÓN'].map(h => <th key={h} style={{ padding: '16px 32px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: '#94a3b8' }}>{h}</th>)}
+                    {['USUARIO / IDENTIDAD', 'PROGRAMA / ÁREA', 'ROL', 'ESTADO', 'GESTIÓN'].map((h, idx) => (
+                      <th key={h} style={{ 
+                        padding: '16px 32px', 
+                        fontSize: '0.7rem', 
+                        fontWeight: 800, 
+                        textTransform: 'uppercase', 
+                        letterSpacing: '1px', 
+                        color: '#94a3b8',
+                        textAlign: 'left',
+                        whiteSpace: 'nowrap',
+                        position: idx === 4 ? 'sticky' : 'static',
+                        right: idx === 4 ? 0 : 'auto',
+                        background: idx === 4 ? '#f8fafc' : 'transparent',
+                        zIndex: idx === 4 ? 20 : 1,
+                        boxShadow: idx === 4 ? '-4px 0 8px rgba(0,0,0,0.02)' : 'none'
+                      }}>
+                        {h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map(s => (
-                    <tr key={s.id} style={{ transition: 'background 0.2s' }}>
+                  {currentItems.map(s => (
+                    <tr 
+                      key={s.id} 
+                      onClick={() => setEditingStudent(s)}
+                      style={{ 
+                        transition: 'background 0.2s', 
+                        cursor: 'pointer' 
+                      }}
+                      className="table-row-hover"
+                    >
                       <td style={{ padding: '20px 32px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                           <div style={{ 
@@ -742,13 +961,75 @@ const AdminDashboard = () => {
                           <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{s.status === 'Active' ? 'Activo' : 'Suspendido'}</span>
                         </div>
                       </td>
-                      <td style={{ padding: '20px 32px' }}>
+                      <td style={{ 
+                        padding: '20px 32px',
+                        position: 'sticky',
+                        right: 0,
+                        background: 'white',
+                        zIndex: 10,
+                        boxShadow: '-4px 0 8px rgba(0,0,0,0.02)'
+                      }}>
                         <div style={{ display: 'flex', gap: '8px' }}>
-                          <button onClick={() => setEditingStudent(s)} className="admin-nav-item" style={{ width: '36px', height: '36px', padding: 0, justifyContent: 'center' }}>
-                            <Edit2 size={16} />
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); setEditingStudent(s); }} 
+                            style={{ 
+                              width: '38px', 
+                              height: '38px', 
+                              borderRadius: '12px', 
+                              border: '1px solid #e2e8f0', 
+                              background: '#f8fafc', 
+                              color: '#64748b', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              padding: 0
+                            }}
+                            title="Editar Usuario"
+                          >
+                            <Edit2 size={18} />
                           </button>
-                          <button onClick={() => toggleStatus(s)} className="admin-nav-item" style={{ width: '36px', height: '36px', padding: 0, justifyContent: 'center', color: s.status === 'Active' ? '#ef4444' : '#16a34a' }}>
-                            {s.status === 'Active' ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); toggleStatus(s); }} 
+                            style={{ 
+                              width: '38px', 
+                              height: '38px', 
+                              borderRadius: '12px', 
+                              border: '1px solid',
+                              borderColor: s.status === 'Active' ? '#fee2e2' : '#dcfce7',
+                              background: s.status === 'Active' ? '#fef2f2' : '#f0fdf4', 
+                              color: s.status === 'Active' ? '#ef4444' : '#16a34a', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              padding: 0
+                            }}
+                            title={s.status === 'Active' ? 'Suspender Usuario' : 'Activar Usuario'}
+                          >
+                            {s.status === 'Active' ? <XCircle size={18} /> : <CheckCircle2 size={18} />}
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleResetPassword(s); }} 
+                            style={{ 
+                              width: '38px', 
+                              height: '38px', 
+                              borderRadius: '12px', 
+                              border: '1px solid #e2e8f0', 
+                              background: '#fffbeb', 
+                              color: '#d97706', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              padding: 0
+                            }}
+                            title="Resetear Contraseña"
+                          >
+                            <Key size={18} />
                           </button>
                         </div>
                       </td>
@@ -757,6 +1038,70 @@ const AdminDashboard = () => {
                 </tbody>
               </table>
             </div>
+
+            {/* PAGINACIÓN CONTROLES */}
+            {totalPages > 1 && (
+              <div style={{ 
+                padding: '20px 32px', 
+                borderTop: '1px solid #f1f5f9', 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                gap: '12px',
+                background: '#fafafa'
+              }}>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="btn-secondary-premium"
+                  style={{ padding: '8px 16px', opacity: currentPage === 1 ? 0.5 : 1, fontSize: '0.8rem' }}
+                >
+                  Anterior
+                </button>
+                
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {[...Array(totalPages)].map((_, i) => {
+                    const page = i + 1;
+                    if (totalPages > 7) {
+                      if (page !== 1 && page !== totalPages && Math.abs(page - currentPage) > 1) {
+                        if (Math.abs(page - currentPage) === 2) return <span key={page}>...</span>;
+                        return null;
+                      }
+                    }
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '10px',
+                          border: '1px solid',
+                          borderColor: currentPage === page ? 'var(--primary)' : '#e2e8f0',
+                          background: currentPage === page ? 'var(--primary)' : 'white',
+                          color: currentPage === page ? 'white' : '#64748b',
+                          fontWeight: 800,
+                          fontSize: '0.85rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="btn-secondary-premium"
+                  style={{ padding: '8px 16px', opacity: currentPage === totalPages ? 0.5 : 1, fontSize: '0.8rem' }}
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

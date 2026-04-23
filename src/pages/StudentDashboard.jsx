@@ -3,7 +3,7 @@ import { supabase } from '../services/supabase';
 import { 
   LayoutDashboard, UserCircle, QrCode, LogOut, 
   Bell, Settings, BookOpen, ShieldCheck, Star, Calendar, Menu,
-  Library, HeartPulse, Wallet, MapPin, Clock, ArrowLeft, Headphones, Sparkles, BarChart3
+  Library, HeartPulse, Wallet, MapPin, Clock, ArrowLeft, Headphones, Sparkles, BarChart3, HelpCircle
 } from 'lucide-react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import { useNavigate } from 'react-router-dom';
@@ -250,6 +250,7 @@ const StudentDashboard = () => {
       title: 'Comunidad y Soporte',
       items: [
         { id: 'noticias', label: 'Eventos y Noticias', icon: <Bell size={18} />, onClick: () => setActiveTab('noticias') },
+        { id: 'faq', label: 'Preguntas Frecuentes', icon: <HelpCircle size={18} />, onClick: () => navigate('/preguntas-frecuentes') },
         { id: 'salmi_chat', label: 'Consultar a Salmi AI', icon: <Sparkles size={18} />, onClick: () => window.dispatchEvent(new CustomEvent('open-salmi-chat')) },
         { id: 'caracterizacion', label: 'Personalización', icon: <Settings size={18} />, onClick: () => setActiveTab('caracterizacion') },
       ]

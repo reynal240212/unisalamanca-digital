@@ -9,7 +9,8 @@ export const useAdmin = () => {
     total: 0,
     students: 0,
     teachers: 0,
-    admins: 0
+    admins: 0,
+    graduates: 0
   });
 
   const fetchUsers = useCallback(async () => {
@@ -30,6 +31,7 @@ export const useAdmin = () => {
         students: data.filter(u => u.role === 'ESTUDIANTE').length,
         teachers: data.filter(u => u.role === 'PROFESOR').length,
         admins: data.filter(u => u.role === 'ADMIN').length,
+        graduates: data.filter(u => u.role === 'EGRESADO').length,
       });
     } catch (err) {
       console.error("Error fetching users:", err);

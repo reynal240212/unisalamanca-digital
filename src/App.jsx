@@ -9,6 +9,7 @@ import CarteraDashboard from './pages/CarteraDashboard';
 import AdmisionesDashboard from './pages/AdmisionesDashboard';
 import BienestarDashboard from './pages/BienestarDashboard';
 import StudentDashboard from './pages/StudentDashboard';
+import GraduateDashboard from './pages/GraduateDashboard';
 import StudentCard from './pages/StudentCard';
 import Validator from './pages/Validator';
 import Home from './pages/Home';
@@ -17,6 +18,9 @@ import ChangePassword from './pages/ChangePassword';
 import DataPolicy from './pages/DataPolicy';
 import Biblioteca from './pages/Biblioteca';
 import AcademicPrograms from './pages/AcademicPrograms';
+import PQRSF from './pages/PQRSF';
+import Payments from './pages/Payments';
+import FAQ from './pages/FAQ';
 
 
 const ACADEMIC_ROLES = ['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA', 'ADMIN'];
@@ -97,8 +101,15 @@ function App() {
 
           {/* ESTUDIANTE */}
           <Route path="/student" element={
-            <ProtectedRoute allowedRoles={['ESTUDIANTE', 'EGRESADO']}>
+            <ProtectedRoute allowedRoles={['ESTUDIANTE']}>
               <StudentDashboard />
+            </ProtectedRoute>
+          } />
+
+          {/* EGRESADO */}
+          <Route path="/graduate" element={
+            <ProtectedRoute allowedRoles={['EGRESADO']}>
+              <GraduateDashboard />
             </ProtectedRoute>
           } />
 
@@ -123,6 +134,9 @@ function App() {
           <Route path="/data-policy" element={<DataPolicy />} />
 
           <Route path="/biblioteca" element={<Biblioteca />} />
+          <Route path="/pqrsf" element={<PQRSF />} />
+          <Route path="/pagos" element={<Payments />} />
+          <Route path="/preguntas-frecuentes" element={<FAQ />} />
 
 
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -1030,11 +1030,12 @@ body {
 .login-page {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
-  padding: 20px;
-  overflow: hidden;
+  padding: 40px 20px;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -1091,9 +1092,9 @@ body {
 }
 
 .login-footer-branding {
-  position: absolute;
-  bottom: 30px;
-  left: 0;
+  position: relative;
+  margin-top: 40px;
+  padding-bottom: 40px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -1143,9 +1144,9 @@ body {
 
 @media (max-width: 600px) {
   .login-footer-branding {
-    padding: 0 20px;
+    padding: 0 20px 40px;
     gap: 15px;
-    bottom: 20px;
+    margin-top: 20px;
   }
   .footer-line {
     display: none;
@@ -1170,7 +1171,7 @@ body {
     box-shadow: none;
   }
   .login-form-side {
-    padding: 30px 20px;
+    padding: 40px 24px 60px;
   }
   .login-page {
     padding: 0;
@@ -1323,6 +1324,7 @@ body {
   flex-direction: column;
   justify-content: center;
   background: white;
+  min-height: 100%;
 }
 
 @media (max-width: 768px) {
@@ -3967,3 +3969,100 @@ body {
   background: #334155;
   border-radius: 50%;
 }
+
+/* ===== DYNAMIC PORTAL LOGIN ===== */
+.login-page {
+  --portal-color: var(--primary);
+  --portal-bg-glow: rgba(7, 137, 178, 0.15);
+  transition: all 0.5s ease;
+}
+
+.login-page.portal-teacher {
+  --portal-color: #f59e0b;
+  --portal-bg-glow: rgba(245, 158, 11, 0.15);
+}
+
+.login-page.portal-admin {
+  --portal-color: #ef4444;
+  --portal-bg-glow: rgba(239, 68, 68, 0.15);
+}
+
+.portal-switcher-container {
+  background: #f1f5f9;
+  padding: 6px;
+  border-radius: 18px;
+  display: flex;
+  margin-bottom: 30px;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.portal-tab {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 14px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 800;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.portal-tab.active {
+  color: white;
+  background: var(--portal-color);
+  box-shadow: 0 8px 15px var(--portal-bg-glow);
+}
+
+.login-button.portal-dynamic {
+  background: var(--portal-color) !important;
+  box-shadow: 0 10px 20px var(--portal-bg-glow) !important;
+}
+
+.login-button.portal-dynamic:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.input-group input:focus {
+  border-color: var(--portal-color) !important;
+  box-shadow: 0 0 0 4px var(--portal-bg-glow) !important;
+}
+
+.text-portal-color {
+  color: var(--portal-color);
+}
+
+/* ===== HOME PAGE PREMIUM EFFECTS ===== */
+.role-card-premium:hover {
+  transform: translateY(-12px) scale(1.02);
+  background: white !important;
+  border-color: var(--secondary) !important;
+  box-shadow: 0 25px 50px rgba(42, 34, 102, 0.1);
+}
+
+.role-card-premium:hover .role-icon-box {
+  background: var(--primary) !important;
+  color: white !important;
+  transform: rotate(5deg) scale(1.1);
+}
+
+.bento-card {
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.bento-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+  border-color: var(--secondary) !important;
+}
+
