@@ -3,7 +3,7 @@ import { supabase } from '../services/supabase';
 import { 
   LayoutDashboard, UserCircle, QrCode, LogOut, 
   Bell, Settings, BookOpen, ShieldCheck, Star, Calendar, Menu,
-  Library, HeartPulse, Wallet, MapPin, Clock, ArrowLeft, Headphones
+  Library, HeartPulse, Wallet, MapPin, Clock, ArrowLeft, Headphones, Sparkles, BarChart3
 } from 'lucide-react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import { useNavigate } from 'react-router-dom';
@@ -18,10 +18,12 @@ import GradesView from '../components/GradesView';
 import LibraryView from '../components/LibraryView';
 import WellbeingView from '../components/WellbeingView';
 import FinanceView from '../components/FinanceView';
+import AttendanceView from '../components/AttendanceView';
 
 import { useQR } from '../hooks/useQR';
 import { useCharacterization } from '../hooks/useCharacterization';
 import { useSchedule } from '../hooks/useSchedule';
+import { useShake } from '../hooks/useShake';
 
 const StudentDashboard = () => {
   const { user, logout } = useAuth();
@@ -30,6 +32,19 @@ const StudentDashboard = () => {
   
   const [activeTab, setActiveTab] = useState('perfil');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showMotionBanner, setShowMotionBanner] = useState(false);
+
+  // Hook para agitar -> Mostrar QR
+  const { permissionStatus, requestPermission } = useShake(() => {
+    setActiveTab('perfil');
+  });
+
+  useEffect(() => {
+    // Si estamos en iOS y aún no hay permiso, mostramos banner informativo
+    if (permissionStatus === 'unknown' && typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+      setShowMotionBanner(true);
+    }
+  }, [permissionStatus]);
   const { schedule } = useSchedule(user?.id);
 
   // Lógica para encontrar la próxima clase
@@ -108,7 +123,7 @@ const StudentDashboard = () => {
     switch(activeTab) {
       case 'perfil':
         return (
-          <div className="section-reveal" style={{ padding: '20px' }}>
+          <div className="section-reveal" style={{ padding: 0 }}>
             <ProfileView 
               user={studentData} 
               characterization={characterizationData} 
@@ -179,6 +194,12 @@ const StudentDashboard = () => {
             <GradesView user={studentData} />
           </div>
         );
+      case 'asistencias':
+        return (
+          <div className="section-reveal" style={{ padding: '20px' }}>
+            <AttendanceView user={studentData} />
+          </div>
+        );
       case 'biblioteca':
         return (
           <div className="section-reveal" style={{ padding: '20px' }}>
@@ -213,6 +234,7 @@ const StudentDashboard = () => {
       title: 'Académico',
       items: [
         { id: 'horario', label: 'Agenda Semanal', icon: <Calendar size={18} />, onClick: () => setActiveTab('horario') },
+        { id: 'asistencias', label: 'Mis Asistencias', icon: <BarChart3 size={18} />, onClick: () => setActiveTab('asistencias') },
         { id: 'notas', label: 'Rendimiento Académico', icon: <BookOpen size={18} />, onClick: () => setActiveTab('notas') },
       ]
     },
@@ -225,9 +247,10 @@ const StudentDashboard = () => {
       ]
     },
     {
-      title: 'Comunidad',
+      title: 'Comunidad y Soporte',
       items: [
         { id: 'noticias', label: 'Eventos y Noticias', icon: <Bell size={18} />, onClick: () => setActiveTab('noticias') },
+        { id: 'salmi_chat', label: 'Consultar a Salmi AI', icon: <Sparkles size={18} />, onClick: () => window.dispatchEvent(new CustomEvent('open-salmi-chat')) },
         { id: 'caracterizacion', label: 'Personalización', icon: <Settings size={18} />, onClick: () => setActiveTab('caracterizacion') },
       ]
     }
@@ -246,6 +269,42 @@ const StudentDashboard = () => {
       <div className="section-reveal">
         {renderContent()}
       </div>
+
+      {/* BANNER DE PERMISO PARA AGITAR (Solo iOS) */}
+      {showMotionBanner && (
+        <div style={{
+          position: 'fixed', bottom: '20px', left: '20px', right: '20px',
+          background: 'rgba(42, 34, 102, 0.95)', backdropFilter: 'blur(10px)',
+          padding: '20px', borderRadius: '24px', color: 'white', zIndex: 10000,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)',
+          animation: 'slideUp 0.5s ease-out'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '10px', borderRadius: '14px' }}>
+              <QrCode size={24} color="var(--secondary)" />
+            </div>
+            <div>
+              <p style={{ margin: 0, fontWeight: 800, fontSize: '0.9rem' }}>Atajo de Identidad</p>
+              <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.8 }}>Agita tu celular para mostrar el QR</p>
+            </div>
+          </div>
+          <button 
+            onClick={async () => {
+              await requestPermission();
+              setShowMotionBanner(false);
+            }}
+            style={{
+              background: 'var(--secondary)', color: 'white', border: 'none',
+              padding: '10px 20px', borderRadius: '12px', fontWeight: 900,
+              fontSize: '0.8rem', cursor: 'pointer'
+            }}
+          >
+            ACTIVAR
+          </button>
+        </div>
+      )}
+
       <SalmiChatbot />
     </DashboardLayout>
   );

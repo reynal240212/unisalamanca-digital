@@ -60,13 +60,7 @@ const Home = () => {
 
          {/* Presentation Hero */}
          <section className="id-hero" style={{ 
-            backgroundImage: `url(${heroImages[currentBg]})`, 
-            backgroundSize: '100% 100%', 
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center', 
-            position: 'relative', 
-            overflow: 'hidden',
-            transition: 'background-image 0.5s ease-in-out'
+            backgroundImage: `url(${heroImages[currentBg]})`
          }}>
             <div className="hero-overlay"></div>
             

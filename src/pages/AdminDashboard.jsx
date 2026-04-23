@@ -4,6 +4,7 @@ import StudentSchedule from '../components/StudentSchedule';
 import ProfileView from '../components/ProfileView';
 import PhotoValidationModule from '../components/PhotoValidationModule';
 import CurriculumView from '../components/CurriculumView';
+import SalmiChatbot from '../components/SalmiChatbot';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -14,9 +15,10 @@ import {
   CheckCircle2, XCircle, ShieldCheck, BarChart2, Settings,
   Upload, Edit2, X, Save, AlertTriangle, Lock, Bell, Shield,
   Activity, Database, Key, Menu, GraduationCap, Wallet, ClipboardList,
-  Image as ImageIcon, BookOpen, Layers, Clock, ArrowUpRight, Filter
+  Image as ImageIcon, BookOpen, Layers, Clock, ArrowUpRight, Filter, Sparkles
 } from 'lucide-react';
 import DashboardLayout from '../components/layout/DashboardLayout';
+import { useAdmin } from '../hooks/useAdmin';
 
 /* ─── MODAL USUARIO (CREAR/EDITAR) ─────────────────────────────────── */
 const UserFormModal = ({ student, onClose, onSave }) => {
@@ -278,27 +280,36 @@ const SeguridadSection = ({ students, logs = [] }) => {
 
 /* ─── ADMIN DASHBOARD PRINCIPAL ─────────────────────────────────── */
 const AdminDashboard = () => {
-  const [students, setStudents] = useState([]);
-  const [logs, setLogs] = useState([]);
-  const [stats, setStats] = useState({ total: 0, active: 0, suspended: 0, validators: 0, egresados: 0 });
+  const { 
+    users, 
+    logs, 
+    loading, 
+    stats, 
+    fetchUsers, 
+    fetchLogs, 
+    updateUser 
+  } = useAdmin();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('ALL');
-  const [filterProgram, setFilterProgram] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
-  const [isUploading, setIsUploading] = useState(false);
   const [activeNav, setActiveNav] = useState('estudiantes');
   const [editingStudent, setEditingStudent] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user || user.role !== 'ADMIN') navigate('/login');
-    fetchStudents();
+    if (!user || user.role !== 'ADMIN') {
+      navigate('/login');
+      return;
+    }
+    fetchUsers();
     fetchLogs();
 
+    // Realtime logs
     const channel = supabase
       .channel('access_logs_changes')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'access_logs' }, () => {
@@ -309,33 +320,9 @@ const AdminDashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, fetchUsers, fetchLogs, navigate]);
 
-  const fetchStudents = async () => {
-    const { data, error } = await supabase.from('user').select('*')
-      .neq('role', 'ADMIN').order('created_at', { ascending: false });
-    if (!error && data) {
-      setStudents(data);
-      setStats({
-        total: data.length,
-        active: data.filter(s => s.status === 'Active').length,
-        staff: data.filter(s => ['SECRETARIA_ACADEMICA', 'ADMISIONES', 'CARTERA'].includes(s.role)).length,
-        academia: data.filter(s => ['PROFESOR', 'COORD_ACADEMICO', 'DIRECTOR_PROGRAMA'].includes(s.role)).length,
-        egresados: data.filter(s => s.role === 'EGRESADO').length,
-        validators: data.filter(s => s.role === 'VALIDADOR').length,
-      });
-    }
-  };
-
-  const fetchLogs = async () => {
-    const { data, error } = await supabase
-      .from('access_logs')
-      .select('*, user:user_id(name, program)')
-      .order('created_at', { ascending: false })
-      .limit(50);
-    
-    if (!error && data) setLogs(data);
-  };
+  // Eliminamos fetchStudents y fetchLogs locales ya que useAdmin los provee.
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -413,20 +400,17 @@ const AdminDashboard = () => {
 
   const toggleStatus = async (student) => {
     const newStatus = student.status === 'Active' ? 'Suspended' : 'Active';
-    await supabase.from('user').update({ status: newStatus }).eq('id', student.id);
-    fetchStudents();
+    await updateUser(student.id, { status: newStatus });
   };
 
-  const filtered = students.filter(s => {
+  const filtered = users.filter(s => {
     const matchesSearch = (s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          (s.email || '').toLowerCase().includes(searchTerm.toLowerCase());
+                          (s.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (s.document_id || '').includes(searchTerm);
     const matchesRole = filterRole === 'ALL' || s.role === filterRole;
     const matchesStatus = filterStatus === 'ALL' || s.status === filterStatus;
-    const matchesProgram = filterProgram === 'ALL' || s.program === filterProgram;
-    return matchesSearch && matchesRole && matchesStatus && matchesProgram;
+    return matchesSearch && matchesRole && matchesStatus;
   });
-
-  const uniquePrograms = [...new Set(students.map(s => s.program).filter(Boolean))].sort();
 
   const navItems = [
     {
@@ -440,11 +424,9 @@ const AdminDashboard = () => {
       ]
     },
     {
-      title: 'Módulos de Gestión',
+      title: 'Ayuda y Soporte',
       items: [
-        { id: 'm_registro', icon: <GraduationCap size={18} />, label: 'Registro Académico', path: '/registro' },
-        { id: 'm_cartera', icon: <Wallet size={18} />, label: 'Cartera Financiera', path: '/cartera' },
-        { id: 'm_admisiones', icon: <ClipboardList size={18} />, label: 'Admisiones', path: '/admisiones' },
+        { id: 'salmi_chat', icon: <Sparkles size={18} />, label: 'Asistente Salmi AI', onClick: () => window.dispatchEvent(new CustomEvent('open-salmi-chat')) },
       ]
     }
   ];
@@ -466,9 +448,9 @@ const AdminDashboard = () => {
         <UserFormModal onClose={() => setShowCreateModal(false)} onSave={handleSaveUser} />
       )}
 
-      {activeNav === 'reportes' && <ReportesSection students={students} logs={logs} />}
+      {activeNav === 'reportes' && <ReportesSection users={users} logs={logs} />}
       {activeNav === 'validacion_fotos' && <PhotoValidationModule />}
-      {activeNav === 'seguridad' && <SeguridadSection students={students} logs={logs} />}
+      {activeNav === 'seguridad' && <SeguridadSection students={users} logs={logs} />}
       {activeNav === 'curriculum' && <CurriculumView />}
 
       {activeNav === 'estudiantes' && (
@@ -778,6 +760,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+      <SalmiChatbot />
     </DashboardLayout>
   );
 };

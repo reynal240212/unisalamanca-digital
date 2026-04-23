@@ -16,6 +16,7 @@ import Characterization from './pages/Characterization';
 import ChangePassword from './pages/ChangePassword';
 import DataPolicy from './pages/DataPolicy';
 import Biblioteca from './pages/Biblioteca';
+import AcademicPrograms from './pages/AcademicPrograms';
 
 
 const ACADEMIC_ROLES = ['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA', 'ADMIN'];
@@ -42,6 +43,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/programas" element={<AcademicPrograms />} />
           <Route path="/login" element={<Login />} />
 
           {/* ADMIN — control total */}

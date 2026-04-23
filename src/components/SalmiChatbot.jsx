@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 
 const SalmiChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [messages, setMessages] = useState([
     { 
       id: 1, 
@@ -19,66 +20,16 @@ const SalmiChatbot = () => {
 
   // Escuchar evento para abrir el chat externamente
   useEffect(() => {
-    const handleOpenChat = () => setIsOpen(true);
+    const handleOpenChat = () => {
+      setIsVisible(true);
+      setIsOpen(true);
+    };
     window.addEventListener('open-salmi-chat', handleOpenChat);
     return () => window.removeEventListener('open-salmi-chat', handleOpenChat);
   }, []);
 
-  // AGITAR PARA ACTIVAR (Shake to Activate)
-  useEffect(() => {
-    let lastX, lastY, lastZ;
-    let lastUpdate = 0;
-    const SHAKE_THRESHOLD = 15;
-
-    const onDeviceMotion = (event) => {
-      const acceleration = event.accelerationIncludingGravity;
-      if (!acceleration) return;
-
-      const currentTime = Date.now();
-      if ((currentTime - lastUpdate) > 100) {
-        const diffTime = currentTime - lastUpdate;
-        lastUpdate = currentTime;
-
-        const { x, y, z } = acceleration;
-
-        if (lastX !== undefined) {
-          const speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
-
-          if (speed > 800) { // Umbral de velocidad para agitar
-            setIsOpen(true);
-            // Feedback vibración si está disponible
-            if (navigator.vibrate) navigator.vibrate(200);
-          }
-        }
-
-        lastX = x;
-        lastY = y;
-        lastZ = z;
-      }
-    };
-
-    // Solicitar permiso en iOS si es necesario
-    const requestPermission = async () => {
-      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-        try {
-          const response = await DeviceMotionEvent.requestPermission();
-          if (response === 'granted') {
-            window.addEventListener('devicemotion', onDeviceMotion);
-          }
-        } catch (e) {
-          console.error("DeviceMotion permission denied");
-        }
-      } else {
-        window.addEventListener('devicemotion', onDeviceMotion);
-      }
-    };
-
-    requestPermission();
-
-    return () => {
-      window.removeEventListener('devicemotion', onDeviceMotion);
-    };
-  }, []);
+  // Eliminamos la lógica de agitar de aquí, ya que ahora se maneja globalmente
+  // en el Dashboard para abrir el carnet QR.
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -137,19 +88,25 @@ const SalmiChatbot = () => {
 
   return (
     <div className="salmi-chatbot-wrapper">
-      {/* Floating Toggle Button */}
-      {!isOpen && (
-        <button 
-          className="salmi-chat-toggle"
-          onClick={() => setIsOpen(true)}
-        >
-          <div className="salmi-toggle-badge">1</div>
-          <img src="/images/salmi-premium-v2.png" alt="Salmi" className="salmi-toggle-avatar" />
-          <span className="salmi-toggle-text">
-            ¿Dudas? Pregúntame <br/>
-            <small style={{ fontSize: '0.6rem', opacity: 0.8, fontWeight: 500 }}>Agita tu celular</small>
-          </span>
-        </button>
+      {/* Floating Toggle Button (Discreet) */}
+      {!isOpen && isVisible && (
+        <div className="salmi-toggle-wrapper">
+          <button 
+            className="salmi-chat-toggle-mini"
+            onClick={() => setIsOpen(true)}
+            title="Abrir Asistente Salmi"
+          >
+            <div className="salmi-mini-badge"></div>
+            <img src="/images/salmi-premium-v2.png" alt="Salmi" />
+          </button>
+          <button 
+            className="salmi-toggle-dismiss" 
+            onClick={() => setIsVisible(false)}
+            title="Ocultar burbuja"
+          >
+            <X size={10} />
+          </button>
+        </div>
       )}
 
       {/* Chat Window */}

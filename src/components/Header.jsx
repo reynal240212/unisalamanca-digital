@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Home, User, Shield, LogIn } from 'lucide-react';
+import { Search, Menu, X, Home, User, Shield, LogIn, Mail, BookOpen, GraduationCap, Landmark, FileText } from 'lucide-react';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -9,8 +9,12 @@ const Header = () => {
 
     const menuItems = [
         { name: 'Inicio', icon: <Home size={18} />, path: '/' },
-        { name: 'Activar Carnet', icon: <LogIn size={18} />, path: '/login' },
-        { name: 'Validador QR', icon: <Shield size={18} />, path: '/validator' },
+        { name: 'Programas Académicos', icon: <GraduationCap size={18} />, path: '/programas' },
+        { name: 'Admisiones', icon: <FileText size={18} />, path: '#admisiones' },
+        { name: 'Institucional', icon: <Landmark size={18} />, path: '#institucional' },
+        { name: 'Biblioteca Digital', icon: <BookOpen size={18} />, path: '/biblioteca' },
+        { name: 'Correo Institucional', icon: <Mail size={18} />, path: 'https://www.office.com/', isExternal: true },
+        { name: 'Ingresar al Portal', icon: <LogIn size={18} />, path: '/login' },
     ];
 
     return (
@@ -19,10 +23,12 @@ const Header = () => {
                 <div className="branding" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <img src="/images/escudo.png" alt="UniSalamanca" style={{ height: '40px' }} />
                     <span className="branding-text" style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-                        <span className="siau-acronym" title="Sistema Integral de Administración Universitaria" style={{ fontSize: '1.4rem', letterSpacing: '1px', cursor: 'help' }}>
-                            <span className="si">SI</span><span className="au">AU</span>
+                        <span className="siau-acronym" title="Sistema Integral de Administración Universitaria" style={{ fontSize: '1.4rem', letterSpacing: '1px', cursor: 'help', fontWeight: 900 }}>
+                            <span style={{ color: 'var(--primary)' }}>SI</span><span style={{ color: 'var(--secondary)' }}>AU</span>
                         </span>
-                        <span style={{ color: 'var(--primary)', fontSize: '0.7rem', fontWeight: 700, opacity: 0.8 }}>UniSalamanca</span>
+                        <span style={{ color: 'var(--primary)', fontSize: '0.7rem', fontWeight: 800, opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            UniSalamanca <span style={{ color: 'var(--secondary)' }}>Digital</span>
+                        </span>
                     </span>
                 </div>
 
@@ -53,7 +59,11 @@ const Header = () => {
                                 key={index} 
                                 className="menu-dropdown-item"
                                 onClick={() => {
-                                    navigate(item.path);
+                                    if (item.isExternal) {
+                                        window.open(item.path, '_blank');
+                                    } else {
+                                        navigate(item.path);
+                                    }
                                     setIsMenuOpen(false);
                                 }}
                             >

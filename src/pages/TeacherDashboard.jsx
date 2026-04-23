@@ -2,108 +2,61 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, MapPin, LogOut, Menu, Calendar, Scan, CheckCircle, XCircle, AlertCircle, Camera, RefreshCw, RotateCcw } from 'lucide-react';
+import { 
+  BookOpen, Users, Clock, MapPin, LogOut, Menu, Calendar, 
+  Scan, CheckCircle, XCircle, AlertCircle, Camera, RefreshCw, 
+  RotateCcw, BarChart2, CheckCircle2 
+} from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import { getCurrentPosition, isInCampusPerimeter } from '../utils/geoUtils';
+import { useTeacher } from '../hooks/useTeacher';
+import SalmiChatbot from '../components/SalmiChatbot';
+import { Sparkles } from 'lucide-react';
 
 const TeacherDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [subjects, setSubjects] = useState([]);
+
+  const {
+    subjects,
+    loading,
+    activeClass,
+    fetchSubjects,
+    detectLiveClass
+  } = useTeacher(user?.id);
+
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeClass, setActiveClass] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [attendanceData, setAttendanceData] = useState({});
-  const [activeTab, setActiveTab] = useState('grid'); // 'grid' o 'reports'
+  const [activeTab, setActiveTab] = useState('grid');
   const [reportData, setReportData] = useState({ stats: [], totalSessions: 0 });
+  const [location, setLocation] = useState(null);
+  const [isInPerimeter, setIsInPerimeter] = useState(true);
 
   useEffect(() => {
     if (!user || user.role !== 'PROFESOR') {
       navigate('/login');
       return;
     }
-    fetchMySubjects();
-    const interval = setInterval(detectLiveClass, 60000); // Revisar cada minuto
+    const load = async () => {
+      const data = await fetchSubjects();
+      if (data) detectLiveClass(data);
+    };
+    load();
+    const interval = setInterval(() => detectLiveClass(), 60000);
     return () => clearInterval(interval);
-  }, [user]);
-
-  useEffect(() => {
-    if (subjects.length > 0) {
-      detectLiveClass();
-    }
-  }, [subjects]);
-
-  const detectLiveClass = () => {
-    const daysArr = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const now = new Date();
-    const currentDay = daysArr[now.getDay()];
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-
-    const live = subjects.find(s => {
-      return (s.schedule_blocks || []).some(b => {
-        if (b.day_of_week !== currentDay) return false;
-        
-        const [hStart, mStart] = b.start_time.split(':').map(Number);
-        const [hEnd, mEnd] = b.end_time.split(':').map(Number);
-        
-        const startTimeInMin = hStart * 60 + mStart;
-        const endTimeInMin = hEnd * 60 + mEnd;
-        
-        // Ventana: 15 min antes de empezar hasta el final
-        return currentTime >= (startTimeInMin - 15) && currentTime <= endTimeInMin;
-      });
-    });
-
-    setActiveClass(live || null);
-  };
-
-  const fetchMySubjects = async () => {
-    setLoading(true);
-    try {
-      // 3NF: Consultar secciones académicas asignadas a este profesor
-      const { data: sections, error: secError } = await supabase
-        .from('academic_sections')
-        .select(`
-          id,
-          subject:subjects(id, name, credits),
-          period:academic_periods(name),
-          blocks:schedule_blocks(*)
-        `)
-        .eq('teacher_id', user.id);
-
-      if (secError) throw secError;
-
-      // Adaptar al formato anterior
-      const formatted = (sections || []).map(sec => ({
-        id: sec.id,
-        subject: sec.subject.name,
-        subject_id: sec.subject.id,
-        period: sec.period.name,
-        credits: sec.subject.credits,
-        schedule_blocks: sec.blocks || []
-      }));
-      
-      setSubjects(formatted);
-    } catch (err) {
-      console.error("Error fetching academic load:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [user, fetchSubjects, detectLiveClass, navigate]);
 
   const fetchStudentsForSubject = async (section) => {
     setSelectedSubject(section);
-    // 3NF: Obtener estudiantes de academic_enrollments para esta sección
     const { data: enrollments, error: enrError } = await supabase
       .from('academic_enrollments')
       .select(`
-        student:public.user(id, name, email, program:academic_programs(name), semester)
+        student:public.user(id, name, email, photo_url, program:academic_programs(name), semester)
       `)
       .eq('section_id', section.id)
       .eq('status', 'ACTIVE');
@@ -313,6 +266,12 @@ const TeacherDashboard = () => {
         { id: 'grid', icon: <Users size={16} />, label: 'Asistencia Hoy', onClick: () => setActiveTab('grid') },
         { id: 'reports', icon: <BarChart2 size={16} />, label: 'Estadísticas de Asistencia', onClick: () => setActiveTab('reports') },
       ] : []
+    },
+    {
+      title: 'Ayuda',
+      items: [
+        { id: 'salmi_chat', icon: <Sparkles size={16} />, label: 'Consultar a Salmi', onClick: () => window.dispatchEvent(new CustomEvent('open-salmi-chat')) }
+      ]
     }
   ];
 
@@ -563,6 +522,7 @@ const TeacherDashboard = () => {
           </div>
         )}
       </div>
+      <SalmiChatbot />
     </DashboardLayout>
   );
 };
