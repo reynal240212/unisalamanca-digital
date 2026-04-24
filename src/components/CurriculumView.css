@@ -208,8 +208,8 @@
 /* Semester Grid */
 .semester-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 350px), 1fr));
+  gap: 20px;
 }
 
 .semester-card {
@@ -378,33 +378,42 @@
   }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 768px) {
   .curriculum-wrapper {
+    gap: 16px;
+  }
+  .header-title {
+    font-size: 1.5rem;
+  }
+  .header-desc {
+    font-size: 0.85rem;
+  }
+  .program-header-card {
+    padding: 24px;
+    border-radius: 24px;
+  }
+  .semester-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
-  .curriculum-sidebar {
-    position: static;
-    max-height: none;
+  .semester-card {
+    border-radius: 20px;
   }
-  .program-list {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 10px;
-  }
-  .program-item {
-    min-width: 260px;
+  .btn-download-pdf {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .header-title {
-    font-size: 1.6rem;
+    font-size: 1.3rem;
   }
-  .semester-grid {
-    grid-template-columns: 1fr;
+  .semester-label {
+    font-size: 0.8rem;
   }
-  .program-header-card {
-    padding: 24px;
-    border-radius: 20px;
+  .subject-name {
+    font-size: 0.8rem;
   }
 }
