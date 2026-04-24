@@ -1789,15 +1789,41 @@ body {
   color: white;
 }
 
+/* DASHBOARD RESPONSIVE GRIDS */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.responsive-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.responsive-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .responsive-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 992px) {
   .responsive-grid-3 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 640px) {
-  .responsive-grid-3 {
+@media (max-width: 768px) {
+  .responsive-grid-4, .responsive-grid-3, .responsive-grid-2 {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 

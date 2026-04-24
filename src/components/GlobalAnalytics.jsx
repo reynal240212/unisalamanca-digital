@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { 
   Users, UserCheck, TrendingUp, DollarSign, 
-  Target, GraduationCap, Clock, AlertCircle, CheckCircle2, Wallet 
+  Target, GraduationCap, Clock, AlertCircle, CheckCircle2, Wallet, Sparkles
 } from 'lucide-react';
 
 const GlobalAnalytics = () => {
@@ -155,27 +155,87 @@ const GlobalAnalytics = () => {
         </p>
       </div>
 
-      {/* KPI GRID */}
-      <div className="responsive-grid-4" style={{ marginBottom: '40px' }}>
+      {/* KPI GRID - STRATEGIC METRICS */}
+      <div className="responsive-grid-4" style={{ marginBottom: '48px' }}>
         {[
-          { icon: <GraduationCap />, label: 'Estudiantes Totales', value: data.stats.totalStudents, color: '#1e3a8a', bg: '#eef2ff' },
-          { icon: <Target />, label: 'Aspirantes Nuevos', value: data.stats.pendingApplicants, color: '#16b6d6', bg: '#ecfeff' },
-          { icon: <DollarSign />, label: 'Recaudo Total (COP)', value: `$${data.stats.totalRevenue.toLocaleString()}`, color: '#16a34a', bg: '#f0fdf4' },
-          { icon: <AlertCircle />, label: 'Cartera Pendiente', value: `$${data.stats.pendingDebt.toLocaleString()}`, color: '#ef4444', bg: '#fef2f2' },
+          { icon: <GraduationCap size={24} />, label: 'Estudiantes Totales', value: data.stats.totalStudents, color: '#1e3a8a', bg: '#eef2ff' },
+          { icon: <Target size={24} />, label: 'Aspirantes Nuevos', value: data.stats.pendingApplicants, color: '#16b6d6', bg: '#ecfeff' },
+          { icon: <DollarSign size={24} />, label: 'Recaudo Total (COP)', value: `$${data.stats.totalRevenue.toLocaleString()}`, color: '#16a34a', bg: '#f0fdf4' },
+          { icon: <AlertCircle size={24} />, label: 'Cartera Pendiente', value: `$${data.stats.pendingDebt.toLocaleString()}`, color: '#ef4444', bg: '#fef2f2' },
         ].map((kpi, idx) => (
-          <div key={idx} className="kpi-card" style={{ border: '1px solid #f1f5f9' }}>
-            <div className="kpi-icon-box" style={{ background: kpi.bg, color: kpi.color }}>{kpi.icon}</div>
-            <p style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>{kpi.label}</p>
-            <h3 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b', margin: '10px 0' }}>{kpi.value}</h3>
+          <div key={idx} className="kpi-card" style={{ 
+            padding: '30px',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ 
+              position: 'absolute', 
+              top: '-10px', 
+              right: '-10px', 
+              width: '80px', 
+              height: '80px', 
+              background: `radial-gradient(circle, ${kpi.color}08 0%, transparent 70%)`,
+              borderRadius: '50%'
+            }} />
+            
+            <div className="kpi-icon-box" style={{ 
+              background: kpi.bg, 
+              color: kpi.color,
+              width: '52px',
+              height: '52px',
+              borderRadius: '16px'
+            }}>
+              {kpi.icon}
+            </div>
+            
+            <p style={{ 
+              fontSize: '0.7rem', 
+              fontWeight: 800, 
+              color: '#94a3b8', 
+              textTransform: 'uppercase', 
+              letterSpacing: '1.2px',
+              marginBottom: '8px'
+            }}>
+              {kpi.label}
+            </p>
+            
+            <h3 style={{ 
+              fontSize: '2.2rem', 
+              fontWeight: 900, 
+              color: '#0f172a', 
+              margin: 0,
+              letterSpacing: '-1px'
+            }}>
+              {kpi.value}
+            </h3>
+            
+            <div style={{ 
+              marginTop: '12px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px' 
+            }}>
+              <span style={{ 
+                width: '6px', 
+                height: '6px', 
+                borderRadius: '50%', 
+                background: kpi.color 
+              }} />
+              <span style={{ 
+                fontSize: '0.75rem', 
+                color: '#64748b', 
+                fontWeight: 600 
+              }}>Actualizado</span>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* CHARTS GRID */}
-      <div className="responsive-grid-2" style={{ gap: '30px' }}>
+      {/* CHARTS GRID - MAIN ANALYTICS */}
+      <div className="responsive-grid-2" style={{ gap: '30px', marginBottom: '40px' }}>
         
         {/* PIPELINE DE ADMISIONES */}
-        <div style={{ background: 'white', padding: '30px', borderRadius: '24px', border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+        <div className="glass-card" style={{ padding: '30px' }}>
           <h3 style={{ fontWeight: 900, marginBottom: '25px', color: '#334155', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <TrendingUp size={20} color="#16b6d6" /> Embudo de Admisiones
           </h3>
@@ -196,7 +256,7 @@ const GlobalAnalytics = () => {
         </div>
 
         {/* DISTRIBUCIÓN POR PROGRAMAS */}
-        <div style={{ background: 'white', padding: '30px', borderRadius: '24px', border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+        <div className="glass-card" style={{ padding: '30px' }}>
           <h3 style={{ fontWeight: 900, marginBottom: '25px', color: '#334155', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Users size={20} color="#1e3a8a" /> Población por Programa
           </h3>
@@ -222,7 +282,7 @@ const GlobalAnalytics = () => {
         </div>
 
         {/* SALUD FINANCIERA */}
-        <div style={{ background: 'white', padding: '30px', borderRadius: '24px', border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+        <div className="glass-card" style={{ padding: '30px' }}>
           <h3 style={{ fontWeight: 900, marginBottom: '25px', color: '#334155', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Wallet size={20} color="#16a34a" /> Salud Financiera (Estados)
           </h3>
@@ -245,26 +305,37 @@ const GlobalAnalytics = () => {
           </div>
         </div>
 
-        {/* INSIGHTS DE SALMI */}
+        {/* INSIGHTS DE SALMI - INTEGRADO COMO TARJETA DE ACCIÓN */}
         <div style={{ 
-          background: 'linear-gradient(135deg, #1e3a8a, #1e40af)', 
-          padding: '35px', borderRadius: '24px', color: 'white', 
+          background: 'linear-gradient(135deg, #2A2266 0%, #1e184d 100%)', 
+          padding: '35px', borderRadius: '28px', color: 'white', 
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
-          boxShadow: '0 15px 40px rgba(30, 58, 138, 0.2)'
+          boxShadow: '0 20px 40px rgba(42, 34, 102, 0.2)',
+          position: 'relative',
+          overflow: 'hidden'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
-            <div style={{ width: '45px', height: '45px', background: 'rgba(255,255,255,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CheckCircle2 color="white" size={24} />
+          <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '150px', height: '150px', background: 'radial-gradient(circle, rgba(22, 182, 214, 0.2) 0%, transparent 70%)', borderRadius: '50%' }} />
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px', position: 'relative' }}>
+            <div style={{ width: '50px', height: '50px', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Sparkles color="#16B6D6" size={26} />
             </div>
-            <h3 style={{ fontWeight: 900, margin: 0, fontSize: '1.2rem' }}>Insights de Salmi AI</h3>
+            <h3 style={{ fontWeight: 900, margin: 0, fontSize: '1.4rem', letterSpacing: '-0.5px' }}>Análisis Inteligente Salmi</h3>
           </div>
-          <p style={{ fontSize: '1.05rem', lineHeight: 1.6, opacity: 0.9, fontWeight: 500 }}>
-            "Hola Admin. He analizado los datos: Tienes una retención del **{data.stats.totalStudents > 0 ? ((data.stats.activeStudents / data.stats.totalStudents) * 100).toFixed(1) : 0}%**. 
-            La carrera líder es **{data.charts.programDistribution[0]?.name || 'N/A'}**. 
-            Hay una oportunidad de recaudo de **${(data.stats.pendingDebt || 0).toLocaleString()} COP** pendiente por gestionar."
-          </p>
-          <div style={{ marginTop: '25px', padding: '12px 20px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 700, display: 'inline-block' }}>
-            ESTADO INSTITUCIONAL: ÓPTIMO ✓
+          
+          <div style={{ background: 'rgba(255,255,255,0.05)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)', position: 'relative' }}>
+            <p style={{ fontSize: '1.1rem', lineHeight: 1.6, opacity: 0.95, fontWeight: 500, margin: 0 }}>
+              "Hola Admin. He analizado los datos: Tienes una retención del **{data.stats.totalStudents > 0 ? ((data.stats.activeStudents / data.stats.totalStudents) * 100).toFixed(1) : 0}%**. 
+              La carrera líder es **{data.charts.programDistribution[0]?.name || 'N/A'}**. 
+              Hay una oportunidad de recaudo de **${(data.stats.pendingDebt || 0).toLocaleString()} COP** pendiente por gestionar."
+            </p>
+          </div>
+          
+          <div style={{ marginTop: '25px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ padding: '8px 16px', background: 'rgba(22, 182, 214, 0.2)', color: '#16B6D6', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
+              ESTADO: ÓPTIMO ✓
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>Sincronizado hace un momento</div>
           </div>
         </div>
 
@@ -281,8 +352,8 @@ const GlobalAnalytics = () => {
 
         <div className="responsive-grid-3" style={{ gap: '24px' }}>
           {/* DISTRIBUCIÓN POR ESTRATO */}
-          <div style={{ background: 'white', padding: '25px', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
-            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '20px' }}>Distribución por Estrato</h4>
+          <div className="glass-card" style={{ padding: '25px' }}>
+            <h4 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '20px', letterSpacing: '0.5px' }}>Distribución por Estrato</h4>
             <div style={{ height: '250px' }}>
               <ResponsiveContainer>
                 <PieChart>
@@ -291,37 +362,39 @@ const GlobalAnalytics = () => {
                       <Cell key={index} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
-                  <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 600 }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* ESTADO LABORAL */}
-          <div style={{ background: 'white', padding: '25px', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
-            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '20px' }}>Estudiantes que Laboran</h4>
+          <div className="glass-card" style={{ padding: '25px' }}>
+            <h4 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '20px', letterSpacing: '0.5px' }}>Estudiantes que Laboran</h4>
             <div style={{ height: '250px' }}>
               <ResponsiveContainer>
                 <BarChart data={data.charts.employmentStatus}>
-                  <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
-                  <Tooltip cursor={{ fill: '#f8fafc' }} />
-                  <Bar dataKey="value" fill="var(--secondary)" radius={[4, 4, 0, 0]} barSize={50} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} fontWeight={600} />
+                  <YAxis hide />
+                  <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
+                  <Bar dataKey="value" fill="var(--secondary)" radius={[6, 6, 0, 0]} barSize={50} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* EDUCACIÓN PARENTAL */}
-          <div style={{ background: 'white', padding: '25px', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
-            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '20px' }}>Educación Red de Apoyo</h4>
+          <div className="glass-card" style={{ padding: '25px' }}>
+            <h4 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '20px', letterSpacing: '0.5px' }}>Educación Red de Apoyo</h4>
             <div style={{ height: '250px' }}>
               <ResponsiveContainer>
                 <BarChart layout="vertical" data={data.charts.parentEducation}>
                   <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" fontSize={10} width={80} axisLine={false} tickLine={false} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                  <YAxis dataKey="name" type="category" fontSize={10} width={80} axisLine={false} tickLine={false} fontWeight={600} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
+                  <Bar dataKey="value" fill="#8b5cf6" radius={[0, 6, 6, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
