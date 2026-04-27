@@ -301,7 +301,7 @@ const Home = () => {
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                <div style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+                  gridTemplateColumns: '1fr 1.3fr', 
                   gap: '60px', 
                   alignItems: 'center' 
                }}>
@@ -349,21 +349,23 @@ const Home = () => {
                   </div>
 
                   <div className="reveal reveal-right delay-200" style={{ position: 'relative' }}>
-                     <div style={{ 
-                        aspectRatio: '4/3', 
+                     <div className="map-container-premium" style={{ 
+                        aspectRatio: '16/10', 
                         width: '100%', 
                         overflow: 'hidden', 
                         borderRadius: '32px', 
                         border: '1px dashed #e2e8f0',
                         background: '#f8fafc',
                         backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.15) 1px, transparent 1px)',
-                        backgroundSize: '12px 12px'
+                        backgroundSize: '12px 12px',
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.05)'
                      }}>
                         <img 
                            src="https://unisalamanca.edu.co/assets/Mapa%20Prueba-BCzaPIxh.webp" 
                            alt="Mapa de convenios y puntos de atención aliados" 
                            loading="lazy"
-                           style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9 }}
+                           className="hover-zoom-img"
+                           style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9, transition: 'transform 0.5s ease' }}
                         />
                      </div>
                   </div>

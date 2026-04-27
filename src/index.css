@@ -60,6 +60,10 @@
   transform: translate(0) scale(1);
 }
 
+.hover-zoom-img:hover {
+  transform: scale(1.05);
+}
+
 /* Stagger delays */
 .delay-100 { transition-delay: 0.1s; }
 .delay-200 { transition-delay: 0.2s; }

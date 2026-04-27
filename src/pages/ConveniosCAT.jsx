@@ -65,7 +65,7 @@ const ConveniosCAT = () => {
           boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
           overflow: 'hidden',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))'
+          gridTemplateColumns: '1fr 1.5fr'
         }}>
           <div style={{ padding: '60px' }}>
             <h2 style={{ color: 'var(--primary)', fontWeight: 900, fontSize: '2rem', marginBottom: '20px' }}>
@@ -86,11 +86,11 @@ const ConveniosCAT = () => {
               </div>
             </div>
           </div>
-          <div style={{ background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
             <img 
               src="https://unisalamanca.edu.co/assets/MAPA-COLOMBIA2-Yj4iOvVb.webp" 
               alt="Mapa de cobertura CAT UniSalamanca" 
-              style={{ maxWidth: '100%', height: 'auto', borderRadius: '16px' }}
+              style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '16px' }}
             />
           </div>
         </div>
