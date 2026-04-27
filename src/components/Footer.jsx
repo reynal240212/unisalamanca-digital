@@ -8,6 +8,20 @@ const Footer = () => {
     return (
         <footer className="footer-modern-premium">
             <div className="footer-content-wrapper">
+                {/* Google Maps Integration */}
+                <div className="footer-map-section" style={{ marginBottom: '40px', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15665.996101524786!2d-74.811748!3d11.001136!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ef42da77122d413%3A0x53ac276d9553f34b!2sCorporaci%C3%B3n%20Universitaria%20Empresarial%20de%20Salamanca%20-%20CUES!5e0!3m2!1ses!2sco!4v1777324005629!5m2!1ses!2sco" 
+                        width="100%" 
+                        height="300" 
+                        style={{ border: 0, display: 'block' }} 
+                        allowFullScreen="" 
+                        loading="lazy" 
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Ubicación UniSalamanca"
+                    ></iframe>
+                </div>
+
                 <div className="footer-grid-premium">
                     {/* Brand Column */}
                     <div className="footer-col-main">
