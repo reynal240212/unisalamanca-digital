@@ -14,6 +14,8 @@ import {
    CreditCard
 } from 'lucide-react';
 
+import AcademicProgramsSection from '../components/AcademicProgramsSection';
+
 const Home = () => {
    const navigate = useNavigate();
    const [currentBg, setCurrentBg] = useState(0);
@@ -187,7 +189,7 @@ const Home = () => {
                     { label: 'FAQ', icon: <ShieldCheck size={18} />, onClick: () => navigate('/preguntas-frecuentes') },
                     { label: 'Reglamento', icon: <BookOpen size={18} />, onClick: () => window.open('https://unisalamanca.edu.co/documentos/NEW%20REGLAMENTO%20ESTUDIANTIL.pdf', '_blank') },
                     { label: 'Biblioteca', icon: <GraduationCap size={18} />, onClick: () => navigate('/biblioteca') },
-                    { label: 'Horarios', icon: <Users size={18} /> },
+                    { label: 'Programas', icon: <BookOpen size={18} />, onClick: () => document.getElementById('programas').scrollIntoView({ behavior: 'smooth' }) },
                     { label: 'Manuales', icon: <Briefcase size={18} /> }
                   ].map(item => (
                     <button 
@@ -253,6 +255,9 @@ const Home = () => {
                </div>
             </div>
          </section>
+
+         {/* Academic Programs Section */}
+         <AcademicProgramsSection />
 
          {/* Steps Section */}
          <section className="id-steps">
