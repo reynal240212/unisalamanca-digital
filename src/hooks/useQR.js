@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import sign from 'jwt-encode'; // Usaremos una versión ligera compatible con navegador o HMAC manual
 
 /**
  * Hook para gestionar la lógica del QR dinámico con Firma Criptográfica
