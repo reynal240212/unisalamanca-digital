@@ -28,10 +28,27 @@ const Home = () => {
 
    useEffect(() => {
       document.title = "UniSalamanca | Inicio - Identidad Digital Universitaria";
+      
+      // Scroll Reveal Logic
+      const revealElements = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+         entries.forEach(entry => {
+            if (entry.isIntersecting) {
+               entry.target.classList.add('visible');
+            }
+         });
+      }, { threshold: 0.1 });
+
+      revealElements.forEach(el => observer.observe(el));
+
       const interval = setInterval(() => {
          setCurrentBg((prev) => (prev + 1) % heroImages.length);
       }, 6000);
-      return () => clearInterval(interval);
+
+      return () => {
+         clearInterval(interval);
+         revealElements.forEach(el => observer.unobserve(el));
+      };
    }, []);
 
    const jsonLd = {
@@ -118,10 +135,12 @@ const Home = () => {
          </section>
 
          {/* 1. ACADEMIC PROGRAMS (MOST RELEVANT FOR ASPIRANTS) */}
-         <AcademicProgramsSection />
+         <div className="reveal reveal-up">
+            <AcademicProgramsSection />
+         </div>
 
          {/* 2. STUDENT HUB (MOST RELEVANT FOR CURRENT STUDENTS) */}
-         <section id="estudiantes" className="id-student-hub" style={{ 
+         <section id="estudiantes" className="id-student-hub reveal reveal-up" style={{ 
             background: 'linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%)',
             padding: '100px 20px',
             borderRadius: '60px 60px 0 0',
@@ -181,8 +200,8 @@ const Home = () => {
                     { title: 'Office 365 Educación', desc: 'Herramientas de productividad y correo institucional.', img: 'https://unisalamanca.edu.co/assets/Microsotf%20365-DwOksrB0.png' },
                     { title: 'Azure Cloud', desc: 'Servicios en la nube para proyectos de ingeniería y TI.', img: 'https://unisalamanca.edu.co/assets/Logo%20Azure-C6PMMPDU.png' },
                     { title: 'Autodesk Education', desc: 'Software de diseño profesional para estudiantes.', img: 'https://unisalamanca.edu.co/assets/autodesk-CLpro_QZ.png' }
-                  ].map(plat => (
-                    <article key={plat.title} className="off-feat-card" style={{ 
+                  ].map((plat, idx) => (
+                    <article key={plat.title} className={`off-feat-card reveal reveal-up delay-${(idx + 1) * 100}`} style={{ 
                       display: 'flex', flexDirection: 'column', height: '100%', 
                       border: '1px solid #f1f5f9', background: 'white',
                       transition: 'all 0.3s ease'
@@ -221,24 +240,24 @@ const Home = () => {
          </section>
 
          {/* 3. TECHNOLOGY & SECURITY (FEATURES) */}
-         <section id="features" className="id-features">
+         <section id="features" className="id-features reveal reveal-up">
             <div className="features-intro">
                <h2>Innovación en Educación y Seguridad Digital</h2>
                <p>Descubre los beneficios de portar tu identidad digital institucional UniSalamanca.</p>
             </div>
 
             <div className="features-official-grid">
-               <div className="off-feat-card">
+               <div className="off-feat-card reveal reveal-left delay-100">
                   <div className="off-icon cyan"><QrCode size={30} /></div>
                   <h3>Carnetización con QR Dinámico</h3>
                   <p>Acceso seguro mediante un código encriptado que se renueva cada 30 segundos.</p>
                </div>
-               <div className="off-feat-card">
+               <div className="off-feat-card reveal reveal-up delay-200">
                   <div className="off-icon navy"><ShieldCheck size={30} /></div>
                   <h3>Control de Acceso al Campus</h3>
                   <p>Verificación instantánea en portería para una entrada fluida y segura al campus universitario.</p>
                </div>
-               <div className="off-feat-card">
+               <div className="off-feat-card reveal reveal-right delay-300">
                   <div className="off-icon green"><UserCheck size={30} /></div>
                   <h3>Protección de Datos Personales</h3>
                   <p>Gestión de información bajo la Ley 1581 (Habeas Data) y estándares de seguridad robustos.</p>
@@ -247,29 +266,29 @@ const Home = () => {
          </section>
 
          {/* 4. ROLES & COMMUNITY */}
-         <section className="id-roles">
+         <section className="id-roles reveal reveal-up">
             <div className="roles-intro">
                <span className="id-badge-small">COMUNIDAD UNIVERSITARIA</span>
                <h2>Servicios Digitales para Toda la Comunidad</h2>
                <p>Nuestra plataforma SIAU centraliza servicios para cada perfil de la familia UniSalamanca.</p>
             </div>
             <div className="roles-grid">
-               <div className="role-card">
+               <div className="role-card reveal reveal-scale delay-100">
                   <div className="role-icon-box"><GraduationCap size={40} /></div>
                   <h3>Portal para Estudiantes</h3>
                   <p>Acceso al carnet digital, calificaciones, horarios y servicios de bienestar estudiantil.</p>
                </div>
-               <div className="role-card">
+               <div className="role-card reveal reveal-scale delay-200">
                   <div className="role-icon-box"><BookOpen size={40} /></div>
                   <h3>Portal para Docentes</h3>
                   <p>Gestión académica simplificada, registro de asistencia y herramientas pedagógicas.</p>
                </div>
-               <div className="role-card">
+               <div className="role-card reveal reveal-scale delay-300">
                   <div className="role-icon-box"><Briefcase size={40} /></div>
                   <h3>Gestión Administrativa</h3>
                   <p>Control de procesos internos y herramientas de seguridad para la administración universitaria.</p>
                </div>
-               <div className="role-card">
+               <div className="role-card reveal reveal-scale delay-400">
                   <div className="role-icon-box"><Users size={40} /></div>
                   <h3>Red de Egresados</h3>
                   <p>Vínculo permanente con la universidad y acceso a beneficios exclusivos para graduados.</p>
@@ -278,19 +297,19 @@ const Home = () => {
          </section>
 
          {/* 5. STEPS (ONBOARDING) */}
-         <section className="id-steps">
+         <section className="id-steps reveal reveal-up">
             <div className="steps-container">
-               <div className="step-item">
+               <div className="step-item reveal reveal-scale delay-100">
                   <div className="step-num">01</div>
                   <h3>Autenticación</h3>
                   <p>Inicia sesión con tu correo institucional UniSalamanca.</p>
                </div>
-               <div className="step-item">
+               <div className="step-item reveal reveal-scale delay-200">
                   <div className="step-num">02</div>
                   <h3>Actualización</h3>
                   <p>Verifica tu programa académico y sube tu fotografía.</p>
                </div>
-               <div className="step-item">
+               <div className="step-item reveal reveal-scale delay-300">
                   <div className="step-num">03</div>
                   <h3>Validación</h3>
                   <p>Obtén tu carnet digital con QR para ingreso al campus.</p>
