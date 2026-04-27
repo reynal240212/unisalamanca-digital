@@ -296,7 +296,82 @@ const Home = () => {
             </div>
          </section>
 
-         {/* 5. STEPS (ONBOARDING) */}
+         {/* 5. CONVENIOS Y PUNTOS DE ATENCIÓN */}
+         <section className="id-convenios reveal reveal-up" style={{ padding: '100px 20px', background: 'white' }}>
+            <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+               <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+                  gap: '60px', 
+                  alignItems: 'center' 
+               }}>
+                  <div className="reveal reveal-left delay-100" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                     <h2 style={{ 
+                        fontSize: '2.8rem', 
+                        fontWeight: 900, 
+                        color: 'var(--primary)', 
+                        lineHeight: 1.1,
+                        margin: 0
+                     }}>
+                        Convenios y puntos de atención aliados
+                     </h2>
+                     <p style={{ 
+                        fontSize: '0.85rem', 
+                        fontWeight: 800, 
+                        color: 'rgba(42, 34, 102, 0.7)', 
+                        letterSpacing: '2px',
+                        textTransform: 'uppercase',
+                        margin: 0
+                     }}>
+                        Presencia institucional en distintas regiones del país.
+                     </p>
+                     <div style={{ 
+                        marginTop: '10px', 
+                        background: '#f8fafc', 
+                        padding: '30px', 
+                        borderRadius: '24px', 
+                        border: '1px solid #f1f5f9',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '20px'
+                     }}>
+                        <p style={{ fontSize: '1.1rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                           Contamos con aliados estratégicos en distintas ciudades para acompañarte en tu proceso académico.
+                        </p>
+                        <button 
+                           onClick={() => navigate('/sedes')}
+                           className="btn-id-primary-small"
+                           style={{ width: 'fit-content', padding: '14px 30px', borderRadius: '50px' }}
+                        >
+                           VER CONVENIOS POR CIUDAD
+                        </button>
+                     </div>
+                  </div>
+
+                  <div className="reveal reveal-right delay-200" style={{ position: 'relative' }}>
+                     <div style={{ 
+                        aspectRatio: '4/3', 
+                        width: '100%', 
+                        overflow: 'hidden', 
+                        borderRadius: '32px', 
+                        border: '1px dashed #e2e8f0',
+                        background: '#f8fafc',
+                        backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.15) 1px, transparent 1px)',
+                        backgroundSize: '12px 12px'
+                     }}>
+                        <img 
+                           src="https://unisalamanca.edu.co/assets/Mapa%20Prueba-BCzaPIxh.webp" 
+                           alt="Mapa de convenios y puntos de atención aliados" 
+                           loading="lazy"
+                           style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9 }}
+                        />
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+
+         {/* 6. STEPS (ONBOARDING) */}
          <section className="id-steps reveal reveal-up">
             <div className="steps-container">
                <div className="step-item reveal reveal-scale delay-100">
