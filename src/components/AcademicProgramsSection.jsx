@@ -140,7 +140,8 @@ const AcademicProgramsSection = () => {
                 <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>
                   <img 
                     src={getProgramImage(p.name)} 
-                    alt={p.name} 
+                    alt={`Programa Académico: ${p.name} - UniSalamanca`} 
+                    loading="lazy"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                   />
                   <div style={{

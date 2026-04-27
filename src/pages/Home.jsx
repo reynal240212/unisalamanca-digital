@@ -27,14 +27,31 @@ const Home = () => {
    ];
 
    useEffect(() => {
+      document.title = "UniSalamanca | Inicio - Identidad Digital Universitaria";
       const interval = setInterval(() => {
          setCurrentBg((prev) => (prev + 1) % heroImages.length);
       }, 6000);
       return () => clearInterval(interval);
    }, []);
 
+   const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "UniSalamanca",
+      "url": window.location.origin,
+      "logo": `${window.location.origin}/images/escudo.png`,
+      "description": "Institución de educación superior enfocada en la excelencia académica y transformación digital.",
+      "address": {
+         "@type": "PostalAddress",
+         "addressCountry": "CO"
+      }
+   };
+
    return (
       <div className="official-presentation">
+         <script type="application/ld+json">
+            {JSON.stringify(jsonLd)}
+         </script>
          <Header />
 
          {/* Sub-Header Bar */}
@@ -42,9 +59,9 @@ const Home = () => {
             <div className="sub-header-content-premium">
                <div className="sub-header-text">
                   <span className="id-badge-small">NUEVO SIAU {new Date().getFullYear()}</span>
-                  <h1 className="sub-header-title">Ecosistema Digital <span className="siau-acronym"><span className="si">SI</span><span className="au">AU</span></span></h1>
+                  <h1 className="sub-header-title">Identidad Digital <span className="siau-acronym">UniSalamanca</span></h1>
                   <p className="sub-header-desc">
-                     <b>Sistema Integral de Administración Universitaria</b> — La plataforma líder de identidad y servicios para toda la comunidad UniSalamanca.
+                     <b>SIAU (Sistema Integral de Administración Universitaria)</b> — La plataforma oficial de servicios digitales para estudiantes, egresados y docentes.
                   </p>
                </div>
                <div className="sub-header-actions">
@@ -53,9 +70,9 @@ const Home = () => {
                   </button>
                   <button 
                      className="btn-id-secondary-small"
-                     onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
+                     onClick={() => document.getElementById('programas').scrollIntoView({ behavior: 'smooth' })}
                   >
-                     EXPLORAR
+                     VER PROGRAMAS
                   </button>
                </div>
             </div>
@@ -64,7 +81,7 @@ const Home = () => {
          {/* Presentation Hero */}
          <section className="id-hero" style={{ 
             backgroundImage: `url(${heroImages[currentBg]})`
-         }}>
+         }} aria-label="Banner Institucional">
             <div className="hero-overlay"></div>
             
             <div className="hero-grid">
@@ -94,7 +111,7 @@ const Home = () => {
                         cursor: 'pointer',
                         transition: 'all 0.3s ease'
                      }}
-                     title={`Slide ${index + 1}`}
+                     title={`Banner UniSalamanca ${index + 1}`}
                   />
                ))}
             </div>
@@ -103,25 +120,25 @@ const Home = () => {
          {/* Features Presentation */}
          <section id="features" className="id-features">
             <div className="features-intro">
-               <h2>Tecnología al Servicio de tu Seguridad</h2>
-               <p>Descubre los beneficios de portar tu identidad digital institucional.</p>
+               <h2>Innovación en Educación y Seguridad Digital</h2>
+               <p>Descubre los beneficios de portar tu identidad digital institucional UniSalamanca.</p>
             </div>
 
             <div className="features-official-grid">
                <div className="off-feat-card">
                   <div className="off-icon cyan"><QrCode size={30} /></div>
-                  <h3>QR Dinámico</h3>
-                  <p>Código encriptado que se renueva cada 30 segundos para evitar duplicados.</p>
+                  <h3>Carnetización con QR Dinámico</h3>
+                  <p>Acceso seguro mediante un código encriptado que se renueva cada 30 segundos.</p>
                </div>
                <div className="off-feat-card">
                   <div className="off-icon navy"><ShieldCheck size={30} /></div>
-                  <h3>Validación Instantánea</h3>
-                  <p>Verificación rápida en portería para un acceso fluido al campus.</p>
+                  <h3>Control de Acceso al Campus</h3>
+                  <p>Verificación instantánea en portería para una entrada fluida y segura al campus universitario.</p>
                </div>
                <div className="off-feat-card">
                   <div className="off-icon green"><UserCheck size={30} /></div>
-                  <h3>Ley 1581 (Habeas Data)</h3>
-                  <p>Tus datos protegidos bajo los más altos estándares legales de Colombia.</p>
+                  <h3>Protección de Datos Personales</h3>
+                  <p>Gestión de información bajo la Ley 1581 (Habeas Data) y estándares de seguridad robustos.</p>
                </div>
             </div>
          </section>
@@ -129,63 +146,63 @@ const Home = () => {
          {/* Roles Section */}
          <section className="id-roles">
             <div className="roles-intro">
-               <span className="id-badge-small">NUESTRA COMUNIDAD</span>
-               <h2>Un Espacio para Todos</h2>
-               <p>Nuestra identidad digital se adapta a cada miembro de la familia UniSalamanca.</p>
+               <span className="id-badge-small">COMUNIDAD UNIVERSITARIA</span>
+               <h2>Servicios Digitales para Toda la Comunidad</h2>
+               <p>Nuestra plataforma SIAU centraliza servicios para cada perfil de la familia UniSalamanca.</p>
             </div>
             <div className="roles-grid">
                <div className="role-card">
                   <div className="role-icon-box"><GraduationCap size={40} /></div>
-                  <h4>Estudiantes</h4>
-                  <p>Acceso rápido al campus, carnet digital siempre a mano y servicios de bienestar.</p>
+                  <h3>Portal para Estudiantes</h3>
+                  <p>Acceso al carnet digital, calificaciones, horarios y servicios de bienestar estudiantil.</p>
                </div>
                <div className="role-card">
                   <div className="role-icon-box"><BookOpen size={40} /></div>
-                  <h4>Docentes</h4>
-                  <p>Gestión académica simplificada y validación de identidad en procesos institucionales.</p>
+                  <h3>Portal para Docentes</h3>
+                  <p>Gestión académica simplificada, registro de asistencia y herramientas pedagógicas.</p>
                </div>
                <div className="role-card">
                   <div className="role-icon-box"><Briefcase size={40} /></div>
-                  <h4>Administrativos</h4>
-                  <p>Herramientas de control eficientes y entorno digital seguro para la gestión diaria.</p>
+                  <h3>Gestión Administrativa</h3>
+                  <p>Control de procesos internos y herramientas de seguridad para la administración universitaria.</p>
                </div>
                <div className="role-card">
                   <div className="role-icon-box"><Users size={40} /></div>
-                  <h4>Egresados</h4>
-                  <p>Mantén tu vínculo con la universidad y accede a beneficios exclusivos post-grado.</p>
+                  <h3>Red de Egresados</h3>
+                  <p>Vínculo permanente con la universidad y acceso a beneficios exclusivos para graduados.</p>
                </div>
             </div>
          </section>
 
-         {/* NEW: Student Hub Section (Inspired by unisalamanca.edu.co) */}
+         {/* NEW: Student Hub Section */}
          <section id="estudiantes" className="id-student-hub" style={{ 
-           background: 'linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%)',
-           padding: '100px 20px',
-           borderRadius: '60px 60px 0 0',
-           marginTop: '-40px',
-           position: 'relative',
-           zIndex: 5
+            background: 'linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%)',
+            padding: '100px 20px',
+            borderRadius: '60px 60px 0 0',
+            marginTop: '-40px',
+            position: 'relative',
+            zIndex: 5
          }}>
             <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
                <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-                  <span className="id-badge-small" style={{ background: '#e0f2fe', color: '#0369a1' }}>PORTAL ESTUDIANTIL</span>
-                  <h2 style={{ fontSize: '2.8rem', fontWeight: 900, color: '#0f172a', marginBottom: '20px' }}>Tu Vida Universitaria en un Solo Lugar</h2>
+                  <span className="id-badge-small" style={{ background: '#e0f2fe', color: '#0369a1' }}>RECURSOS DIGITALES</span>
+                  <h2 style={{ fontSize: '2.8rem', fontWeight: 900, color: '#0f172a', marginBottom: '20px' }}>Tu Ecosistema de Aprendizaje</h2>
                   <p style={{ color: '#64748b', fontSize: '1.1rem', maxWidth: '700px', margin: '0 auto' }}>
-                     Accesos rápidos a las herramientas y servicios que impulsan tu formación académica.
+                     Enlaces directos a las plataformas académicas que impulsan tu formación en UniSalamanca.
                   </p>
                </div>
 
                {/* Quick Access Bar */}
-               <div style={{ 
+               <nav style={{ 
                  display: 'flex', 
                  flexWrap: 'wrap', 
                  justifyContent: 'center', 
                  gap: '12px', 
                  marginBottom: '60px' 
-               }}>
+               }} aria-label="Accesos rápidos">
                   {[
                     { label: 'PQRSF', icon: <UserCheck size={18} />, onClick: () => navigate('/pqrsf') },
-                    { label: 'Pagos', icon: <CreditCard size={18} />, onClick: () => navigate('/pagos') },
+                    { label: 'Pagos en Línea', icon: <CreditCard size={18} />, onClick: () => navigate('/pagos') },
                     { label: 'FAQ', icon: <ShieldCheck size={18} />, onClick: () => navigate('/preguntas-frecuentes') },
                     { label: 'Reglamento', icon: <BookOpen size={18} />, onClick: () => window.open('https://unisalamanca.edu.co/documentos/NEW%20REGLAMENTO%20ESTUDIANTIL.pdf', '_blank') },
                     { label: 'Biblioteca', icon: <GraduationCap size={18} />, onClick: () => navigate('/biblioteca') },
@@ -203,7 +220,7 @@ const Home = () => {
                       {item.icon} {item.label}
                     </button>
                   ))}
-               </div>
+               </nav>
 
                {/* Platforms Grid */}
                <div style={{ 
@@ -212,14 +229,14 @@ const Home = () => {
                  gap: '24px' 
                }}>
                   {[
-                    { title: 'Q10 Académico', desc: 'Horarios, procesos académicos y estado financiero.', img: 'https://unisalamanca.edu.co/assets/Q10-CQvQK7aj.png' },
-                    { title: 'Moodle Virtual', desc: 'Aulas virtuales, contenidos de clase y calificaciones.', img: 'https://unisalamanca.edu.co/assets/moodle-brNoss2L.png' },
-                    { title: 'Teams & Comunidades', desc: 'Clases sincrónicas y colaboración en tiempo real.', img: 'https://unisalamanca.edu.co/assets/Teams-Bei1SR1r.png' },
-                    { title: 'Office 365', desc: 'Correo institucional y herramientas de productividad.', img: 'https://unisalamanca.edu.co/assets/Microsotf%20365-DwOksrB0.png' },
-                    { title: 'Azure & DevTools', desc: 'Servicios en la nube y software de desarrollo.', img: 'https://unisalamanca.edu.co/assets/Logo%20Azure-C6PMMPDU.png' },
-                    { title: 'Autodesk Education', desc: 'Software profesional de diseño y arquitectura.', img: 'https://unisalamanca.edu.co/assets/autodesk-CLpro_QZ.png' }
+                    { title: 'Q10 Académico', desc: 'Gestión de horarios, notas y estado financiero estudiantil.', img: 'https://unisalamanca.edu.co/assets/Q10-CQvQK7aj.png' },
+                    { title: 'Moodle Virtual', desc: 'Acceso a aulas virtuales, foros y material de estudio.', img: 'https://unisalamanca.edu.co/assets/moodle-brNoss2L.png' },
+                    { title: 'Microsoft Teams', desc: 'Plataforma para clases virtuales y trabajo colaborativo.', img: 'https://unisalamanca.edu.co/assets/Teams-Bei1SR1r.png' },
+                    { title: 'Office 365 Educación', desc: 'Herramientas de productividad y correo institucional.', img: 'https://unisalamanca.edu.co/assets/Microsotf%20365-DwOksrB0.png' },
+                    { title: 'Azure Cloud', desc: 'Servicios en la nube para proyectos de ingeniería y TI.', img: 'https://unisalamanca.edu.co/assets/Logo%20Azure-C6PMMPDU.png' },
+                    { title: 'Autodesk Education', desc: 'Software de diseño profesional para estudiantes.', img: 'https://unisalamanca.edu.co/assets/autodesk-CLpro_QZ.png' }
                   ].map(plat => (
-                    <div key={plat.title} className="off-feat-card" style={{ 
+                    <article key={plat.title} className="off-feat-card" style={{ 
                       display: 'flex', flexDirection: 'column', height: '100%', 
                       border: '1px solid #f1f5f9', background: 'white',
                       transition: 'all 0.3s ease'
@@ -231,11 +248,12 @@ const Home = () => {
                       }}>
                         <img 
                           src={plat.img} 
-                          alt={plat.title} 
+                          alt={`Plataforma ${plat.title}`} 
+                          loading="lazy"
                           style={{ 
                             maxHeight: '80px', 
                             objectFit: 'contain',
-                            transform: plat.title === 'Office 365' ? 'scale(2.0)' : 'none',
+                            transform: plat.title.includes('Office') ? 'scale(2.0)' : 'none',
                             transformOrigin: 'left center'
                           }} 
                         />
@@ -248,9 +266,9 @@ const Home = () => {
                         display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem',
                         padding: 0
                       }}>
-                        ACCEDER AHORA <ChevronRight size={16} />
+                        IR A LA PLATAFORMA <ChevronRight size={16} />
                       </button>
-                    </div>
+                    </article>
                   ))}
                </div>
             </div>
@@ -264,18 +282,18 @@ const Home = () => {
             <div className="steps-container">
                <div className="step-item">
                   <div className="step-num">01</div>
-                  <h4>Inicia Sesión</h4>
-                  <p>Usa tus credenciales de correo institucional.</p>
+                  <h3>Autenticación</h3>
+                  <p>Inicia sesión con tu correo institucional UniSalamanca.</p>
                </div>
                <div className="step-item">
                   <div className="step-num">02</div>
-                  <h4>Completa tu Perfil</h4>
-                  <p>Sube tu foto y verifica tus datos institucionales.</p>
+                  <h3>Actualización</h3>
+                  <p>Verifica tu programa académico y sube tu fotografía.</p>
                </div>
                <div className="step-item">
                   <div className="step-num">03</div>
-                  <h4>¡Listo para Usar!</h4>
-                  <p>Presenta tu QR en los puntos de acceso.</p>
+                  <h3>Validación</h3>
+                  <p>Obtén tu carnet digital con QR para ingreso al campus.</p>
                </div>
             </div>
          </section>
