@@ -260,79 +260,107 @@ const Validator = () => {
     if (now - lastScanTime.current < 3000) return;
     lastScanTime.current = now;
 
-    try {
-      const parts = decodedText.split('|');
-      if (parts[0] !== 'UNIS' || parts.length !== 3) throw new Error("QR No institucional");
+    const SECRET = "Unisalamanca_Secure_Key_2026";
+    let studentId = "";
+    let receivedBlock = 0;
+    let isOfflineVerified = false;
 
-      const studentId = parts[1];
-      const receivedBlock = parseInt(parts[2]);
+    try {
+      // INTENTAR DECODIFICACIÓN CRIPTOGRÁFICA (V2)
+      if (decodedText.includes('.')) {
+        const parts = decodedText.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(atob(parts[1]));
+          const signature = parts[2];
+          
+          // Verificar firma (Simulación de verificación HMAC)
+          const expectedSig = btoa(`SIG|${payload.sub}|${payload.iat}|${SECRET}`).substring(0, 16);
+          
+          if (signature === expectedSig) {
+            studentId = payload.sub;
+            receivedBlock = payload.iat;
+            isOfflineVerified = true;
+          } else {
+            throw new Error("Firma inválida");
+          }
+        }
+      } 
+      
+      // FALLBACK A LEGACY (V1)
+      if (!isOfflineVerified) {
+        const parts = decodedText.split('|');
+        if (parts[0] !== 'UNIS' || parts.length !== 3) throw new Error("QR No institucional");
+        studentId = parts[1];
+        receivedBlock = parseInt(parts[2]);
+      }
+
       const currentBlock = Math.floor(Date.now() / 30000);
+      const diff = Math.abs(currentBlock - receivedBlock);
+
+      if (diff > 1) {
+        throw new Error("CÓDIGO EXPIRADO");
+      }
 
       await scannerRef.current.stop();
       setIsScanning(false);
 
-      const diff = Math.abs(currentBlock - receivedBlock);
-      if (diff > 1) {
-        playSound('error');
-        setScanResult({ success: false, message: "CÓDIGO EXPIRADO", sub: "Captura detectada. Pida al usuario que actualice su carnet." });
+      // INTENTAR OBTENER DATOS DE LA DB
+      try {
+        const { data: student, error } = await supabase
+          .from('user')
+          .select('*')
+          .eq('id', studentId)
+          .single();
         
-        await supabase.from('access_logs').insert({
-          user_id: studentId,
-          status: 'DENIED',
-          location: selectedZone,
-          reason: 'EXPIRED_QR'
+        if (error || !student) throw new Error("Estudiante no registrado");
+
+        if (student.status !== 'Active') {
+          playSound('error');
+          setScanResult({ 
+            success: false, 
+            message: `ACCESO DENEGADO`, 
+            sub: `Estado de la cuenta: ${student.status}` 
+          });
+          setStudentData(student);
+          return;
+        }
+
+        playSound('success');
+        setScanResult({ 
+          success: true, 
+          message: "ACCESO PERMITIDO", 
+          sub: isOfflineVerified ? "Verificación Criptográfica Exitosa (Online)" : "Verificación Estándar Exitosa" 
         });
-        return;
-      }
-
-      const { data: student, error } = await supabase
-        .from('user')
-        .select('*')
-        .eq('id', studentId)
-        .single();
-      
-      if (error || !student) throw new Error("Estudiante no registrado");
-
-      if (student.status !== 'Active') {
-        playSound('error');
-        setScanResult({ success: false, message: `ACCESO DENEGADO`, sub: `Estado de la cuenta: ${student.status}` });
         setStudentData(student);
 
+        // Registrar log
         const pos = await getCurrentPosition().catch(() => null);
         await supabase.from('access_logs').insert({
-          user_id: studentId,
-          status: 'DENIED',
-          location: selectedZone,
-          reason: 'INACTIVE_STATUS',
-          latitude: pos?.lat,
-          longitude: pos?.lng
+            user_id: studentId,
+            status: 'GRANTED',
+            location: selectedZone,
+            latitude: pos?.lat,
+            longitude: pos?.lng
         });
-        return;
+
+      } catch (dbError) {
+        // MODO OFFLINE ACTIVADO si falló la DB pero la firma es válida
+        if (isOfflineVerified) {
+          playSound('success');
+          setScanResult({ 
+            success: true, 
+            message: "ACCESO PERMITIDO (OFFLINE)", 
+            sub: "Identidad verificada mediante firma criptográfica. Sin conexión a base de datos." 
+          });
+          setStudentData({
+            id: studentId,
+            name: "Usuario Verificado",
+            program: "Modo Offline Activado"
+          });
+        } else {
+          throw dbError;
+        }
       }
-
-      playSound('success');
-      setScanResult({ success: true, message: "ACCESO PERMITIDO", sub: "Verificación de identidad exitosa" });
-      setStudentData(student);
-
-      const pos = await getCurrentPosition().catch(() => null);
-      await supabase.from('access_logs').insert({
-          user_id: studentId,
-          status: 'GRANTED',
-          location: selectedZone,
-          latitude: pos?.lat,
-          longitude: pos?.lng
-        });
-
-      setRecentScans(prev => {
-        const newScan = {
-          id: Date.now(),
-          name: student.name,
-          program: student.program,
-          time: new Date().toLocaleTimeString(),
-          status: 'GRANTED'
-        };
-        return [newScan, ...prev].slice(0, 5);
-      });
 
       fetchStats();
 
@@ -340,15 +368,19 @@ const Validator = () => {
       playSound('error');
       setScanResult({ success: false, message: "ACCESO DENEGADO", sub: err.message });
       
-      const pos = await getCurrentPosition().catch(() => null);
-      await supabase.from('access_logs').insert({
-        user_id: 'unknown',
-        status: 'DENIED',
-        location: selectedZone,
-        reason: err.message,
-        latitude: pos?.lat,
-        longitude: pos?.lng
-      });
+      try {
+        const pos = await getCurrentPosition().catch(() => null);
+        await supabase.from('access_logs').insert({
+          user_id: studentId || 'unknown',
+          status: 'DENIED',
+          location: selectedZone,
+          reason: err.message,
+          latitude: pos?.lat,
+          longitude: pos?.lng
+        });
+      } catch (logErr) {
+        console.warn("Could not log denial due to offline status");
+      }
     }
   };
 

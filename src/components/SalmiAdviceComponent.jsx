@@ -41,22 +41,46 @@ const SalmiAdviceComponent = ({ student, characterization }) => {
     setDisplayedText('');
     
     try {
-      // Prompt dinámico basado en contexto real
-      const prompt = `Genera un consejo muy corto (máximo 140 caracteres) para enviarle a ${(student?.name || 'un estudiante').split(' ')[0]}. 
-      Contexto: Estudia ${student?.program || 'su carrera'}, semestre ${student?.semester || 'actual'}. Promedio: ${student?.gpa || 'N/A'}. 
-      ${characterization?.is_working === 'Si' ? 'Dato: Trabaja y estudia al tiempo.' : ''}
-      El tono debe ser motivacional pero profesional. Solo devuelve el consejo, sin introducciones.`;
+      // 1. OBTENER DATOS PARA PROACTIVIDAD
+      const [logs, events] = await Promise.all([
+        supabase.from('access_logs')
+          .select('*')
+          .eq('user_id', student.id)
+          .eq('status', 'GRANTED')
+          .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+        supabase.from('campus_events')
+          .select('*')
+          .gte('start_time', new Date().toISOString())
+          .order('start_time', { ascending: true })
+          .limit(1)
+      ]);
+
+      const attendanceCount = logs.data?.length || 0;
+      const nextEvent = events.data?.[0];
+
+      // 2. CONSTRUIR PROMPT PROACTIVO
+      let proactiveContext = "";
+      if (attendanceCount < 2) {
+        proactiveContext = "ALERTA: El estudiante ha venido poco esta semana al campus. Sé empático y motívalo a volver.";
+      } else if (nextEvent) {
+        proactiveContext = `SUGERENCIA: Recomienda el evento '${nextEvent.title}' que será en ${nextEvent.location}.`;
+      }
+
+      const prompt = `Actúa como Salmi, la mascota de UniSalamanca. Genera un consejo muy corto (máximo 140 caracteres).
+      Estudiante: ${(student?.name || 'Estudiante').split(' ')[0]}. 
+      Programa: ${student?.program}. Promedio: ${student?.gpa}.
+      ${proactiveContext}
+      Solo devuelve el consejo, sin introducciones.`;
 
       const { data, error } = await supabase.functions.invoke('salmi-ai', {
         body: { message: prompt }
       });
 
       if (error || !data) throw new Error("IA offline");
-      
       setAdvice(data.response);
+
     } catch (err) {
       console.warn("Salmi AI Fallback:", err);
-      // Fallback a lógica local si falla la IA
       const newAdvice = getContextualAdvice();
       setAdvice(newAdvice);
     }

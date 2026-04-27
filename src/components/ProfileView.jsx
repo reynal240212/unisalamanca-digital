@@ -113,6 +113,7 @@ const ProfileView = ({
          <SalmiAdviceComponent student={user} characterization={characterization} />
       </div>
 
+
       {/* 3. QUICK INSIGHTS (NEXT CLASS) */}
       <div className="whatsapp-quick-insight" onClick={() => setActiveTab('horario')}>
          <div className="insight-icon">
