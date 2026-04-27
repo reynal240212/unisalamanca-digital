@@ -117,64 +117,10 @@ const Home = () => {
             </div>
          </section>
 
-         {/* Features Presentation */}
-         <section id="features" className="id-features">
-            <div className="features-intro">
-               <h2>Innovación en Educación y Seguridad Digital</h2>
-               <p>Descubre los beneficios de portar tu identidad digital institucional UniSalamanca.</p>
-            </div>
+         {/* 1. ACADEMIC PROGRAMS (MOST RELEVANT FOR ASPIRANTS) */}
+         <AcademicProgramsSection />
 
-            <div className="features-official-grid">
-               <div className="off-feat-card">
-                  <div className="off-icon cyan"><QrCode size={30} /></div>
-                  <h3>Carnetización con QR Dinámico</h3>
-                  <p>Acceso seguro mediante un código encriptado que se renueva cada 30 segundos.</p>
-               </div>
-               <div className="off-feat-card">
-                  <div className="off-icon navy"><ShieldCheck size={30} /></div>
-                  <h3>Control de Acceso al Campus</h3>
-                  <p>Verificación instantánea en portería para una entrada fluida y segura al campus universitario.</p>
-               </div>
-               <div className="off-feat-card">
-                  <div className="off-icon green"><UserCheck size={30} /></div>
-                  <h3>Protección de Datos Personales</h3>
-                  <p>Gestión de información bajo la Ley 1581 (Habeas Data) y estándares de seguridad robustos.</p>
-               </div>
-            </div>
-         </section>
-
-         {/* Roles Section */}
-         <section className="id-roles">
-            <div className="roles-intro">
-               <span className="id-badge-small">COMUNIDAD UNIVERSITARIA</span>
-               <h2>Servicios Digitales para Toda la Comunidad</h2>
-               <p>Nuestra plataforma SIAU centraliza servicios para cada perfil de la familia UniSalamanca.</p>
-            </div>
-            <div className="roles-grid">
-               <div className="role-card">
-                  <div className="role-icon-box"><GraduationCap size={40} /></div>
-                  <h3>Portal para Estudiantes</h3>
-                  <p>Acceso al carnet digital, calificaciones, horarios y servicios de bienestar estudiantil.</p>
-               </div>
-               <div className="role-card">
-                  <div className="role-icon-box"><BookOpen size={40} /></div>
-                  <h3>Portal para Docentes</h3>
-                  <p>Gestión académica simplificada, registro de asistencia y herramientas pedagógicas.</p>
-               </div>
-               <div className="role-card">
-                  <div className="role-icon-box"><Briefcase size={40} /></div>
-                  <h3>Gestión Administrativa</h3>
-                  <p>Control de procesos internos y herramientas de seguridad para la administración universitaria.</p>
-               </div>
-               <div className="role-card">
-                  <div className="role-icon-box"><Users size={40} /></div>
-                  <h3>Red de Egresados</h3>
-                  <p>Vínculo permanente con la universidad y acceso a beneficios exclusivos para graduados.</p>
-               </div>
-            </div>
-         </section>
-
-         {/* NEW: Student Hub Section */}
+         {/* 2. STUDENT HUB (MOST RELEVANT FOR CURRENT STUDENTS) */}
          <section id="estudiantes" className="id-student-hub" style={{ 
             background: 'linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%)',
             padding: '100px 20px',
@@ -274,10 +220,64 @@ const Home = () => {
             </div>
          </section>
 
-         {/* Academic Programs Section */}
-         <AcademicProgramsSection />
+         {/* 3. TECHNOLOGY & SECURITY (FEATURES) */}
+         <section id="features" className="id-features">
+            <div className="features-intro">
+               <h2>Innovación en Educación y Seguridad Digital</h2>
+               <p>Descubre los beneficios de portar tu identidad digital institucional UniSalamanca.</p>
+            </div>
 
-         {/* Steps Section */}
+            <div className="features-official-grid">
+               <div className="off-feat-card">
+                  <div className="off-icon cyan"><QrCode size={30} /></div>
+                  <h3>Carnetización con QR Dinámico</h3>
+                  <p>Acceso seguro mediante un código encriptado que se renueva cada 30 segundos.</p>
+               </div>
+               <div className="off-feat-card">
+                  <div className="off-icon navy"><ShieldCheck size={30} /></div>
+                  <h3>Control de Acceso al Campus</h3>
+                  <p>Verificación instantánea en portería para una entrada fluida y segura al campus universitario.</p>
+               </div>
+               <div className="off-feat-card">
+                  <div className="off-icon green"><UserCheck size={30} /></div>
+                  <h3>Protección de Datos Personales</h3>
+                  <p>Gestión de información bajo la Ley 1581 (Habeas Data) y estándares de seguridad robustos.</p>
+               </div>
+            </div>
+         </section>
+
+         {/* 4. ROLES & COMMUNITY */}
+         <section className="id-roles">
+            <div className="roles-intro">
+               <span className="id-badge-small">COMUNIDAD UNIVERSITARIA</span>
+               <h2>Servicios Digitales para Toda la Comunidad</h2>
+               <p>Nuestra plataforma SIAU centraliza servicios para cada perfil de la familia UniSalamanca.</p>
+            </div>
+            <div className="roles-grid">
+               <div className="role-card">
+                  <div className="role-icon-box"><GraduationCap size={40} /></div>
+                  <h3>Portal para Estudiantes</h3>
+                  <p>Acceso al carnet digital, calificaciones, horarios y servicios de bienestar estudiantil.</p>
+               </div>
+               <div className="role-card">
+                  <div className="role-icon-box"><BookOpen size={40} /></div>
+                  <h3>Portal para Docentes</h3>
+                  <p>Gestión académica simplificada, registro de asistencia y herramientas pedagógicas.</p>
+               </div>
+               <div className="role-card">
+                  <div className="role-icon-box"><Briefcase size={40} /></div>
+                  <h3>Gestión Administrativa</h3>
+                  <p>Control de procesos internos y herramientas de seguridad para la administración universitaria.</p>
+               </div>
+               <div className="role-card">
+                  <div className="role-icon-box"><Users size={40} /></div>
+                  <h3>Red de Egresados</h3>
+                  <p>Vínculo permanente con la universidad y acceso a beneficios exclusivos para graduados.</p>
+               </div>
+            </div>
+         </section>
+
+         {/* 5. STEPS (ONBOARDING) */}
          <section className="id-steps">
             <div className="steps-container">
                <div className="step-item">
