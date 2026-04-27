@@ -339,7 +339,7 @@ const Home = () => {
                            Contamos con aliados estratégicos en distintas ciudades para acompañarte en tu proceso académico.
                         </p>
                         <button 
-                           onClick={() => navigate('/sedes')}
+                           onClick={() => navigate('/convenios-cat')}
                            className="btn-id-primary-small"
                            style={{ width: 'fit-content', padding: '14px 30px', borderRadius: '50px' }}
                         >

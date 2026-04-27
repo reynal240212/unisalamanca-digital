@@ -21,6 +21,7 @@ import AcademicPrograms from './pages/AcademicPrograms';
 import PQRSF from './pages/PQRSF';
 import Payments from './pages/Payments';
 import FAQ from './pages/FAQ';
+import ConveniosCAT from './pages/ConveniosCAT';
 
 
 const ACADEMIC_ROLES = ['COORD_ACADEMICO', 'DIRECTOR_PROGRAMA', 'ADMIN'];
@@ -137,6 +138,7 @@ function App() {
           <Route path="/pqrsf" element={<PQRSF />} />
           <Route path="/pagos" element={<Payments />} />
           <Route path="/preguntas-frecuentes" element={<FAQ />} />
+          <Route path="/convenios-cat" element={<ConveniosCAT />} />
 
 
           <Route path="*" element={<Navigate to="/" replace />} />
