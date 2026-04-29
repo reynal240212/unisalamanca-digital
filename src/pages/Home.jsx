@@ -151,7 +151,7 @@ const Home = () => {
             <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
                <div style={{ textAlign: 'center', marginBottom: '60px' }}>
                   <span className="id-badge-small" style={{ background: '#e0f2fe', color: '#0369a1' }}>RECURSOS DIGITALES</span>
-                  <h2 style={{ fontSize: '2.8rem', fontWeight: 900, color: '#0f172a', marginBottom: '20px' }}>Tu Ecosistema de Aprendizaje</h2>
+                  <h2 className="home-section-title" style={{ color: '#0f172a', marginBottom: '20px' }}>Tu Ecosistema de Aprendizaje</h2>
                   <p style={{ color: '#64748b', fontSize: '1.1rem', maxWidth: '700px', margin: '0 auto' }}>
                      Enlaces directos a las plataformas académicas que impulsan tu formación en UniSalamanca.
                   </p>
@@ -306,13 +306,7 @@ const Home = () => {
                   alignItems: 'center' 
                }}>
                   <div className="reveal reveal-left delay-100" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                     <h2 style={{ 
-                        fontSize: '2.8rem', 
-                        fontWeight: 900, 
-                        color: 'var(--primary)', 
-                        lineHeight: 1.1,
-                        margin: 0
-                     }}>
+                     <h2 className="home-section-title" style={{ color: 'var(--primary)' }}>
                         Convenios y puntos de atención aliados
                      </h2>
                      <p style={{ 

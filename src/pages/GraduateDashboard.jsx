@@ -93,7 +93,7 @@ const GraduateDashboard = () => {
                }} />
              </div>
 
-             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+             <div className="responsive-grid-2" style={{ gap: '24px' }}>
                 <div className="kpi-card" style={{ background: 'white', padding: '30px', borderRadius: '24px' }}>
                    <div className="kpi-icon-box" style={{ background: '#f0fdf4', color: '#16a34a' }}>
                      <Award size={24} />
@@ -117,7 +117,7 @@ const GraduateDashboard = () => {
       case 'empleo':
         return (
           <div className="section-reveal" style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h2 style={{ fontWeight: 900, color: '#0f172a', margin: 0 }}>Oportunidades de Carrera</h2>
               <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '6px 12px', borderRadius: '100px', fontSize: '0.8rem', fontWeight: 700 }}>
                 {MOCK_JOBS.length} Vacantes Activas
@@ -125,7 +125,7 @@ const GraduateDashboard = () => {
             </div>
             <div style={{ display: 'grid', gap: '16px' }}>
               {MOCK_JOBS.map(job => (
-                <div key={job.id} className="kpi-card" style={{ background: 'white', padding: '24px', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.3s ease' }}>
+                <div key={job.id} className="kpi-card dashboard-header-flex" style={{ background: 'white', padding: '24px', borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.3s ease' }}>
                   <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                     <div style={{ width: '60px', height: '60px', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #f1f5f9' }}>
                       <Briefcase size={24} color="#94a3b8" />

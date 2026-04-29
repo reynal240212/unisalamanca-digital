@@ -176,7 +176,7 @@ const Login = () => {
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1.1rem', marginBottom: '10px', fontWeight: 500 }}>
             ¡Bienvenido, <span style={{ color: 'var(--secondary)', fontWeight: 700 }}>{user?.name.split(' ')[0]}</span>!
           </p>
-          <h1 style={{ color: 'white', fontSize: '3.5rem', fontWeight: 900, marginBottom: '60px', letterSpacing: '-1px', lineHeight: 1.1 }}>
+          <h1 className="profile-selector-title">
             ¿Con qué perfil deseas ingresar hoy?
           </h1>
           
@@ -321,6 +321,54 @@ const Login = () => {
             text-transform: capitalize;
             transition: all 0.3s;
             letter-spacing: -0.5px;
+          }
+          
+          .profile-selector-title {
+            color: white; 
+            font-size: 3.5rem; 
+            font-weight: 900; 
+            marginBottom: 60px; 
+            letter-spacing: -1px; 
+            line-height: 1.1;
+          }
+
+          @media (max-width: 768px) {
+            .profile-selector-title {
+              font-size: 2.2rem;
+              margin-bottom: 40px;
+            }
+            .profiles-grid {
+              gap: 30px;
+            }
+            .profile-avatar-circle {
+              width: 140px;
+              height: 140px;
+            }
+            .profile-salmi-img {
+              width: 110px;
+              height: 110px;
+            }
+            .profile-label {
+              font-size: 1.1rem;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .profile-selector-title {
+              font-size: 1.8rem;
+              margin-bottom: 30px;
+            }
+            .profiles-grid {
+              gap: 20px;
+            }
+            .profile-avatar-circle {
+              width: 120px;
+              height: 120px;
+            }
+            .profile-salmi-img {
+              width: 90px;
+              height: 90px;
+            }
           }
         `}</style>
       </div>

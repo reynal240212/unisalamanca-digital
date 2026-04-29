@@ -35,12 +35,12 @@ const NewApplicantModal = ({ onClose, onSaved }) => {
   return (
     <div className="premium-modal-overlay">
       <div className="premium-modal-content" style={{ maxWidth: '560px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2 style={{ fontWeight: 900, fontSize: '1.3rem', color: '#1e293b', margin: 0 }}>Nuevo Aspirante</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} color="#94a3b8" /></button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="responsive-grid-2" style={{ gap: '16px' }}>
             <div style={{ gridColumn: 'span 2' }}>
               <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Nombre Completo *</label>
               <input className="input-premium" style={{ width: '100%' }} required value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />

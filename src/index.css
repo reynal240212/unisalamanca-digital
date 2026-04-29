@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap');
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 :root {
   --primary: #2A2266;
   --primary-dark: #1e184d;
@@ -371,6 +383,8 @@ body {
   display: flex;
   gap: 15px;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .btn-id-primary-small {
@@ -426,6 +440,69 @@ body {
   .id-hero {
     padding: 20px 0; /* Reducir padding lateral para banners */
     text-align: center;
+  }
+  .home-section-title {
+    font-size: 1.8rem !important;
+  }
+}
+
+.home-section-title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.id-steps {
+  padding: 100px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.steps-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.step-item {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 24px;
+  text-align: center;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+}
+
+.step-num {
+  width: 60px;
+  height: 60px;
+  background: var(--secondary);
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 900;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.step-item h3 {
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin-bottom: 15px;
+  font-weight: 800;
+}
+
+.step-item p {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .id-steps {
+    padding: 60px 20px;
   }
 }
 
@@ -1358,7 +1435,40 @@ body {
 
 @media (max-width: 768px) {
   .login-form-side {
-    padding: 40px 30px;
+    padding: 40px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form-side {
+    padding: 30px 15px;
+  }
+  
+  .portal-switcher-container {
+    padding: 4px;
+    margin-left: -5px;
+    margin-right: -5px;
+    flex-wrap: wrap;
+    border-radius: 14px;
+  }
+  
+  .portal-tab {
+    padding: 8px 6px;
+    font-size: 0.65rem;
+    gap: 4px;
+  }
+  
+  .portal-tab svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .form-header .siau-acronym {
+    font-size: 1rem !important;
+  }
+  
+  .form-title {
+    font-size: 1.2rem !important;
   }
 }
 
@@ -3518,8 +3628,26 @@ body {
 
 @media (max-width: 480px) {
   .whatsapp-hero { padding: 30px 20px; }
-  .whatsapp-action-btn { padding: 8px 12px; font-size: 0.7rem; }
-  .whatsapp-hero-stats { padding: 12px; }
+  .whatsapp-action-btn { padding: 8px 12px; font-size: 0.7rem; flex: 1; justify-content: center; }
+  .whatsapp-hero-stats { padding: 12px; flex-wrap: wrap; gap: 15px; }
+  
+  .whatsapp-hero-top {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  .whatsapp-status-badges {
+    justify-content: center;
+  }
+  .whatsapp-name {
+    font-size: 1.3rem;
+  }
+  
+  .avatar-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .info-item-premium:hover .info-item-icon {
@@ -4119,5 +4247,132 @@ body {
   transform: translateY(-5px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.06);
   border-color: var(--secondary) !important;
+}
+
+/* ===== GLOBAL RESPONSIVE UTILITIES ===== */
+
+/* Grids Responsivos */
+.responsive-grid-2, .responsive-grid-3, .responsive-grid-4 {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 769px) {
+  .responsive-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .responsive-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .responsive-grid-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .responsive-grid-2, 
+  .responsive-grid-3, 
+  .responsive-grid-4,
+  .responsive-grid-asym {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .responsive-grid-3, .responsive-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablas Premium Responsivas */
+.premium-table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.premium-table {
+  min-width: 600px;
+}
+
+/* Modales Premium Responsivos */
+@media (max-width: 768px) {
+  .premium-modal-content {
+    width: 95% !important;
+    max-width: none !important;
+    padding: 24px !important;
+    margin: 10px auto !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+  
+  .dashboard-header-flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 15px !important;
+  }
+  
+  .dashboard-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  .modal-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .input-premium, .select-premium, .btn-primary-premium, .btn-secondary-premium {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+  
+  .flex-wrap-mobile {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+/* ===== RESPONSIVE DATA TABLE (STACK PATTERN) ===== */
+@media (max-width: 768px) {
+  .table-responsive-stack thead {
+    display: none;
+  }
+  
+  .table-responsive-stack tr {
+    display: block;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 16px;
+    background: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .table-responsive-stack td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+    text-align: right;
+  }
+  
+  .table-responsive-stack td:last-child {
+    border-bottom: none;
+  }
+  
+  .table-responsive-stack td::before {
+    content: attr(data-label);
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    margin-right: 15px;
+    text-align: left;
+    flex: 1;
+  }
+
+  .table-responsive-stack td > * {
+    flex: 2;
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 

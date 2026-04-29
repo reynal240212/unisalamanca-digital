@@ -291,7 +291,7 @@ const TeacherDashboard = () => {
           </div>
         ) : !selectedSubject ? (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#1e293b', margin: 0, letterSpacing: '-1px' }}>
                 Bienvenido, {user?.name?.split(' ')[0]} 👋
               </h1>
@@ -361,7 +361,7 @@ const TeacherDashboard = () => {
                     style={{ background: 'white', border: '1px solid #f1f5f9', borderRadius: '20px', padding: '24px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', boxShadow: 'var(--card-shadow)' }}
                     onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--premium-shadow-hover)'; }}
                     onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--card-shadow)'; }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                    <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                       <div className="kpi-icon-box" style={{ background: '#eef2ff', color: 'var(--primary)', marginBottom: 0 }}>
                         <BookOpen size={22} />
                       </div>
@@ -429,7 +429,7 @@ const TeacherDashboard = () => {
             </div>
 
             {/* Lista de estudiantes */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                <h3 style={{ fontWeight: 900, color: '#1e293b', fontSize: '1.2rem', margin: 0 }}>
                  <Users size={20} style={{ marginRight: '10px', verticalAlign: 'middle', color: 'var(--primary)' }} />
                  Estudiantes Matriculados
@@ -502,7 +502,7 @@ const TeacherDashboard = () => {
                 <h4 style={{ fontWeight: 900, color: '#1e293b', marginBottom: '24px' }}>Consolidado de Asistencia - {reportData.totalSessions} Sesiones Totales</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {reportData.stats.sort((a,b) => a.percent - b.percent).map(s => (
-                    <div key={s.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', alignItems: 'center', gap: '20px', padding: '12px', borderBottom: '1px solid #f8fafc' }}>
+                    <div key={s.id} className="responsive-grid-asym" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', alignItems: 'center', gap: '20px', padding: '12px', borderBottom: '1px solid #f8fafc' }}>
                       <div>
                         <p style={{ margin: 0, fontWeight: 800, color: s.percent < 80 ? '#ef4444' : '#1e293b' }}>{s.name}</p>
                         <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8' }}>{typeof s.program === 'object' ? s.program?.name : s.program}</p>

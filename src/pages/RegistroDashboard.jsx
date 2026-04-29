@@ -104,7 +104,7 @@ const RegistroDashboard = () => {
         ) : activeNav === 'curriculum' ? (
           <CurriculumView />
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1.6fr' : '1fr', gap: '32px' }}>
+          <div className={selected ? "responsive-grid-asym" : ""} style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1.6fr' : '1fr', gap: '32px' }}>
             {/* STUDENT LIST */}
             <div className="premium-table-container">
               <table className="premium-table">
@@ -208,7 +208,7 @@ const RegistroDashboard = () => {
                 <div style={{ padding: '32px' }}>
                   {activeTab === 'institucional' && (
                     <div className="section-reveal">
-                      <div className="grid-info-premium" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+                      <div className="grid-info-premium responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
                         {[
                           { label: 'Nombre Completo', value: selected.name },
                           { label: 'Documento de Identidad', value: selected.document_id || 'Pendiente' },
@@ -229,7 +229,7 @@ const RegistroDashboard = () => {
                   {activeTab === 'caracterizacion' && (
                     <div className="section-reveal">
                       {charData ? (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+                        <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
                             {[
                               { label: 'Fecha Nacimiento', value: charData.birth_date },
                               { label: 'Tipo de Sangre/RH', value: charData.blood_type },
@@ -263,7 +263,7 @@ const RegistroDashboard = () => {
                   {activeTab === 'bienestar' && (
                     <div className="section-reveal">
                       {charData ? (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+                        <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
                             {[
                               { label: 'Colegio de Procedencia', value: charData.previous_school },
                               { label: 'Origen de Fondos', value: charData.income_source },

@@ -61,7 +61,7 @@ const FinanceView = ({ user }) => {
       </div>
 
       {/* CONTENIDO PRINCIPAL: PLATAFORMA DE PAGOS */}
-      <div className="finance-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '24px', marginTop: '24px' }}>
+      <div className="finance-main-grid">
         
         {/* Lado Izquierdo: Estado de Cuenta (Simulado) */}
         <div className="glass-card" style={{ padding: '40px' }}>
@@ -149,6 +149,26 @@ const FinanceView = ({ user }) => {
           </div>
         </div>
       </div>
+      <style>{`
+        .finance-main-grid {
+          display: grid;
+          grid-template-columns: 1fr 350px;
+          gap: 24px;
+          margin-top: 24px;
+        }
+
+        @media (max-width: 992px) {
+          .finance-main-grid {
+            grid-template-columns: 1fr;
+          }
+          .payment-gateways-sidebar {
+            order: -1; /* Mostrar pasarelas arriba en móvil */
+          }
+          .welcome-title {
+            font-size: 1.4rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

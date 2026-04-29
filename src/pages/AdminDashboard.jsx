@@ -64,7 +64,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
   return (
     <div className="premium-modal-overlay">
       <div className="premium-modal-content">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
           <div>
             <h2 style={{ fontWeight: 900, fontSize: '1.4rem', color: '#1e293b' }}>{isEdit ? 'Editar Perfil' : 'Alta de Usuario'}</h2>
             <p style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{isEdit ? `ID: ${student.id?.substring(0, 8)}` : 'Nueva identidad digital'}</p>
@@ -103,7 +103,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
               </select>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <div className="modal-form-grid" style={{ gap: '15px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>Rol</label>
                 <select className="input-premium" value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))} style={{ width: '100%', background: 'white' }}>
@@ -168,7 +168,7 @@ const UserFormModal = ({ student, onClose, onSave }) => {
               })()}
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <div className="flex-wrap-mobile" style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
               <button type="button" onClick={onClose} className="btn-secondary-premium" style={{ flex: 1 }}>Cancelar</button>
               <button type="submit" className="btn-primary-premium" style={{ flex: 2 }}>{isEdit ? 'Actualizar' : 'Crear Usuario'}</button>
             </div>
@@ -217,7 +217,7 @@ const ConfirmationModal = ({ isOpen, config, onConfirm, onCancel }) => {
           {message}
         </div>
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="flex-wrap-mobile" style={{ display: 'flex', gap: '12px' }}>
           <button 
             onClick={onCancel} 
             className="btn-secondary-premium" 

@@ -100,7 +100,7 @@ const WellbeingView = ({ user }) => {
                     ></textarea>
                   </div>
                   
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                  <div className="responsive-grid-2" style={{ gap: '15px' }}>
                     <div>
                       <label className="input-label-premium">Fecha Sugerida</label>
                       <input type="date" className="select-premium" style={{ width: '100%' }} />

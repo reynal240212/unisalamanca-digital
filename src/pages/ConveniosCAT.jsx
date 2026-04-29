@@ -57,7 +57,7 @@ const ConveniosCAT = () => {
 
       {/* MAP & INTRO */}
       <section style={{ padding: '0 20px', marginTop: '-60px', position: 'relative', zIndex: 10 }}>
-        <div style={{ 
+        <div className="responsive-grid-asym" style={{ 
           maxWidth: '1200px', 
           margin: '0 auto', 
           background: 'white', 
@@ -99,7 +99,7 @@ const ConveniosCAT = () => {
       {/* SERVICES GRID */}
       <section style={{ padding: '100px 20px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>
+          <div className="responsive-grid-asym" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', alignItems: 'center' }}>
             
             {/* Alianzas */}
             <div style={{ background: 'white', padding: '40px', borderRadius: '24px', border: '1px solid #e2e8f0' }}>

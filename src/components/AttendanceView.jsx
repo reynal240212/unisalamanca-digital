@@ -123,8 +123,11 @@ const AttendanceView = ({ user }) => {
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {attendance.map((record) => (
-              <div key={record.id} className="attendance-row" style={{
-                display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 0.5fr', alignItems: 'center',
+              <div 
+                key={record.id} 
+                className="hover-highlight responsive-grid-asym"
+                style={{ 
+                  display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 0.5fr', alignItems: 'center',
                 padding: '16px', borderRadius: '16px', background: '#f8fafc', border: '1px solid #f1f5f9'
               }}>
                 <div>

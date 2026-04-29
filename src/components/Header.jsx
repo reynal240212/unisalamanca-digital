@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Home, User, Shield, LogIn, Mail, BookOpen, GraduationCap, Landmark, FileText } from 'lucide-react';
+import { Search, Menu, X, Home, User, Shield, LogIn, Mail, BookOpen, GraduationCap, Landmark, FileText, CreditCard } from 'lucide-react';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -11,6 +11,7 @@ const Header = () => {
         { name: 'Inicio', icon: <Home size={18} />, path: '/' },
         { name: 'Programas Académicos', icon: <GraduationCap size={18} />, path: '/programas' },
         { name: 'Admisiones', icon: <FileText size={18} />, path: '#admisiones' },
+        { name: 'Portal Financiera', icon: <CreditCard size={18} />, path: '/pagos' },
         { name: 'Institucional', icon: <Landmark size={18} />, path: '#institucional' },
         { name: 'Biblioteca Digital', icon: <BookOpen size={18} />, path: '/biblioteca' },
         { name: 'Correo Institucional', icon: <Mail size={18} />, path: 'https://www.office.com/', isExternal: true },
@@ -40,6 +41,7 @@ const Header = () => {
                 <div className="header-links-desktop">
                     <a href="https://www.office.com/" target="_blank" className="nav-service-link">Correo</a>
                     <a href="#" className="nav-service-link">SIAU</a>
+                    <span onClick={() => navigate('/pagos')} className="nav-service-link" style={{ cursor: 'pointer' }}>Pagos / Financiera</span>
                     <span onClick={() => navigate('/biblioteca')} className="nav-service-link" style={{ cursor: 'pointer' }}>Biblioteca</span>
                 </div>
 

@@ -10,7 +10,7 @@ const CharacterizationReport = ({ student, charData }) => {
         <div style={{ color: '#1e3a8a' }}>{icon}</div>
         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 900, color: '#1e3a8a', textTransform: 'uppercase' }}>{title}</h3>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+      <div className="responsive-grid-2" style={{ gap: '15px' }}>
         {children}
       </div>
     </div>

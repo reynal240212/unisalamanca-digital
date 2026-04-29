@@ -104,7 +104,7 @@ const StudentCard = () => {
       perspective: '1000px'
     }}>
       <div className="app-container" style={{ width: '100%', maxWidth: '420px', zIndex: 10 }}>
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <header className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <img src="/images/escudo.png" alt="UniSalamanca" style={{ height: '32px', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.3))' }} />
               <h2 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'white', margin: 0, letterSpacing: '-0.5px' }}>

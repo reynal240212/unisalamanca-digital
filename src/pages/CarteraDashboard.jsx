@@ -182,7 +182,7 @@ const CarteraDashboard = () => {
             </button>
 
             {/* HEADER ESTUDIANTE + KPI CARDS */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '24px', marginBottom: '40px' }}>
+            <div className="responsive-grid-asym" style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '24px', marginBottom: '40px' }}>
                <div style={{ background: 'white', padding: '32px', borderRadius: '24px', border: '1px solid #f1f5f9', boxShadow: 'var(--card-shadow)', display: 'flex', alignItems: 'center', gap: '24px' }}>
                   <div style={{ width: '70px', height: '70px', borderRadius: '20px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: '1.8rem' }}>
                     {selected.name.charAt(0)}
@@ -218,7 +218,7 @@ const CarteraDashboard = () => {
             </div>
 
             {/* ACTION BAR */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                <h3 style={{ margin: 0, fontWeight: 900, color: '#1e293b', fontSize: '1.2rem' }}>
                  Historial de Obligaciones
                </h3>
@@ -230,11 +230,11 @@ const CarteraDashboard = () => {
             {/* FORM NUEVA OBLIGACIÓN */}
             {showForm && (
               <form onSubmit={addObligation} className="section-reveal" style={{ background: 'white', borderRadius: '24px', padding: '32px', marginBottom: '32px', border: '1px solid var(--primary)', boxShadow: 'var(--premium-shadow-hover)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                    <h4 style={{ margin: 0, fontWeight: 900, color: 'var(--primary)', fontSize: '1.2rem' }}>Registrar Nueva Obligación</h4>
                    <button onClick={() => setShowForm(false)} type="button" style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>✕</button>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                <div className="responsive-grid-3" style={{ gap: '20px' }}>
                   <div style={{ gridColumn: 'span 3' }}>
                     <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>Descripción del Concepto *</label>
                     <input className="input-premium" style={{ width: '100%', padding: '14px', borderRadius: '12px' }} required

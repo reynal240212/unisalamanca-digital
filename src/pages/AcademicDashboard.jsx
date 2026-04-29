@@ -26,7 +26,7 @@ const SalmiExamAlerts = ({ schedules, periodConfig }) => {
         <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1rem', letterSpacing: '0.5px' }}>SALMI IA: INSIGHTS ACADÉMICOS</h4>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+      <div className="responsive-grid-2" style={{ gap: '16px' }}>
         <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
           <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 800 }}>Próximo Parcial</p>
           <p style={{ margin: '4px 0 0', fontWeight: 900, fontSize: '1.1rem' }}>Semana {examWeeks[0]}</p>
@@ -170,7 +170,7 @@ const ScheduleModal = ({ student, onClose, onSaved, existingSchedules = [] }) =>
   return (
     <div className="premium-modal-overlay">
       <div className="premium-modal-content" style={{ maxWidth: '600px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
             <h2 style={{ fontWeight: 900, fontSize: '1.3rem', color: '#1e293b', margin: 0 }}>Asignación Inteligente</h2>
             <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' }}>
@@ -232,7 +232,7 @@ const ScheduleModal = ({ student, onClose, onSaved, existingSchedules = [] }) =>
                           cursor: 'pointer', transition: 'all 0.2s'
                         }}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ fontWeight: 800, color: '#1e293b', fontSize: '0.85rem' }}>DOCENTE: {sec.teacher?.name || 'Por asignar'}</span>
                           <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>ID: {sec.id.slice(0,8)}</span>
                         </div>
@@ -331,7 +331,7 @@ const TeacherAssignmentModal = ({ teacher, programs, onClose, onSaved }) => {
   return (
     <div className="premium-modal-overlay">
       <div className="premium-modal-content" style={{ maxWidth: '480px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
             <h2 style={{ fontWeight: 900, fontSize: '1.3rem', color: '#1e293b', margin: 0 }}>Asignar Carga Docente</h2>
             <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' }}>Profesor: {teacher.name}</p>
@@ -452,7 +452,7 @@ const HorariosSection = ({ students }) => {
         <p style={{ color: '#64748b', marginTop: '4px' }}>Asigna y administra los horarios de los estudiantes</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '24px' }}>
+      <div className="responsive-grid-asym" style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '24px' }}>
         {/* LISTA DE ESTUDIANTES */}
         <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
           <div style={{ padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
@@ -508,7 +508,7 @@ const HorariosSection = ({ students }) => {
               <SalmiExamAlerts schedules={schedules} />
               
               <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
-              <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="dashboard-header-flex" style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h3 style={{ margin: 0, fontWeight: 900, color: '#1e293b' }}>{selectedStudent.name}</h3>
                   <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
@@ -533,7 +533,7 @@ const HorariosSection = ({ students }) => {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {schedules.map(s => (
                       <div key={s.id} style={{ background: 'white', borderRadius: '16px', padding: '16px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                        <div className="dashboard-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                           <div>
                             <h4 style={{ margin: 0, fontWeight: 800, color: '#1e293b' }}>{s.subject}</h4>
                             <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
@@ -620,14 +620,14 @@ const DocentesSection = ({ teachers, directorPrograms }) => {
 
   return (
     <div className="section-reveal">
-      <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <div className="dashboard-header-flex" style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#1e293b', margin: 0 }}>Planta Docente</h1>
           <p style={{ color: '#64748b', marginTop: '4px' }}>Gestión de carga académica institucional</p>
         </div>
       </div>
 
-      <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
+      <div className="premium-table-container" style={{ background: 'white', borderRadius: '24px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
         <table className="premium-table">
           <thead>
             <tr>
@@ -794,7 +794,7 @@ const AcademicDashboard = () => {
             {students.length} estudiante{students.length !== 1 ? 's' : ''} activo{students.length !== 1 ? 's' : ''}
             {!isCoord && myPrograms.length > 0 && ` en tus programas`}
           </p>
-          <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
+          <div className="premium-table-container" style={{ background: 'white', borderRadius: '20px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
             <table className="premium-table">
               <thead>
                 <tr>

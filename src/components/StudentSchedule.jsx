@@ -66,22 +66,23 @@ const StudentSchedule = ({ student }) => {
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{
-            width: '52px', height: '52px', borderRadius: '16px',
-            background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 8px 20px rgba(42, 34, 102, 0.2)'
-          }}>
-            <Calendar color="white" size={26} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div className="schedule-header-icon" style={{
+              width: '52px', height: '52px', borderRadius: '16px',
+              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 8px 20px rgba(42, 34, 102, 0.2)',
+              flexShrink: 0
+            }}>
+              <Calendar color="white" size={26} />
+            </div>
+            <div>
+              <h2 className="schedule-title" style={{ margin: 0, fontSize: '1.6rem', fontWeight: 900, color: 'var(--primary-dark)' }}>Mi Horario</h2>
+              <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '0.85rem' }}>
+                Período: {period} · {student?.program || 'Programa'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 900, color: 'var(--primary-dark)' }}>Mi Horario Académico</h2>
-            <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '0.85rem' }}>
-              Período: {period} · {student?.program || 'Programa no registrado'}
-            </p>
-          </div>
-        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {pdfPath && (
@@ -135,7 +136,7 @@ const StudentSchedule = ({ student }) => {
         </div>
       ) : (
         /* Grid por días */
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+        <div className="schedule-days-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
           {days.map((day) => {
             const daySubjects = schedule.filter(s =>
               s.blocks?.some(b => b.day_of_week === day)
@@ -225,6 +226,24 @@ const StudentSchedule = ({ student }) => {
           })}
         </div>
       )}
+      <style>{`
+        @media (max-width: 600px) {
+          .schedule-title {
+            font-size: 1.3rem !important;
+          }
+          .schedule-header-icon {
+            width: 42px !important;
+            height: 42px !important;
+          }
+          .schedule-header-icon svg {
+            width: 20px !important;
+            height: 20px !important;
+          }
+          .schedule-days-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

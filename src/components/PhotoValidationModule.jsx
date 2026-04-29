@@ -113,7 +113,7 @@ const PhotoValidationModule = () => {
           <p style={{ color: '#64748b' }}>No hay fotos pendientes de validación en este momento.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '25px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '25px' }}>
           {filteredUsers.map(user => (
             <div key={user.id} className="glass-card-premium" style={{ padding: '20px', borderRadius: '24px', border: '1px solid rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden' }}>
               <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
