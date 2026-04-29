@@ -229,16 +229,31 @@ const RegistroDashboard = () => {
                   {activeTab === 'caracterizacion' && (
                     <div className="section-reveal">
                       {charData ? (
-                        <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+                        <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
                             {[
-                              { label: 'Fecha Nacimiento', value: charData.birth_date },
-                              { label: 'Tipo de Sangre/RH', value: charData.blood_type },
+                              { label: 'Nombre Completo', value: charData.nombre_completo || selected.name },
+                              { label: 'Identificación', value: charData.identificacion || selected.document_id },
+                              { label: 'Tipo de Documento', value: charData.document_type },
+                              { label: 'Género', value: charData.gender },
+                              { label: 'Estado Civil', value: charData.marital_status },
+                              { label: 'Fecha de Nacimiento', value: charData.birth_date ? new Date(charData.birth_date).toLocaleDateString('es-CO') : null },
+                              { label: 'Lugar de Nacimiento', value: charData.lugar_nacimiento },
+                              { label: 'Lugar de Expedición', value: charData.lugar_expedicion },
                               { label: 'Teléfono Contacto', value: charData.phone },
-                              { label: 'Estrato Social', value: charData.estrato },
+                              { label: 'Correo', value: charData.correo || selected.email },
+                              { label: 'Estrato Social', value: charData.estrato ? `Estrato ${charData.estrato}` : null },
+                              { label: 'Barrio', value: charData.barrio },
+                              { label: 'Ciudad', value: charData.ciudad_residencia },
+                              { label: 'Departamento', value: charData.depto_residencia },
+                              { label: 'Etnia', value: charData.ethnicity },
+                              { label: 'Discapacidad', value: charData.disability },
+                              { label: '¿Víctima del conflicto?', value: charData.is_victim },
                               { label: 'Núcleo Familiar (Vive con)', value: charData.lives_with },
-                              { label: 'Educación Padres', value: charData.parent_education },
-                              { label: 'Contacto Emergencia', value: charData.emergency_contact },
-                              { label: 'Tel. Emergencia', value: charData.emergency_phone },
+                              { label: 'Nivel Educativo Padres', value: charData.parent_education },
+                              { label: '¿Tiene hijos?', value: charData.has_children },
+                              { label: 'Contacto de Emergencia', value: charData.emergency_contact },
+                              { label: 'Relación con el contacto', value: charData.emergency_relationship },
+                              { label: 'Tel. de Emergencia', value: charData.emergency_phone },
                             ].map(({ label, value }) => (
                               <div key={label}>
                                 <span style={labelStyle}>{label}</span>
@@ -263,11 +278,23 @@ const RegistroDashboard = () => {
                   {activeTab === 'bienestar' && (
                     <div className="section-reveal">
                       {charData ? (
-                        <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+                        <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
                             {[
+                              { label: 'EPS', value: charData.eps },
+                              { label: 'Caja de Compensación', value: charData.caja_compensacion },
+                              { label: 'Grupo SISBEN', value: charData.grupo_sisben },
+                              { label: 'Tipo de Sangre/RH', value: charData.blood_type },
+                              { label: 'Estrato Social', value: charData.estrato ? `Estrato ${charData.estrato}` : null },
+                              { label: 'Fuente de Ingresos', value: charData.income_source },
+                              { label: '¿Trabaja actualmente?', value: charData.is_working },
+                              { label: 'Empresa', value: charData.work_company },
+                              { label: 'Cargo', value: charData.work_role },
+                              { label: '¿Tiene computador?', value: charData.has_computer },
+                              { label: '¿Tiene Internet?', value: charData.has_internet },
+                              { label: 'Medio de transporte', value: charData.transport_mode },
                               { label: 'Colegio de Procedencia', value: charData.previous_school },
-                              { label: 'Origen de Fondos', value: charData.income_source },
-                              { label: 'Situación Laboral', value: charData.is_working },
+                              { label: 'Último Grado Aprobado', value: charData.last_degree },
+                              { label: 'Año de Graduación', value: charData.graduation_year },
                             ].map(({ label, value }) => (
                               <div key={label}>
                                 <span style={labelStyle}>{label}</span>
@@ -276,11 +303,15 @@ const RegistroDashboard = () => {
                             ))}
                             <div style={{ gridColumn: 'span 2' }}>
                               <span style={labelStyle}>Competencias Digitales</span>
-                              <span style={valueStyle}>{charData.digital_skills || 'Nivel Básico'}</span>
+                              <span style={valueStyle}>{charData.digital_skills || '—'}</span>
+                            </div>
+                            <div style={{ gridColumn: 'span 2' }}>
+                              <span style={labelStyle}>Intereses Culturales / Deportivos</span>
+                              <span style={valueStyle}>{charData.interests || '—'}</span>
                             </div>
                             <div style={{ gridColumn: 'span 2' }}>
                               <span style={labelStyle}>Observaciones Médicas / Alergias</span>
-                              <p style={{ ...valueStyle, color: charData.health_notes ? '#ef4444' : '#1e293b', background: charData.health_notes ? '#fef2f2' : 'transparent', padding: charData.health_notes ? '12px' : 0, borderRadius: '12px' }}>
+                              <p style={{ ...valueStyle, color: charData.health_notes ? '#ef4444' : '#94a3b8', background: charData.health_notes ? '#fef2f2' : '#f8fafc', padding: '12px', borderRadius: '12px', margin: 0 }}>
                                 {charData.health_notes || 'Sin novedades registradas'}
                               </p>
                             </div>
